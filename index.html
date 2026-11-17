@@ -2850,6 +2850,392 @@
       }
 
       // =========================================================================
+      // 学術英語表現ノート（保存・管理・PDF出力）システム
+      // =========================================================================
+      window.englishStudyNotes = JSON.parse(localStorage.getItem('ACADEMIC_ENGLISH_NOTES') || '[]');
+
+      function persistEnglishNotes() {
+        try {
+          localStorage.setItem('ACADEMIC_ENGLISH_NOTES', JSON.stringify(window.englishStudyNotes));
+        } catch (e) {
+          console.error('Failed to save notes:', e);
+        }
+        updateNoteCountBadge();
+      }
+
+      function updateNoteCountBadge() {
+        const badge = document.getElementById('english-note-count-badge');
+        if (badge) badge.textContent = String(window.englishStudyNotes.length);
+      }
+
+      window.addEnglishStudyNote = function(noteObj) {
+        const currentPaper = items.find(i => i.id === selectedItemId);
+        const newNote = {
+          id: 'note-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+          date: new Date().toISOString().slice(0, 10),
+          category: noteObj.category || '構文・ニュアンス',
+          pattern: noteObj.pattern || '',
+          en: noteObj.en || '',
+          ja: noteObj.ja || '',
+          analysis: noteObj.analysis || '',
+          userMemo: noteObj.userMemo || '',
+          sourcePaper: noteObj.sourcePaper || (currentPaper ? currentPaper.title_ja : '')
+        };
+        window.englishStudyNotes.unshift(newNote);
+        persistEnglishNotes();
+        if (typeof showToast === 'function') {
+          showToast('📓 英語表現ノートに保存しました');
+        }
+      };
+
+      window.saveGrammarCardToNote = function(rowId) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+        const enText = decodeURIComponent(row.dataset.enRaw || '');
+        const jaText = decodeURIComponent(row.dataset.jaRaw || '');
+        const data = window.sentenceGrammarCache ? window.sentenceGrammarCache[enText] : null;
+        if (!data) return;
+
+        const analysisSummary = [
+          `【主張の強さ】${data.claim_strength || ''}`,
+          `【時制・態】${data.tense_voice_nuance || ''}`,
+          `【助動詞・ヘッジング】${data.hedging_modality || ''}`,
+          `【英語ニュアンス】${data.japanese_learner_tips || ''}`
+        ].join('\n');
+
+        window.addEnglishStudyNote({
+          category: '構文・ニュアンス',
+          pattern: data.claim_strength || '1文精読分析',
+          en: enText,
+          ja: jaText,
+          analysis: analysisSummary
+        });
+
+        const saveBtn = document.getElementById(`save-note-btn-${rowId}`);
+        if (saveBtn) {
+          saveBtn.textContent = '✓ ノート保存済み';
+          saveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+          saveBtn.classList.add('bg-slate-700');
+        }
+      };
+
+      window.saveWritingExpressionToNote = function(encodedPattern, encodedExample, encodedNote) {
+        window.addEnglishStudyNote({
+          category: 'ライティング表現',
+          pattern: decodeURIComponent(encodedPattern || ''),
+          en: decodeURIComponent(encodedExample || ''),
+          ja: '',
+          analysis: decodeURIComponent(encodedNote || '')
+        });
+      };
+
+      window.exportNotesToPdf = function() {
+        const notes = window.englishStudyNotes || [];
+        if (notes.length === 0) {
+          alert('出力するノートがまだありません。先に英語表現や解説を保存してください。');
+          return;
+        }
+
+        const esc = (s) => String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+
+        const today = new Date().toISOString().slice(0, 10);
+        const cardsHtml = notes.map((n, idx) => `
+          <div class="note-card">
+            <div class="note-header">
+              <span class="badge">${esc(n.category)}</span>
+              <span class="meta">#${idx + 1} • ${esc(n.date)} ${n.sourcePaper ? `• 出典: ${esc(n.sourcePaper)}` : ''}</span>
+            </div>
+            ${n.pattern ? `<div class="pattern">${esc(n.pattern)}</div>` : ''}
+            ${n.en ? `<div class="en-box">${esc(n.en)}</div>` : ''}
+            ${n.ja ? `<div class="ja-box">${esc(n.ja)}</div>` : ''}
+            ${n.analysis ? `<div class="analysis-box">${esc(n.analysis)}</div>` : ''}
+            ${n.userMemo ? `<div class="memo-box"><strong>自分のメモ：</strong>${esc(n.userMemo)}</div>` : ''}
+          </div>
+        `).join('');
+
+        const printWin = window.open('', '_blank', 'width=900,height=750');
+        if (!printWin) {
+          alert('ポップアップがブロックされました。ブラウザのポップアップを許可してから再度お試しください。');
+          return;
+        }
+
+        printWin.document.write(`
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+            <meta charset="UTF-8" />
+            <title>学術英語表現・構文学習ノート (${today})</title>
+            <style>
+              @page { size: A4; margin: 16mm; }
+              body {
+                font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+                color: #1e293b;
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+              }
+              .doc-header {
+                border-bottom: 2px solid #1e3a8a;
+                padding-bottom: 10px;
+                margin-bottom: 18px;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+              }
+              .doc-title { font-size: 18px; font-weight: bold; color: #0f172a; margin: 0; }
+              .doc-sub { font-size: 11px; color: #64748b; }
+              .note-card {
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                padding: 12px 14px;
+                margin-bottom: 14px;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                background: #ffffff;
+              }
+              .note-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 6px;
+                font-size: 10px;
+              }
+              .badge {
+                background: #e0e7ff;
+                color: #1e3a8a;
+                font-weight: bold;
+                padding: 2px 8px;
+                border-radius: 4px;
+              }
+              .meta { color: #64748b; }
+              .pattern {
+                font-family: Consolas, Monaco, monospace;
+                font-size: 12px;
+                font-weight: bold;
+                color: #312e81;
+                background: #f8fafc;
+                padding: 4px 8px;
+                border-left: 3px solid #4f46e5;
+                margin-bottom: 6px;
+              }
+              .en-box {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                color: #0f172a;
+                font-weight: 500;
+                margin-bottom: 4px;
+              }
+              .ja-box {
+                font-size: 11px;
+                color: #475569;
+                margin-bottom: 6px;
+              }
+              .analysis-box {
+                font-size: 11px;
+                background: #f1f5f9;
+                padding: 8px 10px;
+                border-radius: 6px;
+                color: #334155;
+              }
+              .memo-box {
+                font-size: 11px;
+                background: #fefce8;
+                border: 1px solid #fde047;
+                padding: 6px 10px;
+                border-radius: 6px;
+                margin-top: 6px;
+                color: #713f12;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="doc-header">
+              <div>
+                <h1 class="doc-title">📓 学術英語表現・構文ニュアンス学習ノート</h1>
+                <div class="doc-sub">NeuroCardio & Koopman Research Hub — Academic English Study Log</div>
+              </div>
+              <div class="doc-sub">出力日: ${today} / 全 ${notes.length} 件</div>
+            </div>
+            ${cardsHtml}
+            <script>
+              window.onload = function() {
+                setTimeout(function() { window.print(); }, 250);
+              };
+            <\/script>
+          </body>
+          </html>
+        `);
+        printWin.document.close();
+      };
+
+      function setupEnglishNoteUI() {
+        if (document.getElementById('open-english-note-btn')) return;
+
+        // 画面右下に「英語表現ノート」ボタンを追加（PDF解読ボタンのすぐ上）
+        const noteBtn = document.createElement('button');
+        noteBtn.id = 'open-english-note-btn';
+        noteBtn.className = 'fixed bottom-20 right-6 z-40 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold px-5 py-2.5 rounded-full shadow-xl border border-indigo-700 flex items-center gap-2 transition cursor-pointer text-sm';
+        noteBtn.innerHTML = `📓 英語表現ノート <span id="english-note-count-badge" class="bg-indigo-600 text-white text-xs font-extrabold px-2 py-0.5 rounded-full">${window.englishStudyNotes.length}</span>`;
+        document.body.appendChild(noteBtn);
+
+        const modal = document.createElement('div');
+        modal.id = 'english-note-modal';
+        modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6';
+        modal.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200 overflow-hidden">
+            <!-- ヘッダー -->
+            <div class="flex flex-wrap items-center justify-between gap-2 px-6 py-4 bg-slate-900 text-white">
+              <div>
+                <h3 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+                  <span>📓 学術英語表現・構文ニュアンス学習ノート</span>
+                </h3>
+                <p class="text-[11px] text-slate-300">論文精読で学んだ表現・時制/助動詞の使い分けを蓄積し、PDF出力できます</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="export-notes-pdf-btn" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition cursor-pointer">
+                  🖨️ ノートをPDF出力
+                </button>
+                <button id="close-english-note-modal" class="text-slate-300 hover:text-white text-2xl leading-none px-2 cursor-pointer">&times;</button>
+              </div>
+            </div>
+
+            <!-- 新規メモ追加フォーム（折りたたみ式） -->
+            <div class="px-6 py-3 bg-indigo-50/70 border-b border-indigo-100">
+              <button id="toggle-new-note-form" class="text-xs font-extrabold text-indigo-900 hover:text-indigo-700 flex items-center gap-1 cursor-pointer">
+                <span>＋ 学んだ英語表現・自作メモを直接追加する</span>
+              </button>
+              <div id="new-note-form-body" class="hidden mt-3 space-y-2.5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <select id="nn-category" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                    <option value="ライティング表現">ライティング表現</option>
+                    <option value="構文・ニュアンス">構文・ニュアンス</option>
+                    <option value="時制・助動詞メモ">時制・助動詞メモ</option>
+                  </select>
+                  <input id="nn-pattern" type="text" placeholder="表現パターン（例: X may account for Y）" class="sm:col-span-2 px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                </div>
+                <input id="nn-en" type="text" placeholder="英文例（例: Vagal tone may modulate cortical complexity.）" class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                <textarea id="nn-analysis" rows="2" placeholder="解説・ニュアンス・使い方のメモ" class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"></textarea>
+                <div class="flex justify-end">
+                  <button id="nn-submit-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer">ノートに保存</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 検索・フィルタバー -->
+            <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center gap-2">
+              <input id="note-search-input" type="text" placeholder="キーワードでノート内検索..." class="flex-1 min-w-[180px] px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+              <select id="note-filter-cat" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                <option value="ALL">すべてのカテゴリ</option>
+                <option value="構文・ニュアンス">構文・ニュアンス</option>
+                <option value="ライティング表現">ライティング表現</option>
+                <option value="時制・助動詞メモ">時制・助動詞メモ</option>
+              </select>
+            </div>
+
+            <!-- ノート一覧コンテナ -->
+            <div id="english-notes-list" class="p-6 overflow-y-auto space-y-4 flex-1 bg-slate-100/60"></div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        function renderEnglishNotesList() {
+          const listEl = document.getElementById('english-notes-list');
+          if (!listEl) return;
+          const q = (document.getElementById('note-search-input')?.value || '').toLowerCase().trim();
+          const cat = document.getElementById('note-filter-cat')?.value || 'ALL';
+
+          const filtered = (window.englishStudyNotes || []).filter(n => {
+            if (cat !== 'ALL' && n.category !== cat) return false;
+            if (q) {
+              const hay = [n.pattern, n.en, n.ja, n.analysis, n.userMemo, n.sourcePaper].join(' ').toLowerCase();
+              if (!hay.includes(q)) return false;
+            }
+            return true;
+          });
+
+          if (filtered.length === 0) {
+            listEl.innerHTML = `
+              <div class="text-center py-12 text-slate-500 text-xs sm:text-sm">
+                保存されたノートがありません。<br>
+                精読画面の「🔬 解説」パネルや「✍️ ライティング表現」の「📓 ノートに保存」ボタンから追加できます。
+              </div>
+            `;
+            return;
+          }
+
+          listEl.innerHTML = filtered.map(n => `
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 text-indigo-900">${escapeHtmlSafe(n.category)}</span>
+                  <span class="text-[11px] text-slate-400">${escapeHtmlSafe(n.date)}</span>
+                  ${n.sourcePaper ? `<span class="text-[11px] text-slate-500 truncate max-w-[260px]">• ${escapeHtmlSafe(n.sourcePaper)}</span>` : ''}
+                </div>
+                <button onclick="deleteEnglishNote('${n.id}')" class="text-xs text-slate-400 hover:text-red-600 cursor-pointer" title="削除">🗑 削除</button>
+              </div>
+              ${n.pattern ? `<div class="font-mono text-xs font-bold text-indigo-800 bg-indigo-50/70 px-2.5 py-1 rounded border border-indigo-100">${escapeHtmlSafe(n.pattern)}</div>` : ''}
+              ${n.en ? `<div class="text-xs sm:text-sm font-medium text-slate-900 font-sans leading-relaxed">${escapeHtmlSafe(n.en)}</div>` : ''}
+              ${n.ja ? `<div class="text-xs text-slate-600 leading-relaxed">${escapeHtmlSafe(n.ja)}</div>` : ''}
+              ${n.analysis ? `<div class="text-xs text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-200/80 whitespace-pre-line leading-relaxed">${escapeHtmlSafe(n.analysis)}</div>` : ''}
+              <div class="pt-1">
+                <input
+                  type="text"
+                  value="${escapeHtmlSafe(n.userMemo || '')}"
+                  onchange="updateEnglishNoteMemo('${n.id}', this.value)"
+                  placeholder="✏️ 自分用の補足メモ・言い換えアイデアを入力（自動保存）..."
+                  class="w-full px-3 py-1.5 text-xs bg-amber-50/60 border border-amber-200/80 rounded-lg text-slate-800 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+            </div>
+          `).join('');
+        }
+
+        window.deleteEnglishNote = function(noteId) {
+          window.englishStudyNotes = window.englishStudyNotes.filter(n => n.id !== noteId);
+          persistEnglishNotes();
+          renderEnglishNotesList();
+        };
+
+        window.updateEnglishNoteMemo = function(noteId, val) {
+          const target = window.englishStudyNotes.find(n => n.id === noteId);
+          if (target) {
+            target.userMemo = val;
+            persistEnglishNotes();
+          }
+        };
+
+        noteBtn.onclick = () => {
+          renderEnglishNotesList();
+          modal.classList.remove('hidden');
+        };
+        document.getElementById('close-english-note-modal').onclick = () => modal.classList.add('hidden');
+        document.getElementById('export-notes-pdf-btn').onclick = () => window.exportNotesToPdf();
+        document.getElementById('note-search-input').oninput = renderEnglishNotesList;
+        document.getElementById('note-filter-cat').onchange = renderEnglishNotesList;
+
+        document.getElementById('toggle-new-note-form').onclick = () => {
+          document.getElementById('new-note-form-body').classList.toggle('hidden');
+        };
+        document.getElementById('nn-submit-btn').onclick = () => {
+          const cat = document.getElementById('nn-category').value;
+          const pattern = document.getElementById('nn-pattern').value.trim();
+          const en = document.getElementById('nn-en').value.trim();
+          const analysis = document.getElementById('nn-analysis').value.trim();
+          if (!pattern && !en && !analysis) return;
+
+          window.addEnglishStudyNote({ category: cat, pattern, en, analysis });
+          document.getElementById('nn-pattern').value = '';
+          document.getElementById('nn-en').value = '';
+          document.getElementById('nn-analysis').value = '';
+          renderEnglishNotesList();
+        };
+      }
+
+      // =========================================================================
       // 1文ごとの学術英語ニュアンス・時制・助動詞・構文分解エンジン
       // =========================================================================
       window.sentenceGrammarCache = JSON.parse(localStorage.getItem('SENTENCE_GRAMMAR_CACHE') || '{}');
@@ -2862,7 +3248,7 @@
           .replace(/"/g, '&quot;');
       }
 
-      function renderGrammarAnalysisHTML(data) {
+      function renderGrammarAnalysisHTML(data, rowId) {
         const chunks = Array.isArray(data.chunk_breakdown) ? data.chunk_breakdown : [];
         const chunksHTML = chunks.map(c => `
           <div class="inline-flex flex-col bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-2xs">
@@ -2873,16 +3259,24 @@
 
         return `
           <div class="rounded-xl border border-indigo-200 bg-gradient-to-br from-slate-50 via-indigo-50/40 to-white p-4 space-y-3 text-xs sm:text-[13px] shadow-xs">
-            <div class="flex items-center justify-between border-b border-indigo-100 pb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100 pb-2">
               <span class="font-extrabold text-indigo-950 flex items-center gap-1.5">
                 <span>🔬 学術英語・構文＆ニュアンス精密分解</span>
               </span>
-              <span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
-                ${escapeHtmlSafe(data.claim_strength || '学術表現分析')}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  ${escapeHtmlSafe(data.claim_strength || '学術表現分析')}
+                </span>
+                ${rowId ? `
+                  <button
+                    id="save-note-btn-${rowId}"
+                    onclick="saveGrammarCardToNote('${rowId}')"
+                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition cursor-pointer"
+                  >📓 この解説をノートに保存</button>
+                ` : ''}
+              </div>
             </div>
 
-            <!-- チャンク・構文分解 -->
             <div>
               <div class="text-[11px] font-extrabold text-slate-600 mb-1.5">🧩 構文・意味のカタマリ分解（スラッシュリーディング）</div>
               <div class="flex flex-wrap items-stretch gap-1.5">
@@ -2890,7 +3284,6 @@
               </div>
             </div>
 
-            <!-- 3カラム詳細解説：時制・態 / 助動詞・ヘッジング / 日本人向け執筆ニュアンス -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1">
               <div class="bg-white rounded-lg border border-slate-200/90 p-3">
                 <div class="text-[11px] font-extrabold text-blue-900 mb-1">⏱️ 時制・態の意図</div>
@@ -2915,7 +3308,6 @@
         const btn = document.getElementById(`grammar-btn-${rowId}`);
         if (!row || !panel) return;
 
-        // すでに開いている場合は閉じる
         if (!panel.classList.contains('hidden')) {
           panel.classList.add('hidden');
           if (btn) btn.classList.remove('bg-indigo-600', 'text-white');
@@ -2929,9 +3321,8 @@
         panel.classList.remove('hidden');
         if (btn) btn.classList.add('bg-indigo-600', 'text-white');
 
-        // キャッシュがあれば即座に表示
         if (window.sentenceGrammarCache[enText]) {
-          panel.innerHTML = renderGrammarAnalysisHTML(window.sentenceGrammarCache[enText]);
+          panel.innerHTML = renderGrammarAnalysisHTML(window.sentenceGrammarCache[enText], rowId);
           return;
         }
 
@@ -3027,7 +3418,6 @@ ${jaText}
 
           window.sentenceGrammarCache[enText] = parsed;
           try {
-            // キャッシュは最新60文まで保持
             const keys = Object.keys(window.sentenceGrammarCache);
             if (keys.length > 60) {
               delete window.sentenceGrammarCache[keys[0]];
@@ -3035,7 +3425,7 @@ ${jaText}
             localStorage.setItem('SENTENCE_GRAMMAR_CACHE', JSON.stringify(window.sentenceGrammarCache));
           } catch (_) {}
 
-          panel.innerHTML = renderGrammarAnalysisHTML(parsed);
+          panel.innerHTML = renderGrammarAnalysisHTML(parsed, rowId);
         } catch (err) {
           panel.innerHTML = `
             <div class="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800">
@@ -3144,7 +3534,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // 全文精読ビュー制御（PDF解読済みのみ表示・1文連動・1文学術解説ボタン付き）
+      // 全文精読ビュー制御（PDF解読済みのみ表示・1文連動・1文学術解説・ノート保存付き）
       // =========================================================================
       window.getFullTextSections = function(item) {
         if (!item || !item.pdfDecoded) return [];
@@ -3230,7 +3620,6 @@ ${jaText}
                         onmouseleave="highlightPair('${rowId}', false)"
                         class="bilingual-pair-row grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 rounded-xl p-2 -mx-2 transition-colors duration-150 hover:bg-indigo-50/80"
                       >
-                        <!-- 左カラム：1文ごとの日本語訳 -->
                         <div class="ja-col-wrapper">
                           <div class="ja-cell h-full rounded-lg border border-slate-200/80 bg-white px-3.5 py-2.5 text-sm sm:text-[15px] text-slate-800 leading-relaxed">
                             <span class="inline-block text-[10px] font-mono font-bold text-slate-400 mr-1.5">[${pIdx + 1}-${sentIdx + 1}]</span>
@@ -3238,7 +3627,6 @@ ${jaText}
                           </div>
                         </div>
 
-                        <!-- 右カラム：1文ごとの英語原文 ＋ 読み上げアイコン＆その下に構文・ニュアンス分解ボタン -->
                         <div class="en-col-wrapper">
                           <div class="en-cell h-full rounded-lg border border-slate-200/80 bg-white px-3.5 py-2.5 text-sm sm:text-[15px] text-slate-900 leading-relaxed font-sans flex items-start justify-between gap-2.5">
                             <div class="en-text-content flex-1">
@@ -3260,7 +3648,6 @@ ${jaText}
                           </div>
                         </div>
 
-                        <!-- 1文ごとの学術英語分解ドロワー（クリック時に展開） -->
                         <div id="grammar-panel-${rowId}" class="hidden col-span-1 lg:col-span-2 mt-0.5"></div>
                       </div>
                     `;
@@ -3331,10 +3718,18 @@ ${jaText}
                       ${sec.writing_expressions
                         .map(
                           (exp) => `
-                          <div class="bg-white rounded-xl border border-indigo-100 p-3.5 text-xs">
-                            <div class="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded mb-1.5">${exp.pattern}</div>
-                            <p class="text-slate-800 italic mb-1.5">"${exp.example}"</p>
-                            <p class="text-slate-600 leading-relaxed">${exp.note}</p>
+                          <div class="bg-white rounded-xl border border-indigo-100 p-3.5 text-xs flex flex-col justify-between gap-2">
+                            <div>
+                              <div class="flex items-start justify-between gap-2 mb-1.5">
+                                <div class="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded flex-1">${exp.pattern}</div>
+                                <button
+                                  onclick="saveWritingExpressionToNote('${encodeURIComponent(exp.pattern || '')}', '${encodeURIComponent(exp.example || '')}', '${encodeURIComponent(exp.note || '')}')"
+                                  class="shrink-0 px-2 py-1 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition cursor-pointer"
+                                >📓 ノートに保存</button>
+                              </div>
+                              <p class="text-slate-800 italic mb-1.5">"${exp.example}"</p>
+                              <p class="text-slate-600 leading-relaxed">${exp.note}</p>
+                            </div>
                           </div>
                         `
                         )
@@ -3990,6 +4385,7 @@ ${rawPdfText.slice(0, 65000)}
 
       initApp();
       setupVocabPopup();
+      setupEnglishNoteUI();
       setupPdfDecoderUI();
       loadRemoteManifest();
       setTimeout(() => renderMathInTarget(document.body), 350);
