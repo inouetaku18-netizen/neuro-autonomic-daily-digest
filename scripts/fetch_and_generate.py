@@ -14,28 +14,33 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 NCBI_EMAIL = "research-digest@example.com"
 
 # =========================================================================
-# 1. 研究トラック定義（PubMed Central Open Access Subset 直接検索）
+# 1. 毎日取得する5分野の研究トラック定義（すべて PMC Open Access 限定）
 # =========================================================================
-RESEARCH_TRACKS = [
+DAILY_RESEARCH_TRACKS = [
     {
-        "category": "point_process",
-        "category_label": "点過程・脳心臓連関",
-        "query": '("brain-heart" OR "point process" OR "heart rate variability") AND ("electroencephalography" OR "autonomic" OR "interplay") AND "open access"[filter]'
+        "category": "brain",
+        "category_label": "① 脳・神経ダイナミクス",
+        "query": '("electroencephalography" OR "neural dynamics" OR "cortical oscillations") AND ("sample entropy" OR "complexity" OR "nonlinear" OR "synchronization") AND "open access"[filter]'
     },
     {
-        "category": "rc_koopman",
-        "category_label": "RC + Koopman制御",
-        "query": '("Koopman operator" OR "reservoir computing") AND ("dynamical systems" OR "control" OR "physiological" OR "neural") AND "open access"[filter]'
+        "category": "heart",
+        "category_label": "② 心臓・非線形HRV",
+        "query": '("heart rate variability" OR "baroreflex" OR "cardiac autonomic") AND ("sample entropy" OR "Poincare plot" OR "surrogate data" OR "nonlinear") AND "open access"[filter]'
     },
     {
-        "category": "nonlinear_hrv",
-        "category_label": "HRV・非線形時系列解析",
-        "query": '("sample entropy" OR "Poincare plot" OR "surrogate data") AND ("heart rate variability" OR "autonomic nervous system") AND "open access"[filter]'
+        "category": "brain_heart",
+        "category_label": "③ 脳-心臓連関・迷走神経",
+        "query": '("brain-heart" OR "central autonomic network" OR "vagus nerve" OR "gut-brain axis") AND ("heart rate variability" OR "electroencephalography" OR "interoceptive") AND "open access"[filter]'
     },
     {
-        "category": "gut_brain",
-        "category_label": "脳腸相関・迷走神経",
-        "query": '("vagus nerve" OR "gut-brain axis") AND ("autonomic" OR "heart rate variability" OR "interoceptive") AND "open access"[filter]'
+        "category": "ai_control",
+        "category_label": "④ AI・数理神経制御",
+        "query": '("Koopman operator" OR "reservoir computing" OR "closed-loop control" OR "state-space model") AND ("neural" OR "autonomic" OR "physiological" OR "dynamical systems") AND "open access"[filter]'
+    },
+    {
+        "category": "clinical",
+        "category_label": "⑤ 臨床応用・バイオマーカー",
+        "query": '("prodromal Alzheimer" OR "dementia" OR "epilepsy" OR "vagus nerve stimulation" OR "locus coeruleus") AND ("autonomic" OR "heart rate variability" OR "biomarker") AND "open access"[filter]'
     }
 ]
 
@@ -113,7 +118,7 @@ def sanitize_svg(svg_str: str, min_height: int = 220) -> str:
     return match.group(0) if match else svg_str
 
 
-def search_pmc_open_access(query: str, max_results: int = 30) -> List[str]:
+def search_pmc_open_access(query: str, max_results: int = 35) -> List[str]:
     """PubMed Central (db=pmc) から Open Access Subset の PMCID リストを取得する"""
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     params = {
@@ -146,7 +151,6 @@ def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, s
     if article is None:
         return None
 
-    # ID抽出（PMIDとDOIが両方揃っている査読論文のみ許可）
     pmid = ""
     doi = ""
     pmcid_str = f"PMC{numeric_pmcid}"
@@ -163,7 +167,6 @@ def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, s
     if not pmid or not doi:
         return None
 
-    # タイトル・ジャーナル名・アブストラクト抽出
     title_el = article.find(".//article-meta/title-group/article-title")
     title_en = " ".join("".join(title_el.itertext()).split()) if title_el is not None else ""
     if not title_en:
@@ -181,7 +184,6 @@ def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, s
             abstract_parts.append(txt)
     abstract = "\n".join(abstract_parts)
 
-    # 本文（<body>）のセクション・段落抽出
     body = article.find(".//body")
     if body is None:
         return None
@@ -243,7 +245,6 @@ def get_active_client_and_model():
 
     for candidate in preferred:
         if candidate in available:
-            print(f"Selected Gemini model: {candidate}")
             return client, candidate
 
     flash_models = sorted(
@@ -251,18 +252,15 @@ def get_active_client_and_model():
         reverse=True
     )
     if flash_models:
-        print(f"Selected Gemini model (auto-flash): {flash_models[0]}")
         return client, flash_models[0]
 
     return client, "gemini-3.8-flash"
 
 
-def generate_daily_paper_json(meta: dict, full_text: str, track: dict, today_str: str) -> dict:
-    client, model_name = get_active_client_and_model()
-
+def generate_daily_paper_json(client, model_name: str, meta: dict, full_text: str, track: dict, today_str: str) -> dict:
     prompt = f"""
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル編集者です。
-以下は PubMed Central (PMC) から実際に取得された Open Access 査読済み論文のメタデータおよびフルテキスト原文です。
+以下は PubMed Central (PMC) から実際に取得された Open Access 査読済み論文（分野：{track['category_label']}）のメタデータおよびフルテキスト原文です。
 
 【厳守ルール（捏造・ハルシネーションの完全禁止）】
 1. `sections` 内の各パラグラフの `en` フィールドには、**下記の【PMC Full Text 原文】に実際に書かれている英文パラグラフを一字一句改変・創作せずそのまま引用**してください。元の論文に存在しない英文を作ることは厳禁です。
@@ -332,8 +330,7 @@ Journal: {meta['journal']}
     }
 
 
-def generate_clinical_review_json(papers_meta: List[dict], review_topic: dict, today_str: str) -> dict:
-    client, model_name = get_active_client_and_model()
+def generate_clinical_review_json(client, model_name: str, papers_meta: List[dict], review_topic: dict, today_str: str) -> dict:
     papers_text = "\n\n".join([
         f"[{i+1}] PMID: {m['pmid']} | PMCID: {m['pmcid']} | DOI: {m['doi']}\nTitle: {m['title_en']}\nJournal: {m['journal']}\nAbstract: {m['abstract']}"
         for i, m in enumerate(papers_meta)
@@ -368,7 +365,7 @@ def generate_clinical_review_json(papers_meta: List[dict], review_topic: dict, t
 
 
 # =========================================================================
-# 5. メイン実行フロー
+# 5. メイン実行フロー（全5分野から1本ずつ＝計5本取得）
 # =========================================================================
 def main():
     jst = datetime.timezone(datetime.timedelta(hours=9))
@@ -386,43 +383,19 @@ def main():
         manifest = {"papers": [], "reviews": [], "processed_pmids": []}
 
     processed_set = set(manifest.get("processed_pmids", []))
+    client, model_name = get_active_client_and_model()
+    print(f"Using Gemini model: {model_name}")
 
-    if now.weekday() == 6:
-        topic = CLINICAL_REVIEW_TOPICS[now.isocalendar()[1] % len(CLINICAL_REVIEW_TOPICS)]
-        pmc_ids = search_pmc_open_access(topic["query"], max_results=20)
-        metas = []
-        for num_id in pmc_ids:
-            res = fetch_pmc_article_and_fulltext(num_id)
-            if res:
-                metas.append(res[0])
-            if len(metas) >= 4:
-                break
-            time.sleep(0.4)
-
-        if metas:
-            review_data = generate_clinical_review_json(metas, topic, today_str)
-            out_path = f"data/reviews/{today_str}.json"
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(review_data, f, ensure_ascii=False, indent=2)
-            manifest["reviews"] = [r for r in manifest["reviews"] if r["id"] != review_data["id"]]
-            manifest["reviews"].insert(0, {
-                "id": review_data["id"],
-                "date": today_str,
-                "path": out_path,
-                "title_ja": review_data["title_ja"]
-            })
-    else:
-        start_idx = now.timetuple().tm_yday % len(RESEARCH_TRACKS)
-        ordered_tracks = RESEARCH_TRACKS[start_idx:] + RESEARCH_TRACKS[:start_idx]
-
-        selected_track = None
-        selected_meta = None
-        selected_full_text = None
-
-        for track in ordered_tracks:
-            print(f"Searching PMC Open Access papers for track: {track['category_label']}")
-            pmc_ids = search_pmc_open_access(track["query"], max_results=30)
+    # 5つの研究分野すべてを順番に巡回し、各分野1本ずつ（計5本）取得する
+    generated_count = 0
+    for idx, track in enumerate(DAILY_RESEARCH_TRACKS):
+        print(f"\n--- [{idx+1}/{len(DAILY_RESEARCH_TRACKS)}] Track: {track['category_label']} ---")
+        try:
+            pmc_ids = search_pmc_open_access(track["query"], max_results=35)
             print(f"Found {len(pmc_ids)} candidate PMCIDs")
+
+            selected_meta = None
+            selected_full_text = None
 
             for num_id in pmc_ids:
                 time.sleep(0.4)
@@ -432,36 +405,82 @@ def main():
                 meta, full_text = res
                 if meta["pmid"] in processed_set:
                     continue
-                selected_track = track
                 selected_meta = meta
                 selected_full_text = full_text
                 print(f"Verified Open Access paper: PMID={meta['pmid']}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
                 break
 
-            if selected_meta:
-                break
+            if not selected_meta or not selected_full_text:
+                print(f"Warning: No new paper found for {track['category_label']}, skipping.")
+                continue
 
-        if not selected_meta or not selected_full_text or not selected_track:
-            raise RuntimeError("No new PMC Open Access full-text paper found across all tracks.")
+            paper_data = generate_daily_paper_json(client, model_name, selected_meta, selected_full_text, track, today_str)
+            out_path = f"data/papers/{today_str}-{selected_meta['pmid']}.json"
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(paper_data, f, ensure_ascii=False, indent=2)
 
-        paper_data = generate_daily_paper_json(selected_meta, selected_full_text, selected_track, today_str)
-        out_path = f"data/papers/{today_str}-{selected_meta['pmid']}.json"
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump(paper_data, f, ensure_ascii=False, indent=2)
+            manifest["papers"] = [p for p in manifest["papers"] if p["id"] != paper_data["id"]]
+            manifest["papers"].insert(0, {
+                "id": paper_data["id"],
+                "date": today_str,
+                "category": track["category"],
+                "category_label": track["category_label"],
+                "path": out_path,
+                "title_ja": paper_data["title_ja"]
+            })
+            processed_set.add(selected_meta["pmid"])
+            generated_count += 1
 
-        manifest["papers"] = [p for p in manifest["papers"] if p["id"] != paper_data["id"]]
-        manifest["papers"].insert(0, {
-            "id": paper_data["id"],
-            "date": today_str,
-            "path": out_path,
-            "title_ja": paper_data["title_ja"]
-        })
-        processed_set.add(selected_meta["pmid"])
-        manifest["processed_pmids"] = list(processed_set)
+            # 1分野ごとにmanifestを保存（途中経過の保護）
+            manifest["processed_pmids"] = list(processed_set)
+            with open(manifest_path, "w", encoding="utf-8") as f:
+                json.dump(manifest, f, ensure_ascii=False, indent=2)
 
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=2)
-    print("Successfully updated manifest.json")
+            # Gemini API無料枠のレート制限（RPM）を回避するため15秒待機
+            if idx < len(DAILY_RESEARCH_TRACKS) - 1:
+                print("Waiting 15s to respect Gemini API rate limits...")
+                time.sleep(15)
+
+        except Exception as e:
+            print(f"Error processing track {track['category_label']}: {e}")
+            time.sleep(15)
+            continue
+
+    # 日曜日の場合は追加で臨床横断レビューも生成
+    if now.weekday() == 6:
+        try:
+            topic = CLINICAL_REVIEW_TOPICS[now.isocalendar()[1] % len(CLINICAL_REVIEW_TOPICS)]
+            pmc_ids = search_pmc_open_access(topic["query"], max_results=20)
+            metas = []
+            for num_id in pmc_ids:
+                res = fetch_pmc_article_and_fulltext(num_id)
+                if res:
+                    metas.append(res[0])
+                if len(metas) >= 4:
+                    break
+                time.sleep(0.4)
+
+            if metas:
+                review_data = generate_clinical_review_json(client, model_name, metas, topic, today_str)
+                out_path = f"data/reviews/{today_str}.json"
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(review_data, f, ensure_ascii=False, indent=2)
+                manifest["reviews"] = [r for r in manifest["reviews"] if r["id"] != review_data["id"]]
+                manifest["reviews"].insert(0, {
+                    "id": review_data["id"],
+                    "date": today_str,
+                    "path": out_path,
+                    "title_ja": review_data["title_ja"]
+                })
+                with open(manifest_path, "w", encoding="utf-8") as f:
+                    json.dump(manifest, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"Error generating Sunday review: {e}")
+
+    if generated_count == 0:
+        raise RuntimeError("Failed to generate any papers across all 5 tracks.")
+
+    print(f"\nCompleted! Successfully generated {generated_count} papers today.")
 
 
 if __name__ == "__main__":
