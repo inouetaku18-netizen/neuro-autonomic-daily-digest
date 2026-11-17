@@ -2734,33 +2734,50 @@
           const res = await fetch('./data/manifest.json?t=' + Date.now());
           if (!res.ok) return;
           const manifest = await res.json();
+          let updated = false;
 
           if (Array.isArray(manifest.papers)) {
-            for (const item of manifest.papers) {
+            // 古い順にunshiftすることで最新が先頭に来るようにする
+            for (const item of [...manifest.papers].reverse()) {
               if (state.papers.some(p => p.id === item.id)) continue;
-              const pRes = await fetch('./' + item.path);
+              const pRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (pRes.ok) {
                 const pData = await pRes.json();
                 state.papers.unshift(pData);
+                updated = true;
               }
             }
           }
           if (Array.isArray(manifest.reviews)) {
-            for (const item of manifest.reviews) {
+            for (const item of [...manifest.reviews].reverse()) {
               if (state.reviews.some(r => r.id === item.id)) continue;
-              const rRes = await fetch('./' + item.path);
+              const rRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (rRes.ok) {
                 const rData = await rRes.json();
                 state.reviews.unshift(rData);
+                updated = true;
               }
             }
           }
+
+          if (updated) {
+            if (typeof renderFeed === 'function') renderFeed();
+            if (typeof renderReviews === 'function') renderReviews();
+            if (typeof renderArchive === 'function') renderArchive();
+            if (typeof renderPapers === 'function') renderPapers();
+            const activeCatBtn = document.querySelector('[data-category].bg-blue-900, .category-btn.active, [data-tab="feed"]');
+            if (activeCatBtn) activeCatBtn.click();
+            setTimeout(() => {
+              if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
+            }, 200);
+          }
         } catch (e) {
-          console.log('Running in standalone local mode.');
+          console.error('Manifest load error:', e);
         }
       }
 
-      loadRemoteManifest().then(() => initApp());
+      initApp();
+      loadRemoteManifest();
       setTimeout(() => renderMathInTarget(document.body), 350);
     });
   </script>
