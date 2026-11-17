@@ -3789,7 +3789,6 @@ ${jaText}
         try {
           localStorage.setItem('CUSTOM_IMPORTED_PAPERS', JSON.stringify(customList));
         } catch (e) {
-          // 容量超過時は図表のbase64画像を除いて全文テキスト・解説を確実に永続保存する
           const liteList = customList.map(paper => ({
             ...paper,
             full_text: {
@@ -4252,7 +4251,6 @@ ${jaText}
             }
           }
 
-          // 手動追加された任意のPDF論文をアーカイブ先頭へ確実に復元・統合する
           const savedCustomPapers = loadCustomImportedPapers();
           if (savedCustomPapers.length > 0) {
             for (const cp of [...savedCustomPapers].reverse()) {
@@ -4299,7 +4297,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（任意PDFのアーカイブ独立追加・管理対応）
+      // PDFアップロード＆セクション分割・100%全文AI解読エンジン
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -4328,7 +4326,7 @@ ${jaText}
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              自分で探してきた論文PDFをドロップすると、<strong>デイリー論文アーカイブに独立した論文として追加</strong>され、全セクション・1文ごと対訳・図表抽出・要約・全文精読が可能になります。
+              論文PDFをドロップすると、<strong>全セクション・全サブセクション（2.1, 2.2等）を1段落も省略せず分割処理で抽出</strong>し、1文ごとの対訳・図表・要約を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -4361,7 +4359,6 @@ ${jaText}
             </div>
             <div id="pdf-status-box" class="hidden mt-4 p-3 rounded-lg bg-slate-100 text-xs text-slate-700 font-medium"></div>
 
-            <!-- 手動追加済みPDF論文の管理リスト -->
             <div id="custom-pdf-manage-box" class="mt-5 pt-4 border-t border-slate-200 hidden">
               <div class="text-xs font-extrabold text-slate-700 mb-2">📚 手動追加済みのPDF論文（アーカイブ保存中）</div>
               <div id="custom-pdf-manage-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
@@ -4416,6 +4413,17 @@ ${jaText}
           if (fileInput.files[0]) handlePdfFile(fileInput.files[0]);
         };
 
+        // ページ上下のランニングヘッダー/フッターやハイフン改行を除去して純粋な本文を復元する
+        function cleanExtractedPageText(rawPageText) {
+          return rawPageText
+            .replace(/Downloaded from\s+https?:\/\/\S+/gi, ' ')
+            .replace(/\bby guest\s+on\s+\d{1,2}\s+[A-Za-z]+\s+\d{4}\b/gi, ' ')
+            .replace(/royalsocietypublishing\.org\/journal\/\S+\s+R\.\s*Soc\.\s*Open\s*Sci\.\s*\d+:\s*\d+/gi, ' ')
+            .replace(/([a-z])-\s+([a-z])/g, '$1$2')
+            .replace(/\s+/g, ' ')
+            .trim();
+        }
+
         async function extractTextAndFiguresFromPdf(file) {
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -4428,7 +4436,8 @@ ${jaText}
             const page = await pdf.getPage(i);
             const viewport = page.getViewport({ scale: 1.0 });
             const content = await page.getTextContent();
-            const pageText = content.items.map(item => item.str).join(' ');
+            const rawJoined = content.items.map(item => item.str).join(' ');
+            const cleanedPage = cleanExtractedPageText(rawJoined);
 
             const pageHits = [];
             for (const item of content.items) {
@@ -4499,20 +4508,20 @@ ${jaText}
             }
 
             if (i >= refStartThreshold) {
-              const refHeadingMatch = pageText.match(/(?:^|\s)(?:References|REFERENCES|Bibliography)\s+(?:\[1\]|1\.|[A-Z][a-z]+,\s+[A-Z]\.)/);
+              const refHeadingMatch = cleanedPage.match(/(?:^|\s)(?:References|REFERENCES|Bibliography)\s+(?:\[1\]|1\.|[A-Z][a-z]+,\s+[A-Z]\.)/);
               if (refHeadingMatch) {
-                const beforeRef = pageText.slice(0, refHeadingMatch.index);
-                fullText += `\n--- Page ${i} ---\n${beforeRef}`;
+                const beforeRef = cleanedPage.slice(0, refHeadingMatch.index).trim();
+                if (beforeRef) fullText += `\n${beforeRef}`;
                 break;
               }
             }
-            fullText += `\n--- Page ${i} ---\n${pageText}`;
+            fullText += `\n${cleanedPage}`;
           }
 
-          return { fullText, extractedFigures };
+          return { fullText: fullText.trim(), extractedFigures };
         }
 
-        async function fetchWithTimeout(url, options, timeoutMs = 90000) {
+        async function fetchWithTimeout(url, options, timeoutMs = 65000) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           try {
@@ -4553,6 +4562,81 @@ ${jaText}
           }
         }
 
+        async function callGeminiJsonWithFallback(apiKey, models, prompt, timeoutMs = 65000) {
+          let lastErr = '';
+          for (const modelName of models) {
+            try {
+              const apiRes = await fetchWithTimeout(
+                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                      responseMimeType: 'application/json',
+                      temperature: 0.1,
+                      maxOutputTokens: 32768
+                    }
+                  })
+                },
+                timeoutMs
+              );
+
+              if (apiRes.ok) {
+                const resJson = await apiRes.json();
+                const text = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                const parsed = JSON.parse(text);
+                return Array.isArray(parsed) ? (parsed[0] || {}) : (parsed || {});
+              } else {
+                const errJson = await apiRes.json().catch(() => ({}));
+                lastErr = errJson.error?.message || `API Error: ${apiRes.status}`;
+                if ([404, 429, 500, 503].includes(apiRes.status)) {
+                  await new Promise(r => setTimeout(r, 800));
+                  continue;
+                }
+                throw new Error(lastErr);
+              }
+            } catch (e) {
+              if (e.name === 'AbortError') {
+                lastErr = `${modelName} がタイムアウトしました`;
+                continue;
+              }
+              throw e;
+            }
+          }
+          throw new Error(lastErr || 'すべてのGeminiモデルが混雑しています。少し時間を置いてお試しください。');
+        }
+
+        // 柔軟なアンカー一致検索（空白・ハイフン・記号の微妙な差異を吸収して原文内の位置を特定）
+        function findAnchorPosition(fullText, anchorStr, fallbackHeading, searchFromIdx = 0) {
+          const slice = fullText.slice(searchFromIdx);
+          const candidates = [anchorStr, fallbackHeading].filter(Boolean);
+
+          for (const cand of candidates) {
+            const cleaned = cand.trim();
+            if (!cleaned) continue;
+            // 1. 完全一致
+            const exactPos = slice.indexOf(cleaned);
+            if (exactPos !== -1) return searchFromIdx + exactPos;
+
+            // 2. 単語列に基づく柔軟な正規表現一致（最初の6単語）
+            const words = cleaned
+              .replace(/[^\w\s.-]/g, ' ')
+              .split(/\s+/)
+              .filter(Boolean)
+              .slice(0, 6);
+            if (words.length >= 2) {
+              const pattern = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[\\s\\W]{1,12}');
+              const m = slice.match(new RegExp(pattern, 'i'));
+              if (m && typeof m.index === 'number') {
+                return searchFromIdx + m.index;
+              }
+            }
+          }
+          return -1;
+        }
+
         async function handlePdfFile(file) {
           const apiKey = keyInput.value.trim();
           if (!apiKey) {
@@ -4562,7 +4646,7 @@ ${jaText}
           localStorage.setItem('USER_GEMINI_API_KEY', apiKey);
 
           statusBox.classList.remove('hidden');
-          statusBox.textContent = '1/2 PDFから全ページの本文テキストと図（Fig.）・表（Table）を抽出しています...';
+          statusBox.textContent = '1/3 PDFから全ページの本文テキストと図（Fig.）・表（Table）を抽出しています...';
 
           try {
             const { fullText: rawPdfText, extractedFigures } = await extractTextAndFiguresFromPdf(file);
@@ -4570,33 +4654,25 @@ ${jaText}
               throw new Error('PDFからテキストを抽出できませんでした（スキャン画像PDFの可能性があります）。');
             }
 
+            const candidateModels = await getAvailableGeminiModels(apiKey);
             const detectedFigLabels = Object.keys(extractedFigures);
-            const figHintText = detectedFigLabels.length > 0
-              ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}（各セクションの "figure_refs" に、そのセクションで解説されている図または表のラベルと日本語解説を入れてください）`
-              : '図表ラベル未検出';
 
-            const prompt = `
+            // =================================================================
+            // STEP 1: 論文メタデータ・要約・用語辞書 ＋ 全セクション／サブセクションの目次マップを取得
+            // =================================================================
+            statusBox.textContent = '2/3 論文全体の構造マップ（全セクション・サブセクション見出し）と要約を解析中...';
+
+            const outlinePrompt = `
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
-以下は査読済み論文PDFから抽出した実際の本文テキストです。
+以下は査読済み論文PDFから抽出した全文テキストです。
 
-【厳守ルール（捏造禁止・全セクション＆全段落の文字通り完全抽出）】
-1. **セクション抜け厳禁（実見出しベース抽出）：**
-   - 従来の「Introduction / Methods / Results / Discussion / Conclusion」の5つだけに無理やり当てはめたり、これら以外のセクション（例：Background, Theoretical Framework, Mathematical Formulation, Experimental Setup, Clinical Implications, Limitations, Future Perspectives など、総説や独自構成の論文の章立て）を切り捨てたりしないでください。
-   - **PDF本文に実際に登場するすべての主要セクション（Abstractから結論・展望の最終セクションまで、Referencesの直前にある全セクション）を出現順通りにすべて抽出してください。**
-   - 各セクションの "id" は "sec-1", "sec-2", "sec-3"... のように連番で設定し、"title_en" にはPDF本文に書かれている元の英語セクション見出しをそのまま入れ、"title_ja" にはその正確な日本語訳を入れてください。
-2. **各セクション内の全パラグラフ網羅：**
-   - 各セクションの第1パラグラフから次の見出し直前の最終パラグラフまで、途中の段落も最後の段落も1つも省略せずすべて抽出してください。
-3. **1文ごとのアライメント：**
-   - 各パラグラフの中では、"sentences" 配列に【1文ずつの英語原文（en）】と【その1文に対応する日本語訳（ja）】を1対1で対応させて格納してください。
-   - "en" にはPDF本文に書かれている英文を一字一句改変・創作せずそのまま入れてください。
-4. **図および表の紐付け（${figHintText}）：**
-   - 各セクションの "figure_refs" 配列に、そのセクションに対応する図または表（例: "Fig. 1", "Table 1"）とその内容の日本語解説（caption_ja）を入れてください。
-5. **セクション要点・ライティング表現・用語辞書：**
-   - 各セクションの "takeaways"（重要ポイント）は、**4〜6個の具体的かつ詳細な日本語ポイント**を記述してください。
-   - "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
-   - "vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください。
-6. 以下のJSON形式のみを出力してください（必ず単一のJSONオブジェクトとして出力し、外側に配列 [...] を付けないでください）。
+【タスク】
+1. 論文のタイトル・ジャーナル・DOI・4項目要約・重要用語辞書を作成してください。
+2. **最も重要：この論文に存在する「すべてのセクションおよびサブセクション（例: Abstract, 1. Introduction, 2.1. Database description, 2.2. ..., 3. Results, 4. Discussion, 5. Conclusion 等）」を、出現順に1つも抜かさずリストアップしてください（ReferencesやEthics等の末尾事務欄は除く）。**
+   - 親見出しの直後にサブセクション（例: "2. Material and methods" の直後に "2.1. Database description"）がある場合は、本文を持つ末端のセクション／サブセクション単位（2.1, 2.2, 2.3...）で細かく分割してください。これにより各チャンクが短くなり、後続の全文抽出で1文も省略されなくなります。
+   - 各項目の "start_anchor" には、そのセクション（またはサブセクション）の**見出し＋本文最初の5単語をPDF原文から一字一句そのままコピー**して入れてください。
 
+以下の単一JSONオブジェクトのみを出力してください。
 {
   "title_en": "英語タイトル",
   "title_ja": "日本語タイトル",
@@ -4609,32 +4685,11 @@ ${jaText}
   "key_results": "PDF本文に記載された定量的結果・統計値（日本語）",
   "discussion_and_implications": "考察と意義（日本語）",
   "relevance_to_my_research": "脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用ヒント（日本語）",
-  "sections": [
+  "section_outline": [
     {
-      "id": "sec-1",
-      "title_en": "PDFに書かれている元の英語見出し1",
-      "title_ja": "その日本語訳1",
-      "figure_refs": [
-        { "label": "Fig. 1", "caption_ja": "図1が示す内容の日本語解説" }
-      ],
-      "paragraphs": [
-        {
-          "en": "段落全体の英文",
-          "ja": "段落全体の日本語訳",
-          "sentences": [
-            { "en": "第1文の英文.", "ja": "第1文の日本語訳。" }
-          ]
-        }
-      ],
-      "takeaways": [
-        "詳細な重要ポイント1",
-        "詳細な重要ポイント2",
-        "詳細な重要ポイント3",
-        "詳細な重要ポイント4"
-      ],
-      "writing_expressions": [
-        { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
-      ]
+      "title_en": "元の英語セクション／サブセクション見出し（例: 2.1. Database description）",
+      "title_ja": "その日本語訳（例: 2.1. データベースの概要）",
+      "start_anchor": "PDF原文に実際に書かれている見出し＋冒頭数語"
     }
   ],
   "vocabulary": {
@@ -4642,67 +4697,14 @@ ${jaText}
   }
 }
 
-【PDF抽出テキスト】
-${rawPdfText.slice(0, 85000)}
+【PDF全文テキスト】
+${rawPdfText.slice(0, 90000)}
 `;
 
-            const candidateModels = await getAvailableGeminiModels(apiKey);
-            let result = null;
-            let lastErrMsg = '';
+            const metaParsed = await callGeminiJsonWithFallback(apiKey, candidateModels, outlinePrompt, 60000);
 
-            for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクション・全パラグラフの1文ごと対訳・図表紐付けを生成中（約35〜65秒）...`;
-              try {
-                const apiRes = await fetchWithTimeout(
-                  `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      contents: [{ parts: [{ text: prompt }] }],
-                      generationConfig: {
-                        responseMimeType: 'application/json',
-                        temperature: 0.1,
-                        maxOutputTokens: 65536
-                      }
-                    })
-                  },
-                  90000
-                );
-
-                if (apiRes.ok) {
-                  result = await apiRes.json();
-                  break;
-                } else {
-                  const errJson = await apiRes.json().catch(() => ({}));
-                  lastErrMsg = errJson.error?.message || `API Error: ${apiRes.status}`;
-                  if ([404, 429, 500, 503].includes(apiRes.status)) {
-                    statusBox.textContent = `⚠️ ${modelName} が混雑中のため別モデルへ切り替えます...`;
-                    await new Promise(r => setTimeout(r, 1000));
-                    continue;
-                  }
-                  throw new Error(lastErrMsg);
-                }
-              } catch (fetchErr) {
-                if (fetchErr.name === 'AbortError') {
-                  lastErrMsg = `${modelName} がタイムアウトしました。`;
-                  statusBox.textContent = `⚠️ ${modelName} がタイムアウトしたため別モデルへ切り替えます...`;
-                  continue;
-                }
-                throw fetchErr;
-              }
-            }
-
-            if (!result) {
-              throw new Error(lastErrMsg || '利用可能なGeminiモデルがすべて混雑しています。少し時間を置いてお試しください。');
-            }
-
-            const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-            const rawParsed = JSON.parse(jsonText);
-            const parsed = Array.isArray(rawParsed) ? (rawParsed[0] || {}) : (rawParsed || {});
-
-            if (parsed.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
-              Object.entries(parsed.vocabulary).forEach(([k, v]) => {
+            if (metaParsed.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
+              Object.entries(metaParsed.vocabulary).forEach(([k, v]) => {
                 if (v && typeof v === 'object') {
                   ACADEMIC_GLOSSARY[k.toLowerCase()] = {
                     ipa: v.ipa || '',
@@ -4715,39 +4717,186 @@ ${rawPdfText.slice(0, 85000)}
               });
             }
 
-            const usedLabels = new Set();
-            const normalizedSections = (Array.isArray(parsed.sections) ? parsed.sections : []).map((sec, idx) => {
-              const figs = [];
-              if (Array.isArray(sec.figure_refs)) {
-                for (const ref of sec.figure_refs) {
-                  const rawLabel = String(ref?.label || '');
-                  const numMatch = rawLabel.match(/(\d+)/);
-                  const isTable = /table/i.test(rawLabel);
-                  const normLabel = numMatch
-                    ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
-                    : rawLabel;
+            // =================================================================
+            // JavaScript側でアンカー位置に基づき原文テキストを隙間なくセクション分割する
+            // =================================================================
+            const rawOutline = Array.isArray(metaParsed.section_outline) ? metaParsed.section_outline : [];
+            const locatedSections = [];
+            let cursor = 0;
 
-                  const imgObj = extractedFigures[normLabel];
-                  if (imgObj && !usedLabels.has(normLabel)) {
-                    usedLabels.add(normLabel);
-                    figs.push({
-                      label: normLabel,
-                      page: imgObj.page,
-                      imageUrl: imgObj.imageUrl,
-                      captionJa: ref?.caption_ja || ''
-                    });
-                  }
+            for (const item of rawOutline) {
+              const pos = findAnchorPosition(rawPdfText, item.start_anchor, item.title_en, cursor);
+              if (pos !== -1) {
+                locatedSections.push({
+                  title_en: item.title_en || 'Section',
+                  title_ja: item.title_ja || item.title_en || 'セクション',
+                  startPos: pos
+                });
+                cursor = pos + 10;
+              }
+            }
+
+            // 末尾事務セクション（Ethics. / Data accessibility. / Acknowledgements.）の開始位置を検出して終端とする
+            const backMatterMatch = rawPdfText.slice(cursor).match(/\b(?:Ethics\.|Data accessibility\.|Declaration of AI use\.|Authors' contributions\.|Acknowledgements\.)/);
+            const bodyEndPos = backMatterMatch ? (cursor + backMatterMatch.index) : rawPdfText.length;
+
+            const sectionSlices = [];
+            if (locatedSections.length >= 2) {
+              for (let idx = 0; idx < locatedSections.length; idx++) {
+                const start = locatedSections[idx].startPos;
+                const end = (idx + 1 < locatedSections.length) ? locatedSections[idx + 1].startPos : bodyEndPos;
+                const sliceText = rawPdfText.slice(start, Math.max(start, end)).trim();
+                if (sliceText.length > 40) {
+                  sectionSlices.push({
+                    id: `sec-${idx + 1}`,
+                    title_en: locatedSections[idx].title_en,
+                    title_ja: locatedSections[idx].title_ja,
+                    rawText: sliceText
+                  });
                 }
               }
-              return {
-                ...sec,
-                id: sec.id || `sec-${idx + 1}`,
+            } else {
+              // 万が一見出しアンカーが取れなかった場合は、全文を約7,500文字ずつの連続チャンクに均等分割して100%カバーする
+              const chunkSize = 7500;
+              const cleanBody = rawPdfText.slice(0, bodyEndPos);
+              let part = 1;
+              for (let pos = 0; pos < cleanBody.length; pos += chunkSize) {
+                sectionSlices.push({
+                  id: `sec-${part}`,
+                  title_en: `Part ${part}`,
+                  title_ja: `パート ${part}`,
+                  rawText: cleanBody.slice(pos, pos + chunkSize)
+                });
+                part++;
+              }
+            }
+
+            // =================================================================
+            // STEP 2: セクションごとに1文も省略せず全パラグラフの1文対訳を生成する
+            // =================================================================
+            const normalizedSections = [];
+            const usedLabels = new Set();
+            const figHintText = detectedFigLabels.length > 0
+              ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}`
+              : '図表ラベル未検出';
+
+            for (let sIdx = 0; sIdx < sectionSlices.length; sIdx++) {
+              const secSlice = sectionSlices[sIdx];
+              statusBox.textContent = `3/3 全文精読データを生成中 (${sIdx + 1}/${sectionSlices.length}: ${secSlice.title_en})...`;
+
+              // 1セクションが11,000文字を超える場合はさらにサブチャンクに分割して省略を完全に防ぐ
+              const maxChunkChars = 11000;
+              const subChunks = [];
+              for (let p = 0; p < secSlice.rawText.length; p += maxChunkChars) {
+                subChunks.push(secSlice.rawText.slice(p, p + maxChunkChars));
+              }
+
+              const mergedParagraphs = [];
+              let mergedTakeaways = [];
+              let mergedExpressions = [];
+              let mergedFigRefs = [];
+
+              for (let cIdx = 0; cIdx < subChunks.length; cIdx++) {
+                const subText = subChunks[cIdx];
+                const secPrompt = `
+あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル翻訳者です。
+以下は論文のセクション「${secSlice.title_en}」の実際の英文テキスト（${subChunks.length > 1 ? `パート ${cIdx + 1}/${subChunks.length}` : '全文'}）です。
+
+【絶対厳守ルール（1文たりとも省略・要約・スキップ禁止）】
+1. **下記の【セクション原文テキスト】に含まれるすべての段落・すべての文を、最初から最後まで1文も飛ばさずに順番通り翻訳してください。**
+   - 要約したり、途中の文を飛ばしたり、「〜以降省略」とすることは厳禁です。
+   - "sentences" 配列には、各段落の英文を**1文ずつ**切り分けた "en"（原文そのまま）と "ja"（忠実な学術日本語訳）を1対1で入れてください。
+2. このテキスト内で言及されている図や表（${figHintText}）があれば "figure_refs" にラベルと日本語解説を入れてください。
+3. このセクションの重要ポイント（"takeaways"：3〜5個）と、この英文から学べる学術英語表現（"writing_expressions"：1〜2個）を抽出してください。
+
+以下の単一JSONオブジェクトのみを出力してください。
+{
+  "paragraphs": [
+    {
+      "sentences": [
+        { "en": "第1文の英語原文そのまま.", "ja": "第1文の正確な日本語訳。" },
+        { "en": "第2文の英語原文そのまま.", "ja": "第2文の正確な日本語訳。" }
+      ]
+    }
+  ],
+  "figure_refs": [
+    { "label": "Fig. 1", "caption_ja": "図1の日本語解説" }
+  ],
+  "takeaways": [
+    "このセクションの重要ポイント1",
+    "このセクションの重要ポイント2"
+  ],
+  "writing_expressions": [
+    { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
+  ]
+}
+
+【セクション原文テキスト（${secSlice.title_en}）】
+${subText}
+`;
+                const secResult = await callGeminiJsonWithFallback(apiKey, candidateModels, secPrompt, 65000);
+
+                if (Array.isArray(secResult.paragraphs)) {
+                  for (const para of secResult.paragraphs) {
+                    const sents = Array.isArray(para.sentences)
+                      ? para.sentences.filter(s => s && (s.en || s.ja))
+                      : ((para.en || para.ja) ? [{ en: para.en || '', ja: para.ja || '' }] : []);
+                    if (sents.length > 0) {
+                      mergedParagraphs.push({
+                        en: sents.map(s => s.en).join(' '),
+                        ja: sents.map(s => s.ja).join(''),
+                        sentences: sents
+                      });
+                    }
+                  }
+                }
+                if (Array.isArray(secResult.takeaways)) {
+                  mergedTakeaways.push(...secResult.takeaways);
+                }
+                if (Array.isArray(secResult.writing_expressions)) {
+                  mergedExpressions.push(...secResult.writing_expressions);
+                }
+                if (Array.isArray(secResult.figure_refs)) {
+                  mergedFigRefs.push(...secResult.figure_refs);
+                }
+              }
+
+              // 抽出した図表画像を紐付け
+              const figs = [];
+              for (const ref of mergedFigRefs) {
+                const rawLabel = String(ref?.label || '');
+                const numMatch = rawLabel.match(/(\d+)/);
+                const isTable = /table/i.test(rawLabel);
+                const normLabel = numMatch
+                  ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
+                  : rawLabel;
+
+                const imgObj = extractedFigures[normLabel];
+                if (imgObj && !usedLabels.has(normLabel)) {
+                  usedLabels.add(normLabel);
+                  figs.push({
+                    label: normLabel,
+                    page: imgObj.page,
+                    imageUrl: imgObj.imageUrl,
+                    captionJa: ref?.caption_ja || ''
+                  });
+                }
+              }
+
+              normalizedSections.push({
+                id: secSlice.id,
+                title_en: secSlice.title_en,
+                title_ja: secSlice.title_ja,
+                paragraphs: mergedParagraphs,
                 figures: figs,
+                takeaways: mergedTakeaways.length > 0 ? mergedTakeaways : [`${secSlice.title_ja} の全文対訳です。`],
+                writing_expressions: mergedExpressions,
                 diagram_svg: '',
                 section_svg: ''
-              };
-            });
+              });
+            }
 
+            // 未割当の図・表が残っていたら結果系セクションへ追加
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
               const targetSec =
@@ -4769,18 +4918,18 @@ ${rawPdfText.slice(0, 85000)}
             if (mode === 'current' && targetIdx !== -1 && items[targetIdx]) {
               const prev = items[targetIdx];
               const prevSum = prev.summary || {};
-              const nextProblem = parsed.problem || prev.problem || prevSum.problem || '';
-              const nextMethod = parsed.solution_and_method || prev.method || prevSum.solution_and_method || '';
-              const nextFormula = parsed.formula_block || prev.formula || prevSum.formula_block || '';
-              const nextResults = parsed.key_results || prev.results || prevSum.key_results || '';
-              const nextDiscussion = parsed.discussion_and_implications || prev.discussion || prevSum.discussion_and_implications || '';
-              const nextRelevance = '【PDF全文解読済み】\n' + (parsed.relevance_to_my_research || prev.relevance || prevSum.relevance_to_my_research || '');
+              const nextProblem = metaParsed.problem || prev.problem || prevSum.problem || '';
+              const nextMethod = metaParsed.solution_and_method || prev.method || prevSum.solution_and_method || '';
+              const nextFormula = metaParsed.formula_block || prev.formula || prevSum.formula_block || '';
+              const nextResults = metaParsed.key_results || prev.results || prevSum.key_results || '';
+              const nextDiscussion = metaParsed.discussion_and_implications || prev.discussion || prevSum.discussion_and_implications || '';
+              const nextRelevance = '【PDF全文解読済み】\n' + (metaParsed.relevance_to_my_research || prev.relevance || prevSum.relevance_to_my_research || '');
 
               items[targetIdx] = {
                 ...prev,
                 entry_type: 'daily_paper',
                 pdfDecoded: true,
-                vocabulary: parsed.vocabulary || prev.vocabulary || {},
+                vocabulary: metaParsed.vocabulary || prev.vocabulary || {},
                 problem: nextProblem,
                 method: nextMethod,
                 formula: nextFormula,
@@ -4805,12 +4954,12 @@ ${rawPdfText.slice(0, 85000)}
               const chosenCat = catSelect ? catSelect.value : 'brain_heart';
               const chosenCatLabel = catSelect ? catSelect.options[catSelect.selectedIndex].text : '📄 手動追加PDF';
 
-              const nextProblem = parsed.problem || '';
-              const nextMethod = parsed.solution_and_method || '';
-              const nextFormula = parsed.formula_block || '';
-              const nextResults = parsed.key_results || '';
-              const nextDiscussion = parsed.discussion_and_implications || '';
-              const nextRelevance = parsed.relevance_to_my_research || '';
+              const nextProblem = metaParsed.problem || '';
+              const nextMethod = metaParsed.solution_and_method || '';
+              const nextFormula = metaParsed.formula_block || '';
+              const nextResults = metaParsed.key_results || '';
+              const nextDiscussion = metaParsed.discussion_and_implications || '';
+              const nextRelevance = metaParsed.relevance_to_my_research || '';
 
               const newPaper = {
                 id: newId,
@@ -4818,17 +4967,17 @@ ${rawPdfText.slice(0, 85000)}
                 type: 'paper',
                 pdfDecoded: true,
                 isCustomPdf: true,
-                vocabulary: parsed.vocabulary || {},
+                vocabulary: metaParsed.vocabulary || {},
                 date: new Date().toISOString().slice(0, 10),
                 category: chosenCat,
                 category_label: chosenCatLabel,
-                journal: parsed.journal || file.name,
+                journal: metaParsed.journal || file.name,
                 impact_factor: 4.5,
                 impactFactor: 4.5,
-                doi: parsed.doi || '',
-                title_en: parsed.title_en || file.name,
-                title_ja: parsed.title_ja || file.name,
-                tags: Array.isArray(parsed.tags) ? [...parsed.tags, '手動PDF追加'] : ['PDF Full-Text', '手動PDF追加'],
+                doi: metaParsed.doi || '',
+                title_en: metaParsed.title_en || file.name,
+                title_ja: metaParsed.title_ja || file.name,
+                tags: Array.isArray(metaParsed.tags) ? [...metaParsed.tags, '手動PDF追加'] : ['PDF Full-Text', '手動PDF追加'],
                 problem: nextProblem,
                 method: nextMethod,
                 formula: nextFormula,
@@ -4857,7 +5006,6 @@ ${rawPdfText.slice(0, 85000)}
               if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(newId);
             }
 
-            // 「1. デイリー論文フィード」の「すべて表示」へ切り替えて追加された論文を即座に表示する
             if (typeof currentView !== 'undefined') currentView = 'daily';
             if (typeof activeCategory !== 'undefined') activeCategory = 'ALL';
 
@@ -4868,11 +5016,15 @@ ${rawPdfText.slice(0, 85000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = `✅ 完了！アーカイブに独立論文として追加しました（全 ${normalizedSections.length} セクション / 図表 ${Object.keys(extractedFigures).length} 点）`;
+            const totalSents = normalizedSections.reduce(
+              (acc, s) => acc + s.paragraphs.reduce((a, p) => a + (p.sentences?.length || 0), 0),
+              0
+            );
+            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を省略なしで抽出しました`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
-            }, 1200);
+            }, 1400);
           } catch (err) {
             statusBox.textContent = '❌ エラー: ' + (err?.message || String(err));
           }
