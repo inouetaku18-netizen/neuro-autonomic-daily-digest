@@ -2736,40 +2736,83 @@
           const manifest = await res.json();
           let updated = false;
 
+          // 自動生成されたJSONを最新のUI表示フォーマットへ正規化
+          function normalizeRemoteItem(raw, type) {
+            const s = raw.summary || {};
+            const sections = (raw.full_text && Array.isArray(raw.full_text.sections)) ? raw.full_text.sections : [];
+            const introSec = sections.find(sec => sec.id === 'intro');
+            const abstractEn = introSec && introSec.paragraphs && introSec.paragraphs[0]
+              ? introSec.paragraphs.map(p => p.en).join(' ')
+              : (raw.title_en || '');
+            const abstractJa = introSec && introSec.paragraphs && introSec.paragraphs[0]
+              ? introSec.paragraphs.map(p => p.ja).join(' ')
+              : (s.problem || '');
+
+            // 語彙辞書をUIの形式（meaningキー）にマッピング
+            if (raw.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
+              Object.entries(raw.vocabulary).forEach(([k, v]) => {
+                if (!ACADEMIC_GLOSSARY[k.toLowerCase()]) {
+                  ACADEMIC_GLOSSARY[k.toLowerCase()] = {
+                    ipa: v.ipa || '',
+                    meaning: v.ja || v.meaning || '',
+                    nuance: v.nuance || ''
+                  };
+                }
+              });
+            }
+
+            return {
+              ...raw,
+              type: type,
+              impactFactor: raw.impact_factor || raw.impactFactor || 5.0,
+              problem: s.problem || raw.problem || '',
+              method: s.solution_and_method || raw.method || '',
+              formula: s.formula_block || raw.formula || '',
+              diagramCaption: s.diagram_caption || raw.diagramCaption || 'System Architecture',
+              diagramSvg: s.diagram_svg || raw.diagramSvg || '',
+              results: s.key_results || raw.results || '',
+              discussion: s.discussion_and_implications || raw.discussion || '',
+              relevance: s.relevance_to_my_research || raw.relevance || '',
+              abstractEn: abstractEn,
+              abstractJa: abstractJa,
+              sections: sections
+            };
+          }
+
           if (Array.isArray(manifest.papers)) {
-            // 古い順にunshiftすることで最新が先頭に来るようにする
             for (const item of [...manifest.papers].reverse()) {
-              if (state.papers.some(p => p.id === item.id)) continue;
+              if (items.some(p => p.id === item.id)) continue;
               const pRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (pRes.ok) {
                 const pData = await pRes.json();
-                state.papers.unshift(pData);
+                items.unshift(normalizeRemoteItem(pData, 'paper'));
                 updated = true;
               }
             }
           }
           if (Array.isArray(manifest.reviews)) {
             for (const item of [...manifest.reviews].reverse()) {
-              if (state.reviews.some(r => r.id === item.id)) continue;
+              if (items.some(r => r.id === item.id)) continue;
               const rRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (rRes.ok) {
                 const rData = await rRes.json();
-                state.reviews.unshift(rData);
+                items.unshift(normalizeRemoteItem(rData, 'review'));
                 updated = true;
               }
             }
           }
 
           if (updated) {
-            if (typeof renderFeed === 'function') renderFeed();
-            if (typeof renderReviews === 'function') renderReviews();
-            if (typeof renderArchive === 'function') renderArchive();
-            if (typeof renderPapers === 'function') renderPapers();
-            const activeCatBtn = document.querySelector('[data-category].bg-blue-900, .category-btn.active, [data-tab="feed"]');
-            if (activeCatBtn) activeCatBtn.click();
+            if (typeof renderAll === 'function') {
+              renderAll();
+            } else {
+              if (typeof renderFeed === 'function') renderFeed();
+              if (typeof renderReviews === 'function') renderReviews();
+              if (typeof renderArchiveList === 'function') renderArchiveList();
+            }
             setTimeout(() => {
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
-            }, 200);
+            }, 250);
           }
         } catch (e) {
           console.error('Manifest load error:', e);
