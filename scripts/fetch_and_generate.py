@@ -82,7 +82,7 @@ def build_clean_svg(category_label: str, pmid: str, doi: str) -> str:
   <rect x="24" y="24" width="165" height="56" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
   <text x="106" y="48" text-anchor="middle" fill="#1e3a8a" font-size="12" font-weight="bold">PubMed / PMC OA</text>
   <text x="106" y="66" text-anchor="middle" fill="#334155" font-size="11">PMID: {pmid}</text>
-  <path d="M 195 52 L 225 52" stroke="#0d9488" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 195 52 L 225 52" stroke="#0d9488" stroke-width="2"/>
   <rect x="232" y="24" width="175" height="56" rx="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
   <text x="319" y="48" text-anchor="middle" fill="#115e59" font-size="12" font-weight="bold">{safe_cat}</text>
   <text x="319" y="66" text-anchor="middle" fill="#334155" font-size="10">Verified Abstract Digest</text>
@@ -257,6 +257,7 @@ def generate_batch_digests(candidates: List[dict]) -> List[SinglePaperDigest]:
 
     raise RuntimeError(f"All candidate Gemini models failed. Last error: {last_error}")
 
+
 # =========================================================================
 # 5. メイン実行フロー
 # =========================================================================
@@ -278,7 +279,6 @@ def main():
     processed_set = set(manifest.get("processed_pmids", []))
     candidates = []
 
-    # 1. まず5分野それぞれの実在論文メタデータ＋アブストラクトを高速収集（約5秒）
     for idx, track in enumerate(DAILY_RESEARCH_TRACKS):
         print(f"[{idx+1}/5] Searching PubMed OA for: {track['category_label']}")
         try:
@@ -298,13 +298,9 @@ def main():
     if not candidates:
         raise RuntimeError("No new verified Open Access papers found across all 5 tracks.")
 
-    # 2. Gemini API 1回のバッチ呼び出しで5本まとめて翻訳・構造化（約15〜20秒）
-    client, model_name = get_active_client_and_model()
-    print(f"\nSending {len(candidates)} papers in 1 batch request to {model_name}...")
-    digests = generate_batch_digests(client, model_name, candidates)
+    digests = generate_batch_digests(candidates)
     digest_by_pmid = {d.pmid: d for d in digests}
 
-    # 3. 各論文JSONと manifest.json を保存
     saved_count = 0
     for c in candidates:
         meta = c["meta"]
