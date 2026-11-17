@@ -2731,6 +2731,10 @@
     window.addEventListener("DOMContentLoaded", () => {
       async function loadRemoteManifest() {
         try {
+          // 初期ダミーサンプル（INITIAL_ITEMS）がブラウザキャッシュに残っていれば除外する
+          const dummyIds = new Set(INITIAL_ITEMS.map(i => i.id));
+          items = items.filter(i => !dummyIds.has(i.id));
+
           const res = await fetch('./data/manifest.json?t=' + Date.now());
           if (!res.ok) return;
           const manifest = await res.json();
@@ -2759,10 +2763,17 @@
               });
             }
 
+            // PubMed / PMC 原文への検証リンクを関連研究欄の先頭に明示
+            const pubmedLink = raw.pmid ? `https://pubmed.ncbi.nlm.nih.gov/${raw.pmid}/` : '';
+            const pmcLink = raw.pmcid ? `https://pmc.ncbi.nlm.nih.gov/articles/${raw.pmcid}/` : '';
+            const verificationNote = pubmedLink
+              ? `【一次ソース検証（Open Access原文）】PubMed: ${pubmedLink} ${pmcLink ? '/ PMC全文: ' + pmcLink : ''}\n\n`
+              : '';
+
             return {
               ...raw,
               type: type,
-              impactFactor: raw.impact_factor || raw.impactFactor || 5.0,
+              impactFactor: raw.impact_factor || raw.impactFactor || 4.0,
               problem: s.problem || raw.problem || '',
               method: s.solution_and_method || raw.method || '',
               formula: s.formula_block || raw.formula || '',
@@ -2770,23 +2781,20 @@
               diagramSvg: s.diagram_svg || raw.diagramSvg || '',
               results: s.key_results || raw.results || '',
               discussion: s.discussion_and_implications || raw.discussion || '',
-              relevance: s.relevance_to_my_research || raw.relevance || '',
+              relevance: verificationNote + (s.relevance_to_my_research || raw.relevance || ''),
               abstractEn: abstractEn,
               abstractJa: abstractJa,
               sections: sections
             };
           }
 
-          if (Array.isArray(manifest.papers) && manifest.papers.length > 0) {
-            // 本物の論文が1本でも取得できたら、初期のダミーサンプル論文は除外する
-            const initialIds = new Set(INITIAL_ITEMS.map(i => i.id));
-            items = items.filter(i => !initialIds.has(i.id));
-
+          if (Array.isArray(manifest.papers)) {
             for (const item of [...manifest.papers].reverse()) {
-              if (items.some(p => p.id === item.id)) continue;
               const pRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (pRes.ok) {
                 const pData = await pRes.json();
+                // 既存の同IDデータを最新JSONで置き換え
+                items = items.filter(p => p.id !== pData.id);
                 const normalized = normalizeRemoteItem(pData, 'paper');
                 items.unshift(normalized);
                 if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
@@ -2797,10 +2805,10 @@
 
           if (Array.isArray(manifest.reviews)) {
             for (const item of [...manifest.reviews].reverse()) {
-              if (items.some(r => r.id === item.id)) continue;
               const rRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (rRes.ok) {
                 const rData = await rRes.json();
+                items = items.filter(r => r.id !== rData.id);
                 const normalized = normalizeRemoteItem(rData, 'review');
                 items.unshift(normalized);
                 if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
@@ -2810,7 +2818,6 @@
           }
 
           if (updated && items.length > 0) {
-            // 一番新しい本物の論文を強制的に選択状態にする
             selectedItemId = items[0].id;
             if (typeof saveState === 'function') saveState();
             if (typeof ensureValidSelection === 'function') ensureValidSelection();
