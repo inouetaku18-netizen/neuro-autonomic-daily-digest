@@ -2857,14 +2857,12 @@
       function setupSelectionExplainerUI() {
         if (document.getElementById('selection-explain-trigger')) return;
 
-        // 選択直後に浮かび上がる「💡 選択箇所をAI解説」ボタン
         const triggerBtn = document.createElement('button');
         triggerBtn.id = 'selection-explain-trigger';
         triggerBtn.className = 'fixed z-50 hidden bg-slate-900 hover:bg-indigo-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-full shadow-xl border border-indigo-400/60 flex items-center gap-1.5 transition cursor-pointer';
         triggerBtn.innerHTML = '💡 選択箇所をAI解説';
         document.body.appendChild(triggerBtn);
 
-        // 解説結果を表示するリッチポップアップカード
         const card = document.createElement('div');
         card.id = 'selection-explain-card';
         card.className = 'fixed z-50 hidden w-[92vw] max-w-md bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 p-4 sm:p-5 text-left';
@@ -2993,7 +2991,6 @@
           document.getElementById('sec-exp-actions').classList.remove('hidden');
         }
 
-        // マウスアップ時に精読エリア内の選択テキストを検知してトリガーボタンを表示
         document.addEventListener('mouseup', (e) => {
           if (e.target.closest('#selection-explain-trigger') || e.target.closest('#selection-explain-card')) {
             return;
@@ -3006,7 +3003,6 @@
               return;
             }
 
-            // 精読コンテナ（または要約詳細エリア）内の選択のみ反応させる
             const anchorNode = sel.anchorNode;
             const anchorEl = anchorNode && anchorNode.nodeType === 3 ? anchorNode.parentElement : anchorNode;
             if (!anchorEl || (!anchorEl.closest('#readerSectionsContainer') && !anchorEl.closest('#feedAndClinicalContainer'))) {
@@ -3848,7 +3844,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // 全文精読ビュー制御（PDF解読済みのみ表示・1文連動・1文学術解説・ノート保存付き）
+      // 全文精読ビュー制御（全セクション網羅対応・1文連動・1文学術解説・ノート保存付き）
       // =========================================================================
       window.getFullTextSections = function(item) {
         if (!item || !item.pdfDecoded) return [];
@@ -4224,7 +4220,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（図 Fig. ＆ 表 Table の同時抽出対応）
+      // PDFアップロード＆全文AI解読モーダル（実見出しベースの全セクション抽出対応）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -4253,7 +4249,7 @@ ${jaText}
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>全5セクションの1文ごとの英文原文＋日本語対訳・PDF内の図（Fig. 1等）＆表（Table 1等）の自動切り出し・用語辞書・重要ポイント</strong>を生成します。
+              論文PDFをドロップすると、<strong>PDFの実際の章立て・全セクションを1つも抜かさず抽出し、1文ごとの英文原文＋日本語対訳・PDF内の図（Fig. 1等）＆表（Table 1等）・用語辞書・重要ポイント</strong>を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -4262,7 +4258,7 @@ ${jaText}
             <div class="mb-4">
               <label class="block text-xs font-semibold text-slate-700 mb-1">反映先</label>
               <select id="pdf-target-mode" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white">
-                <option value="current">現在選択中の論文に全文（5セクション＋図・表）を上書き追加する</option>
+                <option value="current">現在選択中の論文に全文（全セクション＋図・表）を上書き追加する</option>
                 <option value="new">新しい独立した論文カードとして一覧の先頭に追加する</option>
               </select>
             </div>
@@ -4307,8 +4303,8 @@ ${jaText}
           const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           let fullText = '';
           const extractedFigures = {};
-          const maxPages = Math.min(pdf.numPages, 40);
-          const refStartThreshold = Math.max(3, Math.floor(pdf.numPages * 0.55));
+          const maxPages = Math.min(pdf.numPages, 50);
+          const refStartThreshold = Math.max(3, Math.floor(pdf.numPages * 0.6));
 
           for (let i = 1; i <= maxPages; i++) {
             const page = await pdf.getPage(i);
@@ -4339,7 +4335,7 @@ ${jaText}
               }
             }
 
-            if (pageHits.length > 0 && Object.keys(extractedFigures).length < 14) {
+            if (pageHits.length > 0 && Object.keys(extractedFigures).length < 16) {
               const renderScale = 1.65;
               const hiViewport = page.getViewport({ scale: renderScale });
               const fullCanvas = document.createElement('canvas');
@@ -4398,7 +4394,7 @@ ${jaText}
           return { fullText, extractedFigures };
         }
 
-        async function fetchWithTimeout(url, options, timeoutMs = 75000) {
+        async function fetchWithTimeout(url, options, timeoutMs = 90000) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           try {
@@ -4448,7 +4444,7 @@ ${jaText}
           localStorage.setItem('USER_GEMINI_API_KEY', apiKey);
 
           statusBox.classList.remove('hidden');
-          statusBox.textContent = '1/2 PDFから本文テキストと図（Fig.）・表（Table）を抽出しています...';
+          statusBox.textContent = '1/2 PDFから全ページの本文テキストと図（Fig.）・表（Table）を抽出しています...';
 
           try {
             const { fullText: rawPdfText, extractedFigures } = await extractTextAndFiguresFromPdf(file);
@@ -4465,16 +4461,23 @@ ${jaText}
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
 以下は査読済み論文PDFから抽出した実際の本文テキストです。
 
-【厳守ルール（捏造禁止・1文ごとのアライメント・図＆表の紐付け・全段落完全抽出）】
-1. sections は必ず id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成してください。
-2. **各セクションの第1パラグラフから次の見出し直前の最終パラグラフまで、1段落も省略せずすべて抽出してください。**
-3. **各パラグラフの中では、"sentences" 配列に【1文ずつの英語原文（en）】と【その1文に対応する日本語訳（ja）】を1対1で対応させて格納してください。**
+【厳守ルール（捏造禁止・全セクション＆全段落の文字通り完全抽出）】
+1. **セクション抜け厳禁（実見出しベース抽出）：**
+   - 従来の「Introduction / Methods / Results / Discussion / Conclusion」の5つだけに無理やり当てはめたり、これら以外のセクション（例：Background, Theoretical Framework, Mathematical Formulation, Experimental Setup, Clinical Implications, Limitations, Future Perspectives など、総説や独自構成の論文の章立て）を切り捨てたりしないでください。
+   - **PDF本文に実際に登場するすべての主要セクション（Abstractから結論・展望の最終セクションまで、Referencesの直前にある全セクション）を出現順通りにすべて抽出してください。**
+   - 各セクションの "id" は "sec-1", "sec-2", "sec-3"... のように連番で設定し、"title_en" にはPDF本文に書かれている元の英語セクション見出しをそのまま入れ、"title_ja" にはその正確な日本語訳を入れてください。
+2. **各セクション内の全パラグラフ網羅：**
+   - 各セクションの第1パラグラフから次の見出し直前の最終パラグラフまで、途中の段落も最後の段落も1つも省略せずすべて抽出してください。
+3. **1文ごとのアライメント：**
+   - 各パラグラフの中では、"sentences" 配列に【1文ずつの英語原文（en）】と【その1文に対応する日本語訳（ja）】を1対1で対応させて格納してください。
    - "en" にはPDF本文に書かれている英文を一字一句改変・創作せずそのまま入れてください。
-4. **図および表の紐付け（${figHintText}）：** 各セクションの "figure_refs" 配列に、そのセクションに対応する図または表（例: "Fig. 1", "Table 1"）とその内容の日本語解説（caption_ja）を入れてください。
-5. 各セクションの "takeaways"（重要ポイント）は、必ず**4〜6個の具体的かつ詳細な日本語ポイント**を記述してください。
-6. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
-7. **"vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください。**
-8. 以下のJSON形式のみを出力してください（必ず単一のJSONオブジェクトとして出力し、外側に配列 [...] を付けないでください）。
+4. **図および表の紐付け（${figHintText}）：**
+   - 各セクションの "figure_refs" 配列に、そのセクションに対応する図または表（例: "Fig. 1", "Table 1"）とその内容の日本語解説（caption_ja）を入れてください。
+5. **セクション要点・ライティング表現・用語辞書：**
+   - 各セクションの "takeaways"（重要ポイント）は、**4〜6個の具体的かつ詳細な日本語ポイント**を記述してください。
+   - "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
+   - "vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください。
+6. 以下のJSON形式のみを出力してください（必ず単一のJSONオブジェクトとして出力し、外側に配列 [...] を付けないでください）。
 
 {
   "title_en": "英語タイトル",
@@ -4490,12 +4493,11 @@ ${jaText}
   "relevance_to_my_research": "脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用ヒント（日本語）",
   "sections": [
     {
-      "id": "intro",
-      "title_en": "1. Introduction",
-      "title_ja": "1. 序論",
+      "id": "sec-1",
+      "title_en": "PDFに書かれている元の英語見出し1",
+      "title_ja": "その日本語訳1",
       "figure_refs": [
-        { "label": "Fig. 1", "caption_ja": "図1が示す生理学的経路・システム全体像の日本語解説" },
-        { "label": "Table 1", "caption_ja": "表1が示す被験者特性・比較条件の日本語解説" }
+        { "label": "Fig. 1", "caption_ja": "図1が示す内容の日本語解説" }
       ],
       "paragraphs": [
         {
@@ -4523,7 +4525,7 @@ ${jaText}
 }
 
 【PDF抽出テキスト】
-${rawPdfText.slice(0, 65000)}
+${rawPdfText.slice(0, 85000)}
 `;
 
             const candidateModels = await getAvailableGeminiModels(apiKey);
@@ -4531,7 +4533,7 @@ ${rawPdfText.slice(0, 65000)}
             let lastErrMsg = '';
 
             for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で1文ごと対訳・図＆表紐付け・用語辞書を生成中（約30〜55秒）...`;
+              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクション・全パラグラフの1文ごと対訳・図表紐付けを生成中（約35〜65秒）...`;
               try {
                 const apiRes = await fetchWithTimeout(
                   `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -4547,7 +4549,7 @@ ${rawPdfText.slice(0, 65000)}
                       }
                     })
                   },
-                  75000
+                  90000
                 );
 
                 if (apiRes.ok) {
@@ -4596,7 +4598,7 @@ ${rawPdfText.slice(0, 65000)}
             }
 
             const usedLabels = new Set();
-            const normalizedSections = (Array.isArray(parsed.sections) ? parsed.sections : []).map(sec => {
+            const normalizedSections = (Array.isArray(parsed.sections) ? parsed.sections : []).map((sec, idx) => {
               const figs = [];
               if (Array.isArray(sec.figure_refs)) {
                 for (const ref of sec.figure_refs) {
@@ -4621,17 +4623,21 @@ ${rawPdfText.slice(0, 65000)}
               }
               return {
                 ...sec,
+                id: sec.id || `sec-${idx + 1}`,
                 figures: figs,
                 diagram_svg: '',
                 section_svg: ''
               };
             });
 
+            // 未割当の図・表が残っていたら結果系セクション（なければ後半セクション）へ追加
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
-              const resSec = normalizedSections.find(s => s.id === 'results') || normalizedSections[normalizedSections.length - 1];
+              const targetSec =
+                normalizedSections.find(s => /result|finding|experiment|evaluation/i.test(s.title_en || '')) ||
+                normalizedSections[Math.floor(normalizedSections.length / 2)];
               for (const rf of remainingFigs) {
-                resSec.figures.push({
+                targetSec.figures.push({
                   label: rf.label,
                   page: rf.page,
                   imageUrl: rf.imageUrl,
@@ -4734,7 +4740,7 @@ ${rawPdfText.slice(0, 65000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = `✅ 完了！（PDF内の図・表 ${Object.keys(extractedFigures).length} 点を自動抽出しました）`;
+            statusBox.textContent = `✅ 完了！（全 ${normalizedSections.length} セクション / 図表 ${Object.keys(extractedFigures).length} 点を抽出しました）`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
