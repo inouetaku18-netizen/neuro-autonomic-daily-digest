@@ -231,9 +231,8 @@ def get_active_client_and_model():
         http_options={"api_version": "v1beta"}
     )
     preferred = [
-        "gemini-3.1-pro-preview",
         "gemini-2.5-flash",
-        "gemini-2.5-pro",
+        "gemini-3-flash-preview",
         "gemini-2.0-flash",
     ]
     available = []
