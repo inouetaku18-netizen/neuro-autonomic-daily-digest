@@ -3746,7 +3746,7 @@ ${jaText}
       };
 
       // =========================================================================
-      // 図表拡大ライトボックス＆localStorage容量保護ヘルパー
+      // 図表拡大ライトボックス＆任意PDF論文の永続化ストレージ管理
       // =========================================================================
       window.openFigureZoomModal = function(imgSrc, captionText) {
         let zoomModal = document.getElementById('figure-zoom-modal');
@@ -3774,12 +3774,60 @@ ${jaText}
         zoomModal.classList.remove('hidden');
       };
 
+      function loadCustomImportedPapers() {
+        try {
+          const raw = localStorage.getItem('CUSTOM_IMPORTED_PAPERS');
+          const arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function persistCustomImportedPapers() {
+        const customList = items.filter(i => i && i.isCustomPdf);
+        try {
+          localStorage.setItem('CUSTOM_IMPORTED_PAPERS', JSON.stringify(customList));
+        } catch (e) {
+          // 容量超過時は図表のbase64画像を除いて全文テキスト・解説を確実に永続保存する
+          const liteList = customList.map(paper => ({
+            ...paper,
+            full_text: {
+              sections: (paper.full_text?.sections || paper.sections || []).map(sec => ({
+                ...sec,
+                figures: (sec.figures || []).map(f => ({ ...f, imageUrl: '' }))
+              }))
+            },
+            sections: (paper.sections || []).map(sec => ({
+              ...sec,
+              figures: (sec.figures || []).map(f => ({ ...f, imageUrl: '' }))
+            }))
+          }));
+          try {
+            localStorage.setItem('CUSTOM_IMPORTED_PAPERS', JSON.stringify(liteList));
+          } catch (_) {}
+        }
+      }
+
+      window.deleteCustomImportedPaper = function(paperId) {
+        if (!confirm('この手動追加したPDF論文をアーカイブから削除しますか？')) return;
+        items = items.filter(i => i.id !== paperId);
+        if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.delete(paperId);
+        persistCustomImportedPapers();
+        if (selectedItemId === paperId) {
+          const next = items.find(i => i.entry_type === 'daily_paper') || items[0];
+          selectedItemId = next ? next.id : null;
+        }
+        safeSaveState();
+        if (typeof renderAll === 'function') renderAll();
+      };
+
       function safeSaveState() {
+        persistCustomImportedPapers();
         if (typeof saveState !== 'function') return;
         try {
           saveState();
         } catch (e) {
-          console.warn('Storage quota reached, saving lightweight text state:', e);
           const backupImages = new Map();
           items.forEach(item => {
             const secs = item.full_text?.sections || item.sections || [];
@@ -4204,6 +4252,37 @@ ${jaText}
             }
           }
 
+          // 手動追加された任意のPDF論文をアーカイブ先頭へ確実に復元・統合する
+          const savedCustomPapers = loadCustomImportedPapers();
+          if (savedCustomPapers.length > 0) {
+            for (const cp of [...savedCustomPapers].reverse()) {
+              if (!items.some(i => i.id === cp.id)) {
+                items.unshift({
+                  ...cp,
+                  entry_type: 'daily_paper',
+                  type: 'paper',
+                  pdfDecoded: true,
+                  isCustomPdf: true
+                });
+              }
+              if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(cp.id);
+              if (cp.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
+                Object.entries(cp.vocabulary).forEach(([k, v]) => {
+                  if (v && typeof v === 'object') {
+                    ACADEMIC_GLOSSARY[k.toLowerCase()] = {
+                      ipa: v.ipa || '',
+                      pos: v.pos || '',
+                      ja: v.ja || v.meaning || '',
+                      meaning: v.meaning || v.ja || '',
+                      nuance: v.nuance || ''
+                    };
+                  }
+                });
+              }
+            }
+            updated = true;
+          }
+
           if (updated && items.length > 0) {
             const firstDaily = items.find(i => i.entry_type === 'daily_paper') || items[0];
             selectedItemId = firstDaily.id;
@@ -4220,7 +4299,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（実見出しベースの全セクション抽出対応）
+      // PDFアップロード＆全文AI解読モーダル（任意PDFのアーカイブ独立追加・管理対応）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -4235,7 +4314,7 @@ ${jaText}
 
         const btn = document.createElement('button');
         btn.id = 'open-pdf-decoder-btn';
-        btn.innerHTML = '📄 ダウンロードしたPDFを全文解読';
+        btn.innerHTML = '📄 任意PDFをアーカイブに追加・解読';
         btn.className = 'fixed bottom-6 right-6 z-40 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-5 py-3 rounded-full shadow-xl border border-blue-700 flex items-center gap-2 transition cursor-pointer';
         document.body.appendChild(btn);
 
@@ -4243,24 +4322,36 @@ ${jaText}
         modal.id = 'pdf-decoder-modal';
         modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
         modal.innerHTML = `
-          <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-bold text-slate-900">📄 論文PDF 全文解読・図表抽出エンジン</h3>
-              <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+          <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-200 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-bold text-slate-900">📄 任意論文PDF アーカイブ追加・全文解読</h3>
+              <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>PDFの実際の章立て・全セクションを1つも抜かさず抽出し、1文ごとの英文原文＋日本語対訳・PDF内の図（Fig. 1等）＆表（Table 1等）・用語辞書・重要ポイント</strong>を生成します。
+              自分で探してきた論文PDFをドロップすると、<strong>デイリー論文アーカイブに独立した論文として追加</strong>され、全セクション・1文ごと対訳・図表抽出・要約・全文精読が可能になります。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
               <input id="pdf-gemini-key" type="password" placeholder="AIzaSy... または AQ.Ab8..." class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
             </div>
-            <div class="mb-4">
-              <label class="block text-xs font-semibold text-slate-700 mb-1">反映先</label>
-              <select id="pdf-target-mode" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white">
-                <option value="current">現在選択中の論文に全文（全セクション＋図・表）を上書き追加する</option>
-                <option value="new">新しい独立した論文カードとして一覧の先頭に追加する</option>
-              </select>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">追加モード</label>
+                <select id="pdf-target-mode" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-lg bg-white">
+                  <option value="new" selected>新しい論文としてアーカイブに追加（おすすめ）</option>
+                  <option value="current">現在選択中の論文に全文を上書き追加</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">分野カテゴリ（新規追加時）</label>
+                <select id="pdf-category-select" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-lg bg-white">
+                  <option value="brain_heart">③ 脳-心臓連関・迷走神経</option>
+                  <option value="brain">① 脳・神経ダイナミクス</option>
+                  <option value="heart">② 心臓・非線形HRV</option>
+                  <option value="ai_control">④ AI・数理神経制御</option>
+                  <option value="clinical">⑤ 臨床応用・バイオマーカー</option>
+                </select>
+              </div>
             </div>
             <div id="pdf-drop-zone" class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 rounded-xl p-8 text-center cursor-pointer transition">
               <div class="text-3xl mb-2">📥</div>
@@ -4269,9 +4360,33 @@ ${jaText}
               <input id="pdf-file-input" type="file" accept="application/pdf" class="hidden" />
             </div>
             <div id="pdf-status-box" class="hidden mt-4 p-3 rounded-lg bg-slate-100 text-xs text-slate-700 font-medium"></div>
+
+            <!-- 手動追加済みPDF論文の管理リスト -->
+            <div id="custom-pdf-manage-box" class="mt-5 pt-4 border-t border-slate-200 hidden">
+              <div class="text-xs font-extrabold text-slate-700 mb-2">📚 手動追加済みのPDF論文（アーカイブ保存中）</div>
+              <div id="custom-pdf-manage-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+            </div>
           </div>
         `;
         document.body.appendChild(modal);
+
+        function refreshCustomPdfManageList() {
+          const box = document.getElementById('custom-pdf-manage-box');
+          const list = document.getElementById('custom-pdf-manage-list');
+          if (!box || !list) return;
+          const customPapers = items.filter(i => i && i.isCustomPdf);
+          if (customPapers.length === 0) {
+            box.classList.add('hidden');
+            return;
+          }
+          box.classList.remove('hidden');
+          list.innerHTML = customPapers.map(cp => `
+            <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs">
+              <span class="truncate font-medium text-slate-800">${escapeHtmlSafe(cp.title_ja || cp.title_en)}</span>
+              <button onclick="deleteCustomImportedPaper('${cp.id}'); setTimeout(() => { const b = document.getElementById('open-pdf-decoder-btn'); if (b) b.click(); }, 50);" class="shrink-0 text-red-600 hover:text-red-800 font-bold cursor-pointer">削除</button>
+            </div>
+          `).join('');
+        }
 
         const keyInput = document.getElementById('pdf-gemini-key');
         keyInput.value = localStorage.getItem('USER_GEMINI_API_KEY') || '';
@@ -4279,7 +4394,10 @@ ${jaText}
           localStorage.setItem('USER_GEMINI_API_KEY', keyInput.value.trim());
         });
 
-        btn.onclick = () => modal.classList.remove('hidden');
+        btn.onclick = () => {
+          refreshCustomPdfManageList();
+          modal.classList.remove('hidden');
+        };
         document.getElementById('close-pdf-modal').onclick = () => modal.classList.add('hidden');
 
         const dropZone = document.getElementById('pdf-drop-zone');
@@ -4630,7 +4748,6 @@ ${rawPdfText.slice(0, 85000)}
               };
             });
 
-            // 未割当の図・表が残っていたら結果系セクション（なければ後半セクション）へ追加
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
               const targetSec =
@@ -4684,6 +4801,10 @@ ${rawPdfText.slice(0, 85000)}
               };
             } else {
               const newId = 'pdf-' + Date.now();
+              const catSelect = document.getElementById('pdf-category-select');
+              const chosenCat = catSelect ? catSelect.value : 'brain_heart';
+              const chosenCatLabel = catSelect ? catSelect.options[catSelect.selectedIndex].text : '📄 手動追加PDF';
+
               const nextProblem = parsed.problem || '';
               const nextMethod = parsed.solution_and_method || '';
               const nextFormula = parsed.formula_block || '';
@@ -4696,17 +4817,18 @@ ${rawPdfText.slice(0, 85000)}
                 entry_type: 'daily_paper',
                 type: 'paper',
                 pdfDecoded: true,
+                isCustomPdf: true,
                 vocabulary: parsed.vocabulary || {},
                 date: new Date().toISOString().slice(0, 10),
-                category: 'brain_heart',
-                category_label: '📄 PDF全文解読',
+                category: chosenCat,
+                category_label: chosenCatLabel,
                 journal: parsed.journal || file.name,
                 impact_factor: 4.5,
                 impactFactor: 4.5,
                 doi: parsed.doi || '',
                 title_en: parsed.title_en || file.name,
                 title_ja: parsed.title_ja || file.name,
-                tags: Array.isArray(parsed.tags) ? parsed.tags : ['PDF Full-Text'],
+                tags: Array.isArray(parsed.tags) ? [...parsed.tags, '手動PDF追加'] : ['PDF Full-Text', '手動PDF追加'],
                 problem: nextProblem,
                 method: nextMethod,
                 formula: nextFormula,
@@ -4725,22 +4847,28 @@ ${rawPdfText.slice(0, 85000)}
                   discussion_and_implications: nextDiscussion,
                   relevance_to_my_research: nextRelevance
                 },
-                abstractEn: '',
-                abstractJa: '',
+                abstractEn: normalizedSections?.[0]?.paragraphs?.[0]?.en || '',
+                abstractJa: normalizedSections?.[0]?.paragraphs?.[0]?.ja || '',
                 full_text: { sections: normalizedSections },
                 sections: normalizedSections
               };
               items.unshift(newPaper);
               selectedItemId = newId;
+              if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(newId);
             }
 
+            // 「1. デイリー論文フィード」の「すべて表示」へ切り替えて追加された論文を即座に表示する
+            if (typeof currentView !== 'undefined') currentView = 'daily';
+            if (typeof activeCategory !== 'undefined') activeCategory = 'ALL';
+
             safeSaveState();
+            if (typeof ensureValidSelection === 'function') ensureValidSelection();
             if (typeof renderAll === 'function') renderAll();
             setTimeout(() => {
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = `✅ 完了！（全 ${normalizedSections.length} セクション / 図表 ${Object.keys(extractedFigures).length} 点を抽出しました）`;
+            statusBox.textContent = `✅ 完了！アーカイブに独立論文として追加しました（全 ${normalizedSections.length} セクション / 図表 ${Object.keys(extractedFigures).length} 点）`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
