@@ -2736,7 +2736,6 @@
           const manifest = await res.json();
           let updated = false;
 
-          // 自動生成されたJSONを最新のUI表示フォーマットへ正規化
           function normalizeRemoteItem(raw, type) {
             const s = raw.summary || {};
             const sections = (raw.full_text && Array.isArray(raw.full_text.sections)) ? raw.full_text.sections : [];
@@ -2748,7 +2747,6 @@
               ? introSec.paragraphs.map(p => p.ja).join(' ')
               : (s.problem || '');
 
-            // 語彙辞書をUIの形式（meaningキー）にマッピング
             if (raw.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
               Object.entries(raw.vocabulary).forEach(([k, v]) => {
                 if (!ACADEMIC_GLOSSARY[k.toLowerCase()]) {
@@ -2779,37 +2777,44 @@
             };
           }
 
-          if (Array.isArray(manifest.papers)) {
+          if (Array.isArray(manifest.papers) && manifest.papers.length > 0) {
+            // 本物の論文が1本でも取得できたら、初期のダミーサンプル論文は除外する
+            const initialIds = new Set(INITIAL_ITEMS.map(i => i.id));
+            items = items.filter(i => !initialIds.has(i.id));
+
             for (const item of [...manifest.papers].reverse()) {
               if (items.some(p => p.id === item.id)) continue;
               const pRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (pRes.ok) {
                 const pData = await pRes.json();
-                items.unshift(normalizeRemoteItem(pData, 'paper'));
+                const normalized = normalizeRemoteItem(pData, 'paper');
+                items.unshift(normalized);
+                if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
                 updated = true;
               }
             }
           }
+
           if (Array.isArray(manifest.reviews)) {
             for (const item of [...manifest.reviews].reverse()) {
               if (items.some(r => r.id === item.id)) continue;
               const rRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (rRes.ok) {
                 const rData = await rRes.json();
-                items.unshift(normalizeRemoteItem(rData, 'review'));
+                const normalized = normalizeRemoteItem(rData, 'review');
+                items.unshift(normalized);
+                if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
                 updated = true;
               }
             }
           }
 
-          if (updated) {
-            if (typeof renderAll === 'function') {
-              renderAll();
-            } else {
-              if (typeof renderFeed === 'function') renderFeed();
-              if (typeof renderReviews === 'function') renderReviews();
-              if (typeof renderArchiveList === 'function') renderArchiveList();
-            }
+          if (updated && items.length > 0) {
+            // 一番新しい本物の論文を強制的に選択状態にする
+            selectedItemId = items[0].id;
+            if (typeof saveState === 'function') saveState();
+            if (typeof ensureValidSelection === 'function') ensureValidSelection();
+            if (typeof renderAll === 'function') renderAll();
             setTimeout(() => {
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
