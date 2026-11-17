@@ -2865,7 +2865,7 @@
                 <button id="fz-close" class="text-slate-500 hover:text-slate-900 text-2xl leading-none px-2 cursor-pointer">&times;</button>
               </div>
               <div class="max-h-[80vh] overflow-auto flex justify-center bg-slate-50 rounded-xl p-2">
-                <img id="fz-img" src="" alt="Enlarged Figure" class="max-w-full h-auto object-contain" />
+                <img id="fz-img" src="" alt="Enlarged Figure or Table" class="max-w-full h-auto object-contain" />
               </div>
             </div>
           `;
@@ -2874,7 +2874,7 @@
           document.getElementById('fz-close').onclick = () => zoomModal.classList.add('hidden');
         }
         document.getElementById('fz-img').src = imgSrc;
-        document.getElementById('fz-caption').textContent = captionText || 'PDF Extracted Figure';
+        document.getElementById('fz-caption').textContent = captionText || 'PDF Extracted Figure / Table';
         zoomModal.classList.remove('hidden');
       };
 
@@ -2883,7 +2883,6 @@
         try {
           saveState();
         } catch (e) {
-          // 画像データでlocalStorage容量(約5MB)を超えた場合は画像URLだけ除いてテキスト状態を保存
           console.warn('Storage quota reached, saving lightweight text state:', e);
           const backupImages = new Map();
           items.forEach(item => {
@@ -2896,7 +2895,6 @@
             });
           });
           try { saveState(); } catch (_) {}
-          // メモリ上には画像を復元して現在の閲覧を維持
           items.forEach(item => {
             const secs = item.full_text?.sections || item.sections || [];
             secs.forEach(sec => {
@@ -2950,7 +2948,7 @@
       }
 
       // =========================================================================
-      // 全文精読ビュー制御（PDF解読済みのみ表示・1文連動・PDF内図表表示）
+      // 全文精読ビュー制御（PDF解読済みのみ表示・1文連動・PDF内の図＆表表示）
       // =========================================================================
       window.getFullTextSections = function(item) {
         if (!item || !item.pdfDecoded) return [];
@@ -3069,19 +3067,25 @@
               })
               .join("");
 
-            // PDFから切り出した図表ブロック（存在する場合のみ表示）
+            // PDFから切り出した図表（Fig. / Table）ブロック
             const validFigures = (sec.figures || []).filter(f => f && f.imageUrl);
             const figuresBlock = validFigures.length > 0
               ? `
                 <div class="space-y-4 my-4">
                   ${validFigures
                     .map((fig) => {
+                      const isTable = /^Table/i.test(fig.label || '');
+                      const badgeIcon = isTable ? '📋' : '📊';
+                      const badgeType = isTable ? 'PDF抽出表' : 'PDF抽出図';
+                      const badgeColor = isTable
+                        ? 'text-teal-950 bg-teal-50 border-teal-200'
+                        : 'text-blue-950 bg-blue-50 border-blue-200';
                       const capTitle = `${fig.label || 'Figure'} (Page ${fig.page || '?'})${fig.captionJa ? `：${fig.captionJa}` : ''}`;
                       return `
                         <div class="rounded-2xl border border-slate-300 bg-white p-4 shadow-xs">
                           <div class="flex items-center justify-between mb-2">
-                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-blue-950 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
-                              📊 PDF抽出図表：${fig.label || 'Figure'}（p.${fig.page || '?'}）
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold ${badgeColor} px-2.5 py-1 rounded-md border">
+                              ${badgeIcon} ${badgeType}：${fig.label || 'Figure'}（p.${fig.page || '?'}）
                             </span>
                             <button
                               onclick="openFigureZoomModal('${fig.imageUrl}', '${encodeURIComponent(capTitle)}'.replace(/%20/g,' '))"
@@ -3091,9 +3095,9 @@
                           <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 flex justify-center">
                             <img
                               src="${fig.imageUrl}"
-                              alt="${fig.label || 'PDF Figure'}"
+                              alt="${fig.label || 'PDF Figure or Table'}"
                               onclick="openFigureZoomModal(this.src, '${(fig.label || 'Figure').replace(/'/g, '')}')"
-                              class="max-h-[460px] w-auto object-contain cursor-zoom-in hover:opacity-95 transition"
+                              class="max-h-[480px] w-auto object-contain cursor-zoom-in hover:opacity-95 transition"
                             />
                           </div>
                           ${fig.captionJa ? `<p class="text-xs text-slate-700 mt-2.5 leading-relaxed font-medium bg-slate-50 p-2.5 rounded-lg border border-slate-100">${fig.captionJa}</p>` : ''}
@@ -3290,7 +3294,7 @@
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（PDF内図表の自動切り出し＆セクション配置対応）
+      // PDFアップロード＆全文AI解読モーダル（図 Fig. ＆ 表 Table の同時抽出対応）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -3319,7 +3323,7 @@
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>全5セクションの1文ごとの英文原文＋日本語対訳・PDF内の図表（Fig. 1等）の自動切り出し・用語辞書・重要ポイント</strong>を生成します。
+              論文PDFをドロップすると、<strong>全5セクションの1文ごとの英文原文＋日本語対訳・PDF内の図（Fig. 1等）＆表（Table 1等）の自動切り出し・用語辞書・重要ポイント</strong>を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -3328,7 +3332,7 @@
             <div class="mb-4">
               <label class="block text-xs font-semibold text-slate-700 mb-1">反映先</label>
               <select id="pdf-target-mode" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white">
-                <option value="current">現在選択中の論文に全文（5セクション＋図表）を上書き追加する</option>
+                <option value="current">現在選択中の論文に全文（5セクション＋図・表）を上書き追加する</option>
                 <option value="new">新しい独立した論文カードとして一覧の先頭に追加する</option>
               </select>
             </div>
@@ -3368,12 +3372,12 @@
           if (fileInput.files[0]) handlePdfFile(fileInput.files[0]);
         };
 
-        // PDFからテキストと図表（Fig. 1, Figure 2等）の画像を同時に抽出する
+        // PDFからテキストと図（Fig. 1等）＆表（Table 1等）の画像を同時に抽出する
         async function extractTextAndFiguresFromPdf(file) {
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           let fullText = '';
-          const extractedFigures = {}; // key: "Fig. 1" -> { label, page, imageUrl }
+          const extractedFigures = {}; // key: "Fig. 1" or "Table 1" -> { label, page, imageUrl }
           const maxPages = Math.min(pdf.numPages, 40);
           const refStartThreshold = Math.max(3, Math.floor(pdf.numPages * 0.55));
 
@@ -3383,23 +3387,32 @@
             const content = await page.getTextContent();
             const pageText = content.items.map(item => item.str).join(' ');
 
-            // このページ内に図のキャプション（Fig. 1 / Figure 2 等）があるか座標付きで検出
-            const pageFigHits = [];
+            // このページ内に図（Fig. / Figure）または表（Table）の見出しキャプションがあるか座標付きで検出
+            const pageHits = [];
             for (const item of content.items) {
               const s = (item.str || '').trim();
-              const m = s.match(/^(?:Fig(?:ure|\.)?|FIG(?:URE|\.)?)\s*(\d+)\s*[\.:]/);
-              if (m) {
-                const figNum = m[1];
-                const label = `Fig. ${figNum}`;
-                if (!extractedFigures[label] && !pageFigHits.some(h => h.label === label)) {
+              const figMatch = s.match(/^(?:Fig(?:ure|\.)?|FIG(?:URE|\.)?)\s*(\d+)\s*[\.:]/);
+              if (figMatch) {
+                const label = `Fig. ${figMatch[1]}`;
+                if (!extractedFigures[label] && !pageHits.some(h => h.label === label)) {
                   const pdfY = item.transform ? item.transform[5] : viewport.height * 0.4;
-                  pageFigHits.push({ label, pdfY });
+                  pageHits.push({ label, kind: 'fig', pdfY });
+                }
+                continue;
+              }
+
+              const tblMatch = s.match(/^(?:Table|TABLE)\s*(\d+)\s*[\.:]/);
+              if (tblMatch) {
+                const label = `Table ${tblMatch[1]}`;
+                if (!extractedFigures[label] && !pageHits.some(h => h.label === label)) {
+                  const pdfY = item.transform ? item.transform[5] : viewport.height * 0.75;
+                  pageHits.push({ label, kind: 'table', pdfY });
                 }
               }
             }
 
-            // 図が見つかったページをレンダリングし、図＋キャプション領域を切り出して画像化
-            if (pageFigHits.length > 0 && Object.keys(extractedFigures).length < 10) {
+            // 図または表が見つかったページをレンダリングして切り出し
+            if (pageHits.length > 0 && Object.keys(extractedFigures).length < 14) {
               const renderScale = 1.65;
               const hiViewport = page.getViewport({ scale: renderScale });
               const fullCanvas = document.createElement('canvas');
@@ -3408,19 +3421,23 @@
               const ctx = fullCanvas.getContext('2d');
               await page.render({ canvasContext: ctx, viewport: hiViewport }).promise;
 
-              for (const hit of pageFigHits) {
-                // PDF座標(左下原点)をCanvas座標(左上原点)へ変換
+              for (const hit of pageHits) {
                 const captionCanvasY = (viewport.height - hit.pdfY) * renderScale;
                 let cropTop, cropBottom;
 
-                if (captionCanvasY < hiViewport.height * 0.25) {
-                  // キャプションがページ上部にある場合はその下側に図がある
-                  cropTop = Math.max(0, captionCanvasY - 25 * renderScale);
-                  cropBottom = Math.min(hiViewport.height, captionCanvasY + 380 * renderScale);
+                if (hit.kind === 'table') {
+                  // 表（Table）はタイトルが表の上部にあるため、タイトル行の少し上から下方向を切り出す
+                  cropTop = Math.max(0, captionCanvasY - 22 * renderScale);
+                  cropBottom = Math.min(hiViewport.height - 15 * renderScale, captionCanvasY + 420 * renderScale);
                 } else {
-                  // 通常はキャプションの上側に図がある
-                  cropTop = Math.max(25 * renderScale, captionCanvasY - 410 * renderScale);
-                  cropBottom = Math.min(hiViewport.height - 20 * renderScale, captionCanvasY + 55 * renderScale);
+                  // 図（Figure）はキャプション位置に応じて上下を判定
+                  if (captionCanvasY < hiViewport.height * 0.25) {
+                    cropTop = Math.max(0, captionCanvasY - 25 * renderScale);
+                    cropBottom = Math.min(hiViewport.height, captionCanvasY + 380 * renderScale);
+                  } else {
+                    cropTop = Math.max(25 * renderScale, captionCanvasY - 410 * renderScale);
+                    cropBottom = Math.min(hiViewport.height - 20 * renderScale, captionCanvasY + 55 * renderScale);
+                  }
                 }
 
                 const cropHeight = Math.max(120, cropBottom - cropTop);
@@ -3506,7 +3523,7 @@
           localStorage.setItem('USER_GEMINI_API_KEY', apiKey);
 
           statusBox.classList.remove('hidden');
-          statusBox.textContent = '1/2 PDFから本文テキストと図表（Fig. 1等）を抽出しています...';
+          statusBox.textContent = '1/2 PDFから本文テキストと図（Fig.）・表（Table）を抽出しています...';
 
           try {
             const { fullText: rawPdfText, extractedFigures } = await extractTextAndFiguresFromPdf(file);
@@ -3516,19 +3533,19 @@
 
             const detectedFigLabels = Object.keys(extractedFigures);
             const figHintText = detectedFigLabels.length > 0
-              ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}（各セクションの "figure_refs" に、そのセクションで解説されている図のラベルと日本語キャプション解説を入れてください）`
+              ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}（各セクションの "figure_refs" に、そのセクションで解説されている図または表のラベルと日本語解説を入れてください）`
               : '図表ラベル未検出';
 
             const prompt = `
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
 以下は査読済み論文PDFから抽出した実際の本文テキストです。
 
-【厳守ルール（捏造禁止・1文ごとのアライメント・図表紐付け・全段落完全抽出）】
+【厳守ルール（捏造禁止・1文ごとのアライメント・図＆表の紐付け・全段落完全抽出）】
 1. sections は必ず id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成してください。
 2. **各セクションの第1パラグラフから次の見出し直前の最終パラグラフまで、1段落も省略せずすべて抽出してください。**
 3. **各パラグラフの中では、"sentences" 配列に【1文ずつの英語原文（en）】と【その1文に対応する日本語訳（ja）】を1対1で対応させて格納してください。**
    - "en" にはPDF本文に書かれている英文を一字一句改変・創作せずそのまま入れてください。
-4. **図表の紐付け（${figHintText}）：** 各セクションの "figure_refs" 配列に、そのセクションに対応する図（例: "Fig. 1"）とその図が示す内容の日本語解説（caption_ja）を入れてください。
+4. **図および表の紐付け（${figHintText}）：** 各セクションの "figure_refs" 配列に、そのセクションに対応する図または表（例: "Fig. 1", "Table 1"）とその内容の日本語解説（caption_ja）を入れてください。
 5. 各セクションの "takeaways"（重要ポイント）は、必ず**4〜6個の具体的かつ詳細な日本語ポイント**を記述してください。
 6. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
 7. **"vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください。**
@@ -3552,7 +3569,8 @@
       "title_en": "1. Introduction",
       "title_ja": "1. 序論",
       "figure_refs": [
-        { "label": "Fig. 1", "caption_ja": "図1が示す生理学的経路・システム全体像の日本語解説" }
+        { "label": "Fig. 1", "caption_ja": "図1が示す生理学的経路・システム全体像の日本語解説" },
+        { "label": "Table 1", "caption_ja": "表1が示す被験者特性・比較条件の日本語解説" }
       ],
       "paragraphs": [
         {
@@ -3588,7 +3606,7 @@ ${rawPdfText.slice(0, 65000)}
             let lastErrMsg = '';
 
             for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で1文ごと対訳・図表紐付け・用語辞書を生成中（約30〜55秒）...`;
+              statusBox.textContent = `2/2 Gemini (${modelName}) で1文ごと対訳・図＆表紐付け・用語辞書を生成中（約30〜55秒）...`;
               try {
                 const apiRes = await fetchWithTimeout(
                   `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -3649,14 +3667,19 @@ ${rawPdfText.slice(0, 65000)}
               });
             }
 
-            // 抽出済みPDF画像（extractedFigures）を各セクションの figure_refs と結合
+            // 抽出済みPDF画像（Fig. / Table）を各セクションの figure_refs と結合
             const usedLabels = new Set();
             const normalizedSections = (parsed.sections || []).map(sec => {
               const figs = [];
               if (Array.isArray(sec.figure_refs)) {
                 for (const ref of sec.figure_refs) {
-                  const numMatch = String(ref.label || '').match(/(\d+)/);
-                  const normLabel = numMatch ? `Fig. ${numMatch[1]}` : ref.label;
+                  const rawLabel = String(ref.label || '');
+                  const numMatch = rawLabel.match(/(\d+)/);
+                  const isTable = /table/i.test(rawLabel);
+                  const normLabel = numMatch
+                    ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
+                    : rawLabel;
+
                   const imgObj = extractedFigures[normLabel];
                   if (imgObj && !usedLabels.has(normLabel)) {
                     usedLabels.add(normLabel);
@@ -3677,7 +3700,7 @@ ${rawPdfText.slice(0, 65000)}
               };
             });
 
-            // 万が一未割当の図が残っていたら Results セクションへ追加
+            // 未割当の図・表が残っていたら Results セクションへ追加
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
               const resSec = normalizedSections.find(s => s.id === 'results') || normalizedSections[normalizedSections.length - 1];
@@ -3750,7 +3773,7 @@ ${rawPdfText.slice(0, 65000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = `✅ 完了！（PDF内図表 ${Object.keys(extractedFigures).length} 点を自動抽出しました）`;
+            statusBox.textContent = `✅ 完了！（PDF内の図・表 ${Object.keys(extractedFigures).length} 点を自動抽出しました）`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
