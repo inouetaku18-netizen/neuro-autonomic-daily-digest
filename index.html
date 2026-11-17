@@ -2850,6 +2850,322 @@
       }
 
       // =========================================================================
+      // テキスト範囲選択による「単語・手法 AI精密解説」ポップアップ機能
+      // =========================================================================
+      window.selectionTermCache = JSON.parse(localStorage.getItem('SELECTION_TERM_CACHE') || '{}');
+
+      function setupSelectionExplainerUI() {
+        if (document.getElementById('selection-explain-trigger')) return;
+
+        // 選択直後に浮かび上がる「💡 選択箇所をAI解説」ボタン
+        const triggerBtn = document.createElement('button');
+        triggerBtn.id = 'selection-explain-trigger';
+        triggerBtn.className = 'fixed z-50 hidden bg-slate-900 hover:bg-indigo-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-full shadow-xl border border-indigo-400/60 flex items-center gap-1.5 transition cursor-pointer';
+        triggerBtn.innerHTML = '💡 選択箇所をAI解説';
+        document.body.appendChild(triggerBtn);
+
+        // 解説結果を表示するリッチポップアップカード
+        const card = document.createElement('div');
+        card.id = 'selection-explain-card';
+        card.className = 'fixed z-50 hidden w-[92vw] max-w-md bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 p-4 sm:p-5 text-left';
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2.5">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span id="sec-exp-badge" class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-100 text-indigo-900">用語・手法解説</span>
+                <span id="sec-exp-ipa" class="text-[11px] font-mono text-slate-500"></span>
+              </div>
+              <h4 id="sec-exp-term" class="text-base font-extrabold text-slate-950 break-words"></h4>
+            </div>
+            <button id="sec-exp-close" class="text-slate-400 hover:text-slate-700 text-2xl leading-none px-1 cursor-pointer">&times;</button>
+          </div>
+
+          <div id="sec-exp-body" class="mt-3 space-y-2.5 text-xs max-h-[55vh] overflow-y-auto pr-1"></div>
+
+          <div id="sec-exp-actions" class="hidden mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
+            <button id="sec-exp-speak" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">🔊 発音</button>
+            <button id="sec-exp-add-word" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer">＋ マイ単語帳</button>
+            <button id="sec-exp-add-note" class="flex-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">📓 ノートに保存</button>
+          </div>
+        `;
+        document.body.appendChild(card);
+
+        let selectedText = '';
+        let contextSentence = '';
+        let lastAnchorRect = null;
+        let currentParsedResult = null;
+
+        document.getElementById('sec-exp-close').onclick = () => card.classList.add('hidden');
+
+        document.getElementById('sec-exp-speak').onclick = () => {
+          if (!selectedText || !('speechSynthesis' in window)) return;
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(selectedText);
+          u.lang = 'en-US';
+          window.speechSynthesis.speak(u);
+        };
+
+        document.getElementById('sec-exp-add-word').onclick = () => {
+          if (!selectedText || !currentParsedResult) return;
+          const key = selectedText.toLowerCase();
+          if (typeof ACADEMIC_GLOSSARY !== 'undefined') {
+            ACADEMIC_GLOSSARY[key] = {
+              ipa: currentParsedResult.ipa || '',
+              pos: currentParsedResult.category || 'term',
+              ja: currentParsedResult.short_meaning || '',
+              meaning: currentParsedResult.short_meaning || '',
+              nuance: currentParsedResult.context_role || ''
+            };
+          }
+          if (typeof wordbook !== 'undefined' && Array.isArray(wordbook)) {
+            if (!wordbook.some(w => (w.term || w.word || '').toLowerCase() === key)) {
+              wordbook.unshift({
+                term: selectedText,
+                word: selectedText,
+                ipa: currentParsedResult.ipa || '',
+                pos: currentParsedResult.category || 'term',
+                ja: currentParsedResult.short_meaning || '',
+                meaning: currentParsedResult.short_meaning || '',
+                nuance: currentParsedResult.context_role || '',
+                addedAt: new Date().toISOString().slice(0, 10)
+              });
+              safeSaveState();
+              if (typeof updateHeaderStats === 'function') updateHeaderStats();
+            }
+          }
+          const btn = document.getElementById('sec-exp-add-word');
+          btn.textContent = '✓ 単語帳済';
+          setTimeout(() => { btn.textContent = '＋ マイ単語帳'; }, 1500);
+        };
+
+        document.getElementById('sec-exp-add-note').onclick = () => {
+          if (!selectedText || !currentParsedResult) return;
+          const detailText = [
+            `【意味・定義】${currentParsedResult.short_meaning || ''}`,
+            `【論文・文脈での役割】${currentParsedResult.context_role || ''}`,
+            `【直感的イメージ・注意点】${currentParsedResult.intuitive_tip || ''}`
+          ].join('\n');
+
+          if (typeof window.addEnglishStudyNote === 'function') {
+            window.addEnglishStudyNote({
+              category: currentParsedResult.category || '用語・手法解説',
+              pattern: `${selectedText} — ${currentParsedResult.short_meaning || ''}`,
+              en: contextSentence || selectedText,
+              ja: '',
+              analysis: detailText
+            });
+          }
+          const btn = document.getElementById('sec-exp-add-note');
+          btn.textContent = '✓ ノート保存済';
+          setTimeout(() => { btn.textContent = '📓 ノートに保存'; }, 1500);
+        };
+
+        function positionFloatingBox(el, rect, boxW, boxH) {
+          const top = (rect.bottom + boxH + 16 < window.innerHeight)
+            ? rect.bottom + 10
+            : Math.max(12, rect.top - boxH - 10);
+          const left = Math.min(window.innerWidth - boxW - 14, Math.max(14, rect.left));
+          el.style.top = `${top}px`;
+          el.style.left = `${left}px`;
+        }
+
+        function renderSelectionExplanation(data) {
+          currentParsedResult = data;
+          document.getElementById('sec-exp-badge').textContent = data.category || '用語・手法解説';
+          document.getElementById('sec-exp-ipa').textContent = data.ipa || '';
+          document.getElementById('sec-exp-term').textContent = selectedText;
+
+          const bodyEl = document.getElementById('sec-exp-body');
+          bodyEl.innerHTML = `
+            <div class="bg-indigo-50/80 border border-indigo-100 rounded-xl p-3">
+              <div class="text-[11px] font-extrabold text-indigo-900 mb-0.5">📌 意味・定義</div>
+              <div class="text-sm font-bold text-slate-900 leading-snug">${escapeHtmlSafe(data.short_meaning)}</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3">
+              <div class="text-[11px] font-extrabold text-blue-900 mb-1">🔬 この文脈・論文での役割と仕組み</div>
+              <p class="text-slate-700 leading-relaxed">${escapeHtmlSafe(data.context_role)}</p>
+            </div>
+            <div class="bg-amber-50/70 border border-amber-200/70 rounded-xl p-3">
+              <div class="text-[11px] font-extrabold text-amber-900 mb-1">💡 直感的イメージ・研究上のポイント</div>
+              <p class="text-slate-700 leading-relaxed">${escapeHtmlSafe(data.intuitive_tip)}</p>
+            </div>
+          `;
+          document.getElementById('sec-exp-actions').classList.remove('hidden');
+        }
+
+        // マウスアップ時に精読エリア内の選択テキストを検知してトリガーボタンを表示
+        document.addEventListener('mouseup', (e) => {
+          if (e.target.closest('#selection-explain-trigger') || e.target.closest('#selection-explain-card')) {
+            return;
+          }
+          setTimeout(() => {
+            const sel = window.getSelection();
+            const rawStr = sel ? sel.toString().trim() : '';
+            if (!rawStr || rawStr.length < 2 || rawStr.length > 180) {
+              triggerBtn.classList.add('hidden');
+              return;
+            }
+
+            // 精読コンテナ（または要約詳細エリア）内の選択のみ反応させる
+            const anchorNode = sel.anchorNode;
+            const anchorEl = anchorNode && anchorNode.nodeType === 3 ? anchorNode.parentElement : anchorNode;
+            if (!anchorEl || (!anchorEl.closest('#readerSectionsContainer') && !anchorEl.closest('#feedAndClinicalContainer'))) {
+              triggerBtn.classList.add('hidden');
+              return;
+            }
+
+            const range = sel.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            if (!rect || (rect.width === 0 && rect.height === 0)) {
+              triggerBtn.classList.add('hidden');
+              return;
+            }
+
+            selectedText = rawStr.replace(/\s+/g, ' ');
+            lastAnchorRect = rect;
+            const rowEl = anchorEl.closest('.bilingual-pair-row');
+            contextSentence = rowEl ? decodeURIComponent(rowEl.dataset.enRaw || '') : '';
+
+            triggerBtn.classList.remove('hidden');
+            positionFloatingBox(triggerBtn, rect, 165, 36);
+          }, 10);
+        });
+
+        document.addEventListener('mousedown', (e) => {
+          if (!e.target.closest('#selection-explain-trigger')) {
+            triggerBtn.classList.add('hidden');
+          }
+          if (!e.target.closest('#selection-explain-card') && !e.target.closest('#selection-explain-trigger')) {
+            card.classList.add('hidden');
+          }
+        });
+
+        triggerBtn.onclick = async (e) => {
+          e.stopPropagation();
+          triggerBtn.classList.add('hidden');
+          if (!selectedText) return;
+
+          document.getElementById('sec-exp-term').textContent = selectedText;
+          document.getElementById('sec-exp-ipa').textContent = '';
+          document.getElementById('sec-exp-badge').textContent = 'AI解析中';
+          document.getElementById('sec-exp-actions').classList.add('hidden');
+          card.classList.remove('hidden');
+          if (lastAnchorRect) {
+            positionFloatingBox(card, lastAnchorRect, 420, 320);
+          }
+
+          const currentPaper = items.find(i => i.id === selectedItemId);
+          const cacheKey = `${selectedText.toLowerCase()}::${(contextSentence || '').slice(0, 60)}`;
+          if (window.selectionTermCache[cacheKey]) {
+            renderSelectionExplanation(window.selectionTermCache[cacheKey]);
+            return;
+          }
+
+          const apiKey = (localStorage.getItem('USER_GEMINI_API_KEY') || '').trim();
+          if (!apiKey) {
+            document.getElementById('sec-exp-body').innerHTML = `
+              <div class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-amber-900">
+                <p class="mb-2 font-semibold">⚠️ 用語・手法のAI解説を使うには、先にGemini APIキーを入力してください。</p>
+                <button onclick="document.getElementById('selection-explain-card').classList.add('hidden'); document.getElementById('pdf-decoder-modal').classList.remove('hidden');" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold cursor-pointer">APIキーを設定する</button>
+              </div>
+            `;
+            return;
+          }
+
+          document.getElementById('sec-exp-body').innerHTML = `
+            <div class="rounded-xl bg-indigo-50/70 border border-indigo-100 p-4 text-indigo-900 font-semibold flex items-center gap-2">
+              <span class="animate-spin inline-block">⏳</span>
+              <span>「${escapeHtmlSafe(selectedText)}」の意味とこの論文での役割を解説中（約2〜3秒）...</span>
+            </div>
+          `;
+
+          const prompt = `
+あなたは生体医工学・神経科学・統計解析・非線形制御工学の専門研究者兼教育者です。
+論文精読中のユーザーが以下の【選択された単語・専門用語・手法名】を選択しました。
+前後の文脈と論文テーマを踏まえ、大学院生や異分野の研究者にも直感的にスッと腹落ちするように分かりやすく解説してください。
+
+【選択された語句・手法】
+${selectedText}
+
+【登場した文脈（英文）】
+${contextSentence || '（文脈なし）'}
+
+【論文タイトル】
+${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
+
+以下のJSON形式のみを出力してください。
+{
+  "category": "分類ラベル（例: 解析手法 / 生理学用語 / 統計指標 / 学術英語表現）",
+  "ipa": "英語の場合は発音記号（例: /ˌbæroʊˈriːflɛks/）、日本語の場合は空文字",
+  "short_meaning": "一言でいうと何か（簡潔な日本語訳・定義）",
+  "context_role": "この文脈・論文の中で、何のために・どのような仕組みで使われているのかの分かりやすい解説（日本語・3〜4文）",
+  "intuitive_tip": "直感的なイメージ・類似手法との違い・論文を読む際の着眼点（日本語・2〜3文）"
+}
+`;
+
+          try {
+            const models = ['gemini-3.8-flash-lite', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview'];
+            let parsed = null;
+            let lastErr = '';
+
+            for (const m of models) {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 25000);
+              try {
+                const res = await fetch(
+                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                      contents: [{ parts: [{ text: prompt }] }],
+                      generationConfig: {
+                        responseMimeType: 'application/json',
+                        temperature: 0.2
+                      }
+                    })
+                  }
+                );
+                clearTimeout(timer);
+                if (res.ok) {
+                  const json = await res.json();
+                  const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
+                  parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
+                  break;
+                } else {
+                  const errData = await res.json().catch(() => ({}));
+                  lastErr = errData.error?.message || `HTTP ${res.status}`;
+                }
+              } catch (err) {
+                clearTimeout(timer);
+                lastErr = err.message;
+              }
+            }
+
+            if (!parsed) {
+              throw new Error(lastErr || '解説サーバーが混雑しています。再度お試しください。');
+            }
+
+            window.selectionTermCache[cacheKey] = parsed;
+            try {
+              const keys = Object.keys(window.selectionTermCache);
+              if (keys.length > 80) delete window.selectionTermCache[keys[0]];
+              localStorage.setItem('SELECTION_TERM_CACHE', JSON.stringify(window.selectionTermCache));
+            } catch (_) {}
+
+            renderSelectionExplanation(parsed);
+          } catch (err) {
+            document.getElementById('sec-exp-body').innerHTML = `
+              <div class="rounded-xl border border-red-200 bg-red-50 p-3 text-red-800">
+                ❌ 解説エラー: ${escapeHtmlSafe(err.message)}
+              </div>
+            `;
+          }
+        };
+      }
+
+      // =========================================================================
       // 学術英語表現ノート（保存・管理・PDF出力）システム
       // =========================================================================
       window.englishStudyNotes = JSON.parse(localStorage.getItem('ACADEMIC_ENGLISH_NOTES') || '[]');
@@ -3075,7 +3391,6 @@
       function setupEnglishNoteUI() {
         if (document.getElementById('open-english-note-btn')) return;
 
-        // 画面右下に「英語表現ノート」ボタンを追加（PDF解読ボタンのすぐ上）
         const noteBtn = document.createElement('button');
         noteBtn.id = 'open-english-note-btn';
         noteBtn.className = 'fixed bottom-20 right-6 z-40 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold px-5 py-2.5 rounded-full shadow-xl border border-indigo-700 flex items-center gap-2 transition cursor-pointer text-sm';
@@ -3087,13 +3402,12 @@
         modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6';
         modal.innerHTML = `
           <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200 overflow-hidden">
-            <!-- ヘッダー -->
             <div class="flex flex-wrap items-center justify-between gap-2 px-6 py-4 bg-slate-900 text-white">
               <div>
                 <h3 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
                   <span>📓 学術英語表現・構文ニュアンス学習ノート</span>
                 </h3>
-                <p class="text-[11px] text-slate-300">論文精読で学んだ表現・時制/助動詞の使い分けを蓄積し、PDF出力できます</p>
+                <p class="text-[11px] text-slate-300">論文精読で学んだ表現・用語解説・時制/助動詞の使い分けを蓄積し、PDF出力できます</p>
               </div>
               <div class="flex items-center gap-2">
                 <button id="export-notes-pdf-btn" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition cursor-pointer">
@@ -3103,7 +3417,6 @@
               </div>
             </div>
 
-            <!-- 新規メモ追加フォーム（折りたたみ式） -->
             <div class="px-6 py-3 bg-indigo-50/70 border-b border-indigo-100">
               <button id="toggle-new-note-form" class="text-xs font-extrabold text-indigo-900 hover:text-indigo-700 flex items-center gap-1 cursor-pointer">
                 <span>＋ 学んだ英語表現・自作メモを直接追加する</span>
@@ -3113,6 +3426,7 @@
                   <select id="nn-category" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
                     <option value="ライティング表現">ライティング表現</option>
                     <option value="構文・ニュアンス">構文・ニュアンス</option>
+                    <option value="用語・手法解説">用語・手法解説</option>
                     <option value="時制・助動詞メモ">時制・助動詞メモ</option>
                   </select>
                   <input id="nn-pattern" type="text" placeholder="表現パターン（例: X may account for Y）" class="sm:col-span-2 px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
@@ -3125,18 +3439,17 @@
               </div>
             </div>
 
-            <!-- 検索・フィルタバー -->
             <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center gap-2">
               <input id="note-search-input" type="text" placeholder="キーワードでノート内検索..." class="flex-1 min-w-[180px] px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
               <select id="note-filter-cat" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
                 <option value="ALL">すべてのカテゴリ</option>
                 <option value="構文・ニュアンス">構文・ニュアンス</option>
+                <option value="用語・手法解説">用語・手法解説</option>
                 <option value="ライティング表現">ライティング表現</option>
                 <option value="時制・助動詞メモ">時制・助動詞メモ</option>
               </select>
             </div>
 
-            <!-- ノート一覧コンテナ -->
             <div id="english-notes-list" class="p-6 overflow-y-auto space-y-4 flex-1 bg-slate-100/60"></div>
           </div>
         `;
@@ -3161,7 +3474,7 @@
             listEl.innerHTML = `
               <div class="text-center py-12 text-slate-500 text-xs sm:text-sm">
                 保存されたノートがありません。<br>
-                精読画面の「🔬 解説」パネルや「✍️ ライティング表現」の「📓 ノートに保存」ボタンから追加できます。
+                精読画面のテキスト選択解説や「🔬 解説」パネルから追加できます。
               </div>
             `;
             return;
@@ -3400,7 +3713,8 @@ ${jaText}
               clearTimeout(timer);
               if (res.ok) {
                 const json = await res.json();
-                parsed = JSON.parse(json.candidates[0].content.parts[0].text);
+                const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
+                parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
                 break;
               } else {
                 const errData = await res.json().catch(() => ({}));
@@ -3658,7 +3972,7 @@ ${jaText}
                   <div class="rounded-2xl border border-slate-200/90 bg-white/70 p-3.5 sm:p-4 shadow-2xs space-y-1.5">
                     <div class="text-[11px] font-mono font-bold text-slate-400 pb-1 border-b border-slate-100 flex items-center justify-between">
                       <span>Paragraph #${sIdx + 1}.${pIdx + 1}（1文ごとにカーソル連動）</span>
-                      <span class="text-[10px] text-indigo-500 font-sans">右端の「🔬 解説」で時制・助動詞・構文を分解</span>
+                      <span class="text-[10px] text-indigo-500 font-sans">単語ドラッグで「💡AI解説」 / 右端の「🔬解説」で構文分解</span>
                     </div>
                     ${sentencesHTML}
                   </div>
@@ -3748,7 +4062,7 @@ ${jaText}
                   </div>
                   <div class="hidden lg:grid grid-cols-2 gap-8 text-xs font-bold text-slate-500 pr-4">
                     <span>左：日本語訳（1文ごとに連動）</span>
-                    <span>右：Original English（点線語・🔬解説対応）</span>
+                    <span>右：Original English（語句選択・🔬解説対応）</span>
                   </div>
                 </div>
 
@@ -3841,6 +4155,16 @@ ${jaText}
               results: s.key_results || raw.results || '',
               discussion: s.discussion_and_implications || raw.discussion || '',
               relevance: sourceHeader + (s.relevance_to_my_research || raw.relevance || ''),
+              summary: {
+                problem: s.problem || raw.problem || '',
+                solution_and_method: s.solution_and_method || raw.method || '',
+                formula_block: s.formula_block || raw.formula || '',
+                diagram_caption: s.diagram_caption || raw.diagramCaption || 'Abstract Flow Diagram',
+                diagram_svg: s.diagram_svg || raw.diagramSvg || '',
+                key_results: s.key_results || raw.results || '',
+                discussion_and_implications: s.discussion_and_implications || raw.discussion || '',
+                relevance_to_my_research: sourceHeader + (s.relevance_to_my_research || raw.relevance || '')
+              },
               abstractEn: abstractEn,
               abstractJa: abstractJa,
               full_text: { sections: [] },
@@ -4150,7 +4474,7 @@ ${jaText}
 5. 各セクションの "takeaways"（重要ポイント）は、必ず**4〜6個の具体的かつ詳細な日本語ポイント**を記述してください。
 6. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
 7. **"vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください。**
-8. 以下のJSON形式のみを出力してください。
+8. 以下のJSON形式のみを出力してください（必ず単一のJSONオブジェクトとして出力し、外側に配列 [...] を付けないでください）。
 
 {
   "title_en": "英語タイトル",
@@ -4253,27 +4577,30 @@ ${rawPdfText.slice(0, 65000)}
               throw new Error(lastErrMsg || '利用可能なGeminiモデルがすべて混雑しています。少し時間を置いてお試しください。');
             }
 
-            const jsonText = result.candidates[0].content.parts[0].text;
-            const parsed = JSON.parse(jsonText);
+            const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+            const rawParsed = JSON.parse(jsonText);
+            const parsed = Array.isArray(rawParsed) ? (rawParsed[0] || {}) : (rawParsed || {});
 
             if (parsed.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
               Object.entries(parsed.vocabulary).forEach(([k, v]) => {
-                ACADEMIC_GLOSSARY[k.toLowerCase()] = {
-                  ipa: v.ipa || '',
-                  pos: v.pos || '',
-                  ja: v.ja || v.meaning || '',
-                  meaning: v.meaning || v.ja || '',
-                  nuance: v.nuance || ''
-                };
+                if (v && typeof v === 'object') {
+                  ACADEMIC_GLOSSARY[k.toLowerCase()] = {
+                    ipa: v.ipa || '',
+                    pos: v.pos || '',
+                    ja: v.ja || v.meaning || '',
+                    meaning: v.meaning || v.ja || '',
+                    nuance: v.nuance || ''
+                  };
+                }
               });
             }
 
             const usedLabels = new Set();
-            const normalizedSections = (parsed.sections || []).map(sec => {
+            const normalizedSections = (Array.isArray(parsed.sections) ? parsed.sections : []).map(sec => {
               const figs = [];
               if (Array.isArray(sec.figure_refs)) {
                 for (const ref of sec.figure_refs) {
-                  const rawLabel = String(ref.label || '');
+                  const rawLabel = String(ref?.label || '');
                   const numMatch = rawLabel.match(/(\d+)/);
                   const isTable = /table/i.test(rawLabel);
                   const normLabel = numMatch
@@ -4287,7 +4614,7 @@ ${rawPdfText.slice(0, 65000)}
                       label: normLabel,
                       page: imgObj.page,
                       imageUrl: imgObj.imageUrl,
-                      captionJa: ref.caption_ja || ''
+                      captionJa: ref?.caption_ja || ''
                     });
                   }
                 }
@@ -4316,23 +4643,48 @@ ${rawPdfText.slice(0, 65000)}
             const mode = document.getElementById('pdf-target-mode').value;
             const targetIdx = items.findIndex(i => i.id === selectedItemId);
 
-            if (mode === 'current' && targetIdx !== -1) {
+            if (mode === 'current' && targetIdx !== -1 && items[targetIdx]) {
+              const prev = items[targetIdx];
+              const prevSum = prev.summary || {};
+              const nextProblem = parsed.problem || prev.problem || prevSum.problem || '';
+              const nextMethod = parsed.solution_and_method || prev.method || prevSum.solution_and_method || '';
+              const nextFormula = parsed.formula_block || prev.formula || prevSum.formula_block || '';
+              const nextResults = parsed.key_results || prev.results || prevSum.key_results || '';
+              const nextDiscussion = parsed.discussion_and_implications || prev.discussion || prevSum.discussion_and_implications || '';
+              const nextRelevance = '【PDF全文解読済み】\n' + (parsed.relevance_to_my_research || prev.relevance || prevSum.relevance_to_my_research || '');
+
               items[targetIdx] = {
-                ...items[targetIdx],
+                ...prev,
                 entry_type: 'daily_paper',
                 pdfDecoded: true,
-                vocabulary: parsed.vocabulary || items[targetIdx].vocabulary,
-                problem: parsed.problem || items[targetIdx].problem,
-                method: parsed.solution_and_method || items[targetIdx].method,
-                formula: parsed.formula_block || items[targetIdx].formula,
-                results: parsed.key_results || items[targetIdx].results,
-                discussion: parsed.discussion_and_implications || items[targetIdx].discussion,
-                relevance: '【PDF全文解読済み】\n' + (parsed.relevance_to_my_research || items[targetIdx].relevance),
+                vocabulary: parsed.vocabulary || prev.vocabulary || {},
+                problem: nextProblem,
+                method: nextMethod,
+                formula: nextFormula,
+                results: nextResults,
+                discussion: nextDiscussion,
+                relevance: nextRelevance,
+                summary: {
+                  ...prevSum,
+                  problem: nextProblem,
+                  solution_and_method: nextMethod,
+                  formula_block: nextFormula,
+                  key_results: nextResults,
+                  discussion_and_implications: nextDiscussion,
+                  relevance_to_my_research: nextRelevance
+                },
                 full_text: { sections: normalizedSections },
                 sections: normalizedSections
               };
             } else {
               const newId = 'pdf-' + Date.now();
+              const nextProblem = parsed.problem || '';
+              const nextMethod = parsed.solution_and_method || '';
+              const nextFormula = parsed.formula_block || '';
+              const nextResults = parsed.key_results || '';
+              const nextDiscussion = parsed.discussion_and_implications || '';
+              const nextRelevance = parsed.relevance_to_my_research || '';
+
               const newPaper = {
                 id: newId,
                 entry_type: 'daily_paper',
@@ -4348,15 +4700,25 @@ ${rawPdfText.slice(0, 65000)}
                 doi: parsed.doi || '',
                 title_en: parsed.title_en || file.name,
                 title_ja: parsed.title_ja || file.name,
-                tags: parsed.tags || ['PDF Full-Text'],
-                problem: parsed.problem || '',
-                method: parsed.solution_and_method || '',
-                formula: parsed.formula_block || '',
+                tags: Array.isArray(parsed.tags) ? parsed.tags : ['PDF Full-Text'],
+                problem: nextProblem,
+                method: nextMethod,
+                formula: nextFormula,
                 diagramCaption: 'PDF Full-Text Decoded',
                 diagramSvg: '',
-                results: parsed.key_results || '',
-                discussion: parsed.discussion_and_implications || '',
-                relevance: parsed.relevance_to_my_research || '',
+                results: nextResults,
+                discussion: nextDiscussion,
+                relevance: nextRelevance,
+                summary: {
+                  problem: nextProblem,
+                  solution_and_method: nextMethod,
+                  formula_block: nextFormula,
+                  diagram_caption: 'PDF Full-Text Decoded',
+                  diagram_svg: '',
+                  key_results: nextResults,
+                  discussion_and_implications: nextDiscussion,
+                  relevance_to_my_research: nextRelevance
+                },
                 abstractEn: '',
                 abstractJa: '',
                 full_text: { sections: normalizedSections },
@@ -4378,13 +4740,14 @@ ${rawPdfText.slice(0, 65000)}
               statusBox.classList.add('hidden');
             }, 1200);
           } catch (err) {
-            statusBox.textContent = '❌ エラー: ' + err.message;
+            statusBox.textContent = '❌ エラー: ' + (err?.message || String(err));
           }
         }
       }
 
       initApp();
       setupVocabPopup();
+      setupSelectionExplainerUI();
       setupEnglishNoteUI();
       setupPdfDecoderUI();
       loadRemoteManifest();
