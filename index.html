@@ -2763,7 +2763,6 @@
               });
             }
 
-            // DOI / PubMed / PMC の一次ソース直リンクを明示
             const links = [];
             if (raw.doi) links.push(`DOI: https://doi.org/${raw.doi}`);
             if (raw.pmid) links.push(`PubMed: https://pubmed.ncbi.nlm.nih.gov/${raw.pmid}/`);
@@ -2772,7 +2771,9 @@
 
             return {
               ...raw,
+              entry_type: type === 'review' ? 'clinical_review' : 'daily_paper',
               type: type,
+              impact_factor: raw.impact_factor || raw.impactFactor || 3.5,
               impactFactor: raw.impact_factor || raw.impactFactor || 3.5,
               problem: s.problem || raw.problem || '',
               method: s.solution_and_method || raw.method || '',
@@ -2790,15 +2791,34 @@
 
           if (Array.isArray(manifest.papers)) {
             for (const item of [...manifest.papers].reverse()) {
+              // テスト時の旧ファイル(2026-11-17.json)はスキップし、個別PMIDファイルのみ読み込む
+              if (item.path === 'data/papers/2026-11-17.json') continue;
+
               const pRes = await fetch('./' + item.path + '?t=' + Date.now());
               if (pRes.ok) {
                 const pData = await pRes.json();
-                // すでにブラウザ上でPDF全文解読済みの論文は上書きしない
                 const existing = items.find(p => p.id === pData.id);
-                if (existing && existing.pdfDecoded) continue;
+                if (existing && existing.pdfDecoded) {
+                  existing.entry_type = 'daily_paper';
+                  continue;
+                }
 
                 items = items.filter(p => p.id !== pData.id);
                 const normalized = normalizeRemoteItem(pData, 'paper');
+                items.unshift(normalized);
+                if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
+                updated = true;
+              }
+            }
+          }
+
+          if (Array.isArray(manifest.reviews)) {
+            for (const item of [...manifest.reviews].reverse()) {
+              const rRes = await fetch('./' + item.path + '?t=' + Date.now());
+              if (rRes.ok) {
+                const rData = await rRes.json();
+                items = items.filter(r => r.id !== rData.id);
+                const normalized = normalizeRemoteItem(rData, 'review');
                 items.unshift(normalized);
                 if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(normalized.id);
                 updated = true;
@@ -2824,7 +2844,6 @@
       // PDFアップロード＆全文AI解読モーダル（ブラウザ完結型・pdf.js + Gemini API）
       // =========================================================================
       function setupPdfDecoderUI() {
-        // pdf.js の動的ロード
         if (!window.pdfjsLib) {
           const sc = document.createElement('script');
           sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
@@ -2835,14 +2854,12 @@
           document.head.appendChild(sc);
         }
 
-        // 右下フローティングボタンを追加
         const btn = document.createElement('button');
         btn.id = 'open-pdf-decoder-btn';
         btn.innerHTML = '📄 ダウンロードしたPDFを全文解読';
         btn.className = 'fixed bottom-6 right-6 z-40 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-5 py-3 rounded-full shadow-xl border border-blue-700 flex items-center gap-2 transition cursor-pointer';
         document.body.appendChild(btn);
 
-        // モーダルHTML
         const modal = document.createElement('div');
         modal.id = 'pdf-decoder-modal';
         modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
@@ -3020,6 +3037,7 @@ ${rawPdfText.slice(0, 32000)}
             if (mode === 'current' && targetIdx !== -1) {
               items[targetIdx] = {
                 ...items[targetIdx],
+                entry_type: 'daily_paper',
                 pdfDecoded: true,
                 problem: parsed.problem || items[targetIdx].problem,
                 method: parsed.solution_and_method || items[targetIdx].method,
@@ -3035,12 +3053,14 @@ ${rawPdfText.slice(0, 32000)}
               const newId = 'pdf-' + Date.now();
               const newPaper = {
                 id: newId,
+                entry_type: 'daily_paper',
                 type: 'paper',
                 pdfDecoded: true,
                 date: new Date().toISOString().slice(0, 10),
                 category: 'brain_heart',
                 category_label: '📄 PDF全文解読',
                 journal: parsed.journal || file.name,
+                impact_factor: 4.5,
                 impactFactor: 4.5,
                 doi: parsed.doi || '',
                 title_en: parsed.title_en || file.name,
