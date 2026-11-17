@@ -5,7 +5,7 @@ import time
 import datetime
 import requests
 import xml.etree.ElementTree as ET
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
@@ -14,18 +14,18 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 NCBI_EMAIL = "research-digest@example.com"
 
 # =========================================================================
-# 1. 研究トラック定義（すべて PubMed Central Open Access 限定検索）
+# 1. 研究トラック定義（PubMed Central Open Access Subset 直接検索）
 # =========================================================================
 RESEARCH_TRACKS = [
-    {
-        "category": "rc_koopman",
-        "category_label": "RC + Koopman制御",
-        "query": '("Koopman operator" OR "reservoir computing") AND ("dynamical systems" OR "control" OR "physiological" OR "neural") AND "open access"[filter]'
-    },
     {
         "category": "point_process",
         "category_label": "点過程・脳心臓連関",
         "query": '("brain-heart" OR "point process" OR "heart rate variability") AND ("electroencephalography" OR "autonomic" OR "interplay") AND "open access"[filter]'
+    },
+    {
+        "category": "rc_koopman",
+        "category_label": "RC + Koopman制御",
+        "query": '("Koopman operator" OR "reservoir computing") AND ("dynamical systems" OR "control" OR "physiological" OR "neural") AND "open access"[filter]'
     },
     {
         "category": "nonlinear_hrv",
@@ -104,7 +104,7 @@ class ClinicalReviewSchema(BaseModel):
     synthesis: str = Field(description="複数論文を統合した臨床・数理モデリング横断レビュー（日本語）")
 
 # =========================================================================
-# 3. PubMed & PMC Open Access フルテキスト実取得関数
+# 3. PubMed Central (PMC) Open Access フルテキスト実取得関数
 # =========================================================================
 def sanitize_svg(svg_str: str, min_height: int = 220) -> str:
     if not svg_str or "<svg" not in svg_str:
@@ -113,10 +113,11 @@ def sanitize_svg(svg_str: str, min_height: int = 220) -> str:
     return match.group(0) if match else svg_str
 
 
-def search_pubmed_open_access(query: str, max_results: int = 25) -> List[str]:
+def search_pmc_open_access(query: str, max_results: int = 30) -> List[str]:
+    """PubMed Central (db=pmc) から Open Access Subset の PMCID リストを取得する"""
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     params = {
-        "db": "pubmed",
+        "db": "pmc",
         "term": query,
         "retmax": max_results,
         "sort": "relevance",
@@ -128,59 +129,10 @@ def search_pubmed_open_access(query: str, max_results: int = 25) -> List[str]:
     return resp.json().get("esearchresult", {}).get("idlist", [])
 
 
-def fetch_pubmed_metadata(pmid: str) -> Optional[dict]:
+def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, str]]:
+    """PMC XMLから実在メタデータ（PMID/PMCID/DOI/Title/Journal/Abstract）と本文フルテキストを一括抽出する"""
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    params = {"db": "pubmed", "id": pmid, "retmode": "xml", "email": NCBI_EMAIL}
-    resp = requests.get(url, params=params, timeout=20)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.text)
-
-    article = root.find(".//PubmedArticle")
-    if article is None:
-        return None
-
-    title_el = article.find(".//ArticleTitle")
-    title_en = "".join(title_el.itertext()).strip() if title_el is not None else ""
-
-    journal_el = article.find(".//Journal/Title")
-    journal = journal_el.text.strip() if journal_el is not None and journal_el.text else "Peer-Reviewed Journal"
-
-    abstract_texts = []
-    for ab in article.findall(".//Abstract/AbstractText"):
-        label = ab.attrib.get("Label", "")
-        text = "".join(ab.itertext()).strip()
-        if text:
-            abstract_texts.append(f"{label}: {text}" if label else text)
-    abstract = "\n".join(abstract_texts)
-
-    doi = ""
-    pmcid = ""
-    for aid in article.findall(".//PubmedData/ArticleIdList/ArticleId"):
-        id_type = aid.attrib.get("IdType", "")
-        if id_type == "doi" and aid.text:
-            doi = aid.text.strip()
-        elif id_type == "pmc" and aid.text:
-            pmcid = aid.text.strip()
-
-    # Open Accessフルテキスト取得のため PMCID と DOI の両方が存在する論文のみ許可
-    if not pmcid or not doi or not title_en:
-        return None
-
-    return {
-        "pmid": pmid,
-        "pmcid": pmcid,
-        "doi": doi,
-        "title_en": title_en,
-        "journal": journal,
-        "abstract": abstract
-    }
-
-
-def fetch_pmc_full_text_sections(pmcid: str) -> Optional[str]:
-    """PubMed Central (PMC) から実際のフルテキストXMLを取得し、セクション構造付きで抽出する"""
-    numeric_id = pmcid.replace("PMC", "")
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    params = {"db": "pmc", "id": numeric_id, "retmode": "xml", "email": NCBI_EMAIL}
+    params = {"db": "pmc", "id": numeric_pmcid, "retmode": "xml", "email": NCBI_EMAIL}
     resp = requests.get(url, params=params, timeout=25)
     if resp.status_code != 200:
         return None
@@ -190,7 +142,47 @@ def fetch_pmc_full_text_sections(pmcid: str) -> Optional[str]:
     except ET.ParseError:
         return None
 
-    body = root.find(".//body")
+    article = root.find(".//article")
+    if article is None:
+        return None
+
+    # ID抽出（PMIDとDOIが両方揃っている査読論文のみ許可）
+    pmid = ""
+    doi = ""
+    pmcid_str = f"PMC{numeric_pmcid}"
+    for aid in article.findall(".//article-meta/article-id"):
+        id_type = aid.attrib.get("pub-id-type", "")
+        if id_type == "pmid" and aid.text:
+            pmid = aid.text.strip()
+        elif id_type == "doi" and aid.text:
+            doi = aid.text.strip()
+        elif id_type == "pmc" and aid.text:
+            val = aid.text.strip()
+            pmcid_str = val if val.startswith("PMC") else f"PMC{val}"
+
+    if not pmid or not doi:
+        return None
+
+    # タイトル・ジャーナル名・アブストラクト抽出
+    title_el = article.find(".//article-meta/title-group/article-title")
+    title_en = " ".join("".join(title_el.itertext()).split()) if title_el is not None else ""
+    if not title_en:
+        return None
+
+    journal_el = article.find(".//journal-meta/journal-title-group/journal-title")
+    if journal_el is None:
+        journal_el = article.find(".//journal-meta/journal-title")
+    journal = " ".join("".join(journal_el.itertext()).split()) if journal_el is not None else "Peer-Reviewed Open Access Journal"
+
+    abstract_parts = []
+    for ab in article.findall(".//article-meta/abstract"):
+        txt = " ".join("".join(ab.itertext()).split())
+        if txt:
+            abstract_parts.append(txt)
+    abstract = "\n".join(abstract_parts)
+
+    # 本文（<body>）のセクション・段落抽出
+    body = article.find(".//body")
     if body is None:
         return None
 
@@ -198,7 +190,7 @@ def fetch_pmc_full_text_sections(pmcid: str) -> Optional[str]:
     total_chars = 0
     for sec in body.findall("./sec"):
         sec_title_el = sec.find("./title")
-        sec_title = "".join(sec_title_el.itertext()).strip() if sec_title_el is not None else "Section"
+        sec_title = " ".join("".join(sec_title_el.itertext()).split()) if sec_title_el is not None else "Section"
         paragraphs = []
         for p in sec.findall(".//p"):
             p_text = " ".join("".join(p.itertext()).split())
@@ -206,15 +198,22 @@ def fetch_pmc_full_text_sections(pmcid: str) -> Optional[str]:
                 paragraphs.append(p_text)
                 total_chars += len(p_text)
         if paragraphs:
-            # 1セクションあたり最大4段落まで（トークン上限内で原文を忠実に保持するため）
             selected_p = "\n\n".join(paragraphs[:4])
             extracted_blocks.append(f"=== SECTION: {sec_title} ===\n{selected_p}")
 
-    # 本文が十分に取得できない記事（制限付きXMLや単なる訂正記事など）は除外
     if total_chars < 1500 or len(extracted_blocks) < 2:
         return None
 
-    return "\n\n".join(extracted_blocks)[:24000]
+    meta = {
+        "pmid": pmid,
+        "pmcid": pmcid_str,
+        "doi": doi,
+        "title_en": title_en,
+        "journal": journal,
+        "abstract": abstract
+    }
+    full_text = "\n\n".join(extracted_blocks)[:24000]
+    return meta, full_text
 
 
 # =========================================================================
@@ -388,15 +387,14 @@ def main():
 
     processed_set = set(manifest.get("processed_pmids", []))
 
-    # 日曜日は臨床レビュー生成、月〜土曜はOpen Access個別論文を1本取得
     if now.weekday() == 6:
         topic = CLINICAL_REVIEW_TOPICS[now.isocalendar()[1] % len(CLINICAL_REVIEW_TOPICS)]
-        pmids = search_pubmed_open_access(topic["query"], max_results=15)
+        pmc_ids = search_pmc_open_access(topic["query"], max_results=20)
         metas = []
-        for pmid in pmids:
-            meta = fetch_pubmed_metadata(pmid)
-            if meta:
-                metas.append(meta)
+        for num_id in pmc_ids:
+            res = fetch_pmc_article_and_fulltext(num_id)
+            if res:
+                metas.append(res[0])
             if len(metas) >= 4:
                 break
             time.sleep(0.4)
@@ -414,31 +412,39 @@ def main():
                 "title_ja": review_data["title_ja"]
             })
     else:
-        track = RESEARCH_TRACKS[now.timetuple().tm_yday % len(RESEARCH_TRACKS)]
-        print(f"Searching PMC Open Access papers for track: {track['category_label']}")
-        pmids = search_pubmed_open_access(track["query"], max_results=30)
+        start_idx = now.timetuple().tm_yday % len(RESEARCH_TRACKS)
+        ordered_tracks = RESEARCH_TRACKS[start_idx:] + RESEARCH_TRACKS[:start_idx]
 
+        selected_track = None
         selected_meta = None
         selected_full_text = None
 
-        for pmid in pmids:
-            if pmid in processed_set:
-                continue
-            time.sleep(0.4)
-            meta = fetch_pubmed_metadata(pmid)
-            if not meta:
-                continue
-            full_text = fetch_pmc_full_text_sections(meta["pmcid"])
-            if full_text:
+        for track in ordered_tracks:
+            print(f"Searching PMC Open Access papers for track: {track['category_label']}")
+            pmc_ids = search_pmc_open_access(track["query"], max_results=30)
+            print(f"Found {len(pmc_ids)} candidate PMCIDs")
+
+            for num_id in pmc_ids:
+                time.sleep(0.4)
+                res = fetch_pmc_article_and_fulltext(num_id)
+                if not res:
+                    continue
+                meta, full_text = res
+                if meta["pmid"] in processed_set:
+                    continue
+                selected_track = track
                 selected_meta = meta
                 selected_full_text = full_text
-                print(f"Found verified Open Access paper: PMID={pmid}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
+                print(f"Verified Open Access paper: PMID={meta['pmid']}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
                 break
 
-        if not selected_meta or not selected_full_text:
-            raise RuntimeError("No new PMC Open Access full-text paper found in this batch.")
+            if selected_meta:
+                break
 
-        paper_data = generate_daily_paper_json(selected_meta, selected_full_text, track, today_str)
+        if not selected_meta or not selected_full_text or not selected_track:
+            raise RuntimeError("No new PMC Open Access full-text paper found across all tracks.")
+
+        paper_data = generate_daily_paper_json(selected_meta, selected_full_text, selected_track, today_str)
         out_path = f"data/papers/{today_str}-{selected_meta['pmid']}.json"
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(paper_data, f, ensure_ascii=False, indent=2)
