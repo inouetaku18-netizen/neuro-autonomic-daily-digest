@@ -1,8 +1,8 @@
 import os
-import re
 import json
 import time
 import datetime
+import html
 import requests
 import xml.etree.ElementTree as ET
 from typing import List, Optional
@@ -45,41 +45,58 @@ DAILY_RESEARCH_TRACKS = [
 ]
 
 # =========================================================================
-# 2. 構造化出力用 Pydantic スキーマ（アブストラクト事実ベース限定）
+# 2. 5本一括処理用 Pydantic スキーマ
 # =========================================================================
 class VocabularyItem(BaseModel):
-    term: str = Field(description="英語アブストラクト内に実際に登場する学術用語・重要動詞")
-    ipa: str = Field(description="国際音声記号（例: /ˌbæroʊˈriːflɛks/）")
+    term: str = Field(description="英語アブストラクト内に実際に登場する学術用語")
+    ipa: str = Field(description="国際音声記号")
     pos: str = Field(description="品詞（noun, verb, adj 等）")
     ja: str = Field(description="学術的な日本語訳")
-    nuance: str = Field(description="論文読解・執筆における用法とニュアンス解説")
+    nuance: str = Field(description="論文読解・執筆における用法解説")
 
-class AbstractDigestSchema(BaseModel):
+class SinglePaperDigest(BaseModel):
+    pmid: str = Field(description="入力されたPMIDをそのまま返す")
     title_ja: str = Field(description="英語論文タイトルの正確な日本語訳")
-    abstract_ja: str = Field(description="英語アブストラクト原文の一文一文に対応した忠実な日本語訳（推測・補完禁止）")
-    impact_factor: float = Field(description="掲載誌の直近インパクトファクター概算値（不明な場合は3.5）")
-    tags: List[str] = Field(description="専門タグ4〜6個")
-    problem: str = Field(description="アブストラクトに記載された研究背景・課題（記載のない推測は禁止）")
-    solution_and_method: str = Field(description="アブストラクトに記載された手法・対象・解析方法（記載のない推測は禁止）")
-    formula_block: str = Field(description="この分野・手法に関連する基本数式または評価指標のLaTeX表記（例: $$...$$）")
-    diagram_caption: str = Field(description="概念図のタイトル（英語・日本語併記）")
-    diagram_svg: str = Field(description="アブストラクトで述べられている因果関係・処理フローを示すクリーンなインラインSVG（<svg ...>...</svg>）")
-    key_results: str = Field(description="アブストラクトに明記されている結果・数値のみ（記載がない場合は『詳細はPDF本文参照』と明記）")
-    discussion_and_implications: str = Field(description="アブストラクトの結論・意義の忠実な要約")
-    relevance_to_my_research: str = Field(description="脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用観点からのコメント")
-    vocabulary_list: List[VocabularyItem]
+    abstract_ja: str = Field(description="英語アブストラクト原文の忠実な日本語訳（推測・補完禁止）")
+    impact_factor: float = Field(description="掲載誌の直近インパクトファクター概算値（不明時は3.5）")
+    tags: List[str] = Field(description="専門タグ4個")
+    problem: str = Field(description="アブストラクトに記載された研究背景・課題")
+    solution_and_method: str = Field(description="アブストラクトに記載された手法・解析方法")
+    formula_block: str = Field(description="関連する基本数式または指標のLaTeX表記（例: $$...$$）")
+    key_results: str = Field(description="アブストラクトに明記されている結果・数値のみ")
+    discussion_and_implications: str = Field(description="アブストラクトの結論・意義")
+    relevance_to_my_research: str = Field(description="脳心臓点過程・非線形HRV・RC+Koopman制御への応用ヒント")
+    vocabulary_list: List[VocabularyItem] = Field(description="アブストラクト内の重要用語5〜8個")
+
+class BatchDigestResponse(BaseModel):
+    digests: List[SinglePaperDigest]
 
 # =========================================================================
-# 3. PubMed 公式API 実データ取得関数
+# 3. PubMed 公式API 実データ取得＆クリーンSVG生成
 # =========================================================================
-def sanitize_svg(svg_str: str, min_height: int = 220) -> str:
-    if not svg_str or "<svg" not in svg_str:
-        return f'<svg viewBox="0 0 600 {min_height}" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="{min_height}" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text x="300" y="{min_height//2}" text-anchor="middle" fill="#475569" font-size="14">Abstract Flow Diagram</text></svg>'
-    match = re.search(r"<svg[\s\S]*?</svg>", svg_str, re.IGNORECASE)
-    return match.group(0) if match else svg_str
+def build_clean_svg(category_label: str, pmid: str, doi: str) -> str:
+    safe_cat = html.escape(category_label)
+    safe_doi = html.escape(doi[:42])
+    return f'''<svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="180" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="24" y="24" width="165" height="56" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="106" y="48" text-anchor="middle" fill="#1e3a8a" font-size="12" font-weight="bold">PubMed / PMC OA</text>
+  <text x="106" y="66" text-anchor="middle" fill="#334155" font-size="11">PMID: {pmid}</text>
+  <path d="M 195 52 L 225 52" stroke="#0d9488" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="232" y="24" width="175" height="56" rx="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
+  <text x="319" y="48" text-anchor="middle" fill="#115e59" font-size="12" font-weight="bold">{safe_cat}</text>
+  <text x="319" y="66" text-anchor="middle" fill="#334155" font-size="10">Verified Abstract Digest</text>
+  <path d="M 413 52 L 443 52" stroke="#0d9488" stroke-width="2"/>
+  <rect x="450" y="24" width="126" height="56" rx="8" fill="#1e3a8a"/>
+  <text x="513" y="48" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="bold">PDF Full-Text</text>
+  <text x="513" y="65" text-anchor="middle" fill="#bfdbfe" font-size="10">Drop PDF to Decode</text>
+  <rect x="24" y="102" width="552" height="54" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="38" y="124" fill="#475569" font-size="11" font-weight="bold">Verified DOI Source:</text>
+  <text x="38" y="143" fill="#2563eb" font-size="11">https://doi.org/{safe_doi}</text>
+</svg>'''
 
 
-def search_pubmed_free_fulltext(query: str, max_results: int = 30) -> List[str]:
+def search_pubmed_free_fulltext(query: str, max_results: int = 25) -> List[str]:
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     params = {
         "db": "pubmed",
@@ -89,7 +106,7 @@ def search_pubmed_free_fulltext(query: str, max_results: int = 30) -> List[str]:
         "retmode": "json",
         "email": NCBI_EMAIL
     }
-    resp = requests.get(url, params=params, timeout=20)
+    resp = requests.get(url, params=params, timeout=15)
     resp.raise_for_status()
     return resp.json().get("esearchresult", {}).get("idlist", [])
 
@@ -97,7 +114,7 @@ def search_pubmed_free_fulltext(query: str, max_results: int = 30) -> List[str]:
 def fetch_pubmed_verified_metadata(pmid: str) -> Optional[dict]:
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     params = {"db": "pubmed", "id": pmid, "retmode": "xml", "email": NCBI_EMAIL}
-    resp = requests.get(url, params=params, timeout=20)
+    resp = requests.get(url, params=params, timeout=15)
     if resp.status_code != 200:
         return None
 
@@ -136,7 +153,6 @@ def fetch_pubmed_verified_metadata(pmid: str) -> Optional[dict]:
         elif id_type == "pmc" and aid.text:
             pmcid = aid.text.strip()
 
-    # 実在確認のため DOI と 十分な長さの Abstract がある論文のみ採用
     if not doi or not title_en or len(abstract_en) < 200:
         return None
 
@@ -152,12 +168,17 @@ def fetch_pubmed_verified_metadata(pmid: str) -> Optional[dict]:
 
 
 # =========================================================================
-# 4. Gemini API クライアント & アブストラクト忠実翻訳
+# 4. Gemini API クライアント（タイムアウト制限付き・1回一括生成）
 # =========================================================================
 def get_active_client_and_model():
+    # SDKの無限リトライによるフリーズを防ぐため、タイムアウト60秒・リトライ1回に設定
     client = genai.Client(
         api_key=GEMINI_API_KEY,
-        http_options={"api_version": "v1beta"}
+        http_options={
+            "api_version": "v1beta",
+            "timeout": 60000,
+            "retry_options": {"attempts": 1}
+        }
     )
     preferred = [
         "gemini-3.8-flash",
@@ -190,100 +211,46 @@ def get_active_client_and_model():
     return client, "gemini-3.8-flash"
 
 
-def generate_abstract_digest_json(client, model_name: str, meta: dict, track: dict, today_str: str) -> dict:
+def generate_batch_digests(client, model_name: str, candidates: List[dict]) -> List[SinglePaperDigest]:
+    papers_block = []
+    for c in candidates:
+        m = c["meta"]
+        t = c["track"]
+        papers_block.append(
+            f"=== PAPER PMID: {m['pmid']} | TRACK: {t['category_label']} ===\n"
+            f"Journal: {m['journal']} ({m['pub_year']})\n"
+            f"DOI: {m['doi']}\n"
+            f"Title: {m['title_en']}\n"
+            f"Abstract:\n{m['abstract_en']}\n"
+        )
+
     prompt = f"""
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル編集者です。
-以下は PubMed から取得した実在の Free Full Text（Open Access）論文のメタデータおよびアブストラクト原文です。
+以下は PubMed から取得した実在する {len(candidates)} 本の Free Full Text（Open Access）論文のメタデータおよびアブストラクト原文です。
+全 {len(candidates)} 本すべてについて、忠実な日本語訳と構造化サマリーを作成してください。
 
 【厳守ルール（捏造・推測の完全禁止）】
-1. **アブストラクト原文に書かれている事実のみ**を忠実に日本語訳・構造化してください。アブストラクトに記載されていない実験データ、サンプル数、統計値、手法の詳細を推測・創作することは厳禁です。
-2. 本文全体（Introduction〜Conclusion）はユーザーが別途PDFをダウンロードしてサイト上で解読するため、現時点ではアブストラクトの範囲を超えた本文の補完は絶対に行わないでください。
-3. `diagram_svg` は背景淡色（#f8fafc）、青系（#1e3a8a, #2563eb）・ティール系（#0d9488）を基調とした概念図SVGを記述してください。
-4. `vocabulary_list` には、下記の【Abstract 原文】に実際に登場する専門用語・学術動詞を8〜12個選び解説してください。
+1. アブストラクト原文に記載されている事実のみを忠実に日本語訳・要約してください。記載されていない数値・実験手法・結論を推測・創作することは厳禁です。
+2. 各要素の `pmid` には、入力された論文の PMID をそのまま正確に入れてください。
+3. `vocabulary_list` には、その論文の Abstract 原文に実際に登場する専門用語・学術動詞を5〜8個選んでください。
 
-【実在論文メタデータ】
-PMID: {meta['pmid']}
-PMCID: {meta['pmcid'] if meta['pmcid'] else 'Publisher Open Access'}
-DOI: {meta['doi']}
-Year: {meta['pub_year']}
-Journal: {meta['journal']}
-Title: {meta['title_en']}
-
-【Abstract 原文】
-{meta['abstract_en']}
+{chr(10).join(papers_block)}
 """
     response = client.models.generate_content(
         model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
-            response_schema=AbstractDigestSchema,
+            response_schema=BatchDigestResponse,
             temperature=0.1
         )
     )
-    parsed = json.loads(response.text)
-    diagram_svg = sanitize_svg(parsed["diagram_svg"], 230)
-
-    vocab_dict = {}
-    for v in parsed.pop("vocabulary_list", []):
-        vocab_dict[v["term"].lower()] = {
-            "ipa": v["ipa"],
-            "pos": v["pos"],
-            "ja": v["ja"],
-            "nuance": v["nuance"]
-        }
-
-    # 現時点では「原文アブストラクト」のみを正確に格納（PDFアップロード後に5セクション全文へ展開）
-    abstract_section = [
-        {
-            "id": "intro",
-            "title_en": "Abstract (Verified Original Text — Upload PDF for Full-Text Sections)",
-            "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右上の「PDF全文解読」へドロップしてください）",
-            "section_svg": diagram_svg,
-            "paragraphs": [
-                {
-                    "en": meta["abstract_en"],
-                    "ja": parsed["abstract_ja"]
-                }
-            ]
-        }
-    ]
-
-    return {
-        "id": f"paper-{today_str}-{meta['pmid']}",
-        "date": today_str,
-        "pmid": meta["pmid"],
-        "pmcid": meta["pmcid"],
-        "doi_url": f"https://doi.org/{meta['doi']}",
-        "pubmed_url": f"https://pubmed.ncbi.nlm.nih.gov/{meta['pmid']}/",
-        "pmc_url": f"https://pmc.ncbi.nlm.nih.gov/articles/{meta['pmcid']}/" if meta["pmcid"] else "",
-        "category": track["category"],
-        "category_label": track["category_label"],
-        "journal": f"{meta['journal']} ({meta['pub_year']})" if meta["pub_year"] else meta["journal"],
-        "impact_factor": parsed["impact_factor"],
-        "doi": meta["doi"],
-        "title_en": meta["title_en"],
-        "title_ja": parsed["title_ja"],
-        "tags": parsed["tags"],
-        "summary": {
-            "problem": parsed["problem"],
-            "solution_and_method": parsed["solution_and_method"],
-            "formula_block": parsed["formula_block"],
-            "diagram_caption": parsed["diagram_caption"],
-            "diagram_svg": diagram_svg,
-            "key_results": parsed["key_results"],
-            "discussion_and_implications": parsed["discussion_and_implications"],
-            "relevance_to_my_research": parsed["relevance_to_my_research"]
-        },
-        "full_text": {
-            "sections": abstract_section
-        },
-        "vocabulary": vocab_dict
-    }
+    parsed = BatchDigestResponse.model_validate_json(response.text)
+    return parsed.digests
 
 
 # =========================================================================
-# 5. メイン実行フロー（5分野から1本ずつ＝計5本取得）
+# 5. メイン実行フロー
 # =========================================================================
 def main():
     jst = datetime.timezone(datetime.timedelta(hours=9))
@@ -301,65 +268,121 @@ def main():
         manifest = {"papers": [], "reviews": [], "processed_pmids": []}
 
     processed_set = set(manifest.get("processed_pmids", []))
-    client, model_name = get_active_client_and_model()
-    print(f"Using Gemini model: {model_name}")
+    candidates = []
 
-    generated_count = 0
+    # 1. まず5分野それぞれの実在論文メタデータ＋アブストラクトを高速収集（約5秒）
     for idx, track in enumerate(DAILY_RESEARCH_TRACKS):
-        print(f"\n--- [{idx+1}/{len(DAILY_RESEARCH_TRACKS)}] Track: {track['category_label']} ---")
+        print(f"[{idx+1}/5] Searching PubMed OA for: {track['category_label']}")
         try:
-            pmids = search_pubmed_free_fulltext(track["query"], max_results=30)
-            print(f"Found {len(pmids)} candidate Free Full Text PMIDs")
-
-            selected_meta = None
+            pmids = search_pubmed_free_fulltext(track["query"], max_results=25)
             for pmid in pmids:
-                if pmid in processed_set:
+                if pmid in processed_set or any(c["meta"]["pmid"] == pmid for c in candidates):
                     continue
                 time.sleep(0.35)
                 meta = fetch_pubmed_verified_metadata(pmid)
                 if meta:
-                    selected_meta = meta
-                    print(f"Verified paper: PMID={pmid}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
+                    candidates.append({"track": track, "meta": meta})
+                    print(f"  -> Found PMID={pmid} | DOI={meta['doi']}")
                     break
-
-            if not selected_meta:
-                print(f"Warning: No new paper found for {track['category_label']}, skipping.")
-                continue
-
-            paper_data = generate_abstract_digest_json(client, model_name, selected_meta, track, today_str)
-            out_path = f"data/papers/{today_str}-{selected_meta['pmid']}.json"
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(paper_data, f, ensure_ascii=False, indent=2)
-
-            manifest["papers"] = [p for p in manifest["papers"] if p["id"] != paper_data["id"]]
-            manifest["papers"].insert(0, {
-                "id": paper_data["id"],
-                "date": today_str,
-                "category": track["category"],
-                "category_label": track["category_label"],
-                "path": out_path,
-                "title_ja": paper_data["title_ja"]
-            })
-            processed_set.add(selected_meta["pmid"])
-            generated_count += 1
-
-            manifest["processed_pmids"] = list(processed_set)
-            with open(manifest_path, "w", encoding="utf-8") as f:
-                json.dump(manifest, f, ensure_ascii=False, indent=2)
-
-            if idx < len(DAILY_RESEARCH_TRACKS) - 1:
-                print("Waiting 12s to respect Gemini API rate limits...")
-                time.sleep(12)
-
         except Exception as e:
-            print(f"Error processing track {track['category_label']}: {e}")
-            time.sleep(12)
+            print(f"  -> PubMed search error for {track['category_label']}: {e}")
+
+    if not candidates:
+        raise RuntimeError("No new verified Open Access papers found across all 5 tracks.")
+
+    # 2. Gemini API 1回のバッチ呼び出しで5本まとめて翻訳・構造化（約15〜20秒）
+    client, model_name = get_active_client_and_model()
+    print(f"\nSending {len(candidates)} papers in 1 batch request to {model_name}...")
+    digests = generate_batch_digests(client, model_name, candidates)
+    digest_by_pmid = {d.pmid: d for d in digests}
+
+    # 3. 各論文JSONと manifest.json を保存
+    saved_count = 0
+    for c in candidates:
+        meta = c["meta"]
+        track = c["track"]
+        d = digest_by_pmid.get(meta["pmid"])
+        if not d:
+            print(f"Warning: Missing digest for PMID={meta['pmid']}")
             continue
 
-    if generated_count == 0:
-        raise RuntimeError("Failed to generate any papers across all 5 tracks.")
+        diagram_svg = build_clean_svg(track["category_label"], meta["pmid"], meta["doi"])
+        vocab_dict = {
+            v.term.lower(): {
+                "ipa": v.ipa,
+                "pos": v.pos,
+                "ja": v.ja,
+                "nuance": v.nuance
+            }
+            for v in d.vocabulary_list
+        }
 
-    print(f"\nCompleted! Successfully generated {generated_count} verified Open Access digests today.")
+        paper_data = {
+            "id": f"paper-{today_str}-{meta['pmid']}",
+            "date": today_str,
+            "pmid": meta["pmid"],
+            "pmcid": meta["pmcid"],
+            "doi_url": f"https://doi.org/{meta['doi']}",
+            "pubmed_url": f"https://pubmed.ncbi.nlm.nih.gov/{meta['pmid']}/",
+            "pmc_url": f"https://pmc.ncbi.nlm.nih.gov/articles/{meta['pmcid']}/" if meta["pmcid"] else "",
+            "category": track["category"],
+            "category_label": track["category_label"],
+            "journal": f"{meta['journal']} ({meta['pub_year']})" if meta["pub_year"] else meta["journal"],
+            "impact_factor": d.impact_factor,
+            "doi": meta["doi"],
+            "title_en": meta["title_en"],
+            "title_ja": d.title_ja,
+            "tags": d.tags,
+            "summary": {
+                "problem": d.problem,
+                "solution_and_method": d.solution_and_method,
+                "formula_block": d.formula_block,
+                "diagram_caption": f"{track['category_label']} — Verified Open Access Source",
+                "diagram_svg": diagram_svg,
+                "key_results": d.key_results,
+                "discussion_and_implications": d.discussion_and_implications,
+                "relevance_to_my_research": d.relevance_to_my_research
+            },
+            "full_text": {
+                "sections": [
+                    {
+                        "id": "intro",
+                        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+                        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+                        "section_svg": diagram_svg,
+                        "paragraphs": [
+                            {
+                                "en": meta["abstract_en"],
+                                "ja": d.abstract_ja
+                            }
+                        ]
+                    }
+                ]
+            },
+            "vocabulary": vocab_dict
+        }
+
+        out_path = f"data/papers/{today_str}-{meta['pmid']}.json"
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(paper_data, f, ensure_ascii=False, indent=2)
+
+        manifest["papers"] = [p for p in manifest["papers"] if p["id"] != paper_data["id"]]
+        manifest["papers"].insert(0, {
+            "id": paper_data["id"],
+            "date": today_str,
+            "category": track["category"],
+            "category_label": track["category_label"],
+            "path": out_path,
+            "title_ja": paper_data["title_ja"]
+        })
+        processed_set.add(meta["pmid"])
+        saved_count += 1
+
+    manifest["processed_pmids"] = list(processed_set)
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+
+    print(f"\nCompleted in fast batch mode! Saved {saved_count} verified Open Access papers.")
 
 
 if __name__ == "__main__":
