@@ -225,8 +225,40 @@ def sanitize_svg(svg_str: str, height: int = 230) -> str:
         return match.group(0)
     return f'<svg viewBox="0 0 680 {height}" class="w-full h-auto"><rect width="680" height="{height}" rx="8" fill="#f8fafc"/><text x="340" y="{height//2}" font-size="13" fill="#475569" text-anchor="middle">Conceptual Architecture Diagram</text></svg>'
 
+def get_active_client_and_model():
+    client = genai.Client(
+        api_key=GEMINI_API_KEY,
+        http_options={"api_version": "v1beta"}
+    )
+    preferred = [
+        "gemini-3.1-pro-preview",
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-2.0-flash",
+    ]
+    available = []
+    try:
+        for m in client.models.list():
+            methods = getattr(m, "supported_actions", None) or getattr(m, "supported_generation_methods", None) or []
+            if not methods or "generateContent" in methods:
+                name = m.name.replace("models/", "")
+                if "gemini" in name and "embedding" not in name and "imagen" not in name:
+                    available.append(name)
+    except Exception as e:
+        print(f"Model list check skipped: {e}")
+
+    for candidate in preferred:
+        if candidate in available:
+            print(f"Selected Gemini model: {candidate}")
+            return client, candidate
+
+    fallback = available[0] if available else "gemini-2.5-flash"
+    print(f"Selected Gemini model (fallback): {fallback}")
+    return client, fallback
+
+
 def generate_daily_paper_json(meta: dict, full_text: str, track: dict, today_str: str) -> dict:
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    client, model_name = get_active_client_and_model()
     
     source_material = f"【Full Text (Open Access)】\n{full_text}" if full_text else f"【Abstract】\n{meta['abstract']}"
     
@@ -253,7 +285,7 @@ DOI: {meta['doi']}
 {source_material}
 """
     response = client.models.generate_content(
-        model="gemini-3.1-pro-preview",
+        model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -296,8 +328,9 @@ DOI: {meta['doi']}
         "vocabulary": vocab_dict
     }
 
+
 def generate_clinical_review_json(papers_meta: List[dict], review_topic: dict, today_str: str) -> dict:
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    client, model_name = get_active_client_and_model()
     papers_text = "\n\n".join([
         f"[{i+1}] Title: {m['title_en']}\nJournal: {m['journal']}\nDOI: {m['doi']}\nAbstract: {m['abstract']}"
         for i, m in enumerate(papers_meta)
@@ -310,7 +343,7 @@ def generate_clinical_review_json(papers_meta: List[dict], review_topic: dict, t
 {papers_text}
 """
     response = client.models.generate_content(
-        model="gemini-3.1-pro-preview",
+        model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
