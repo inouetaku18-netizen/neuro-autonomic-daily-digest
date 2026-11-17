@@ -1,0 +1,227 @@
+{
+  "id": "paper-2026-11-17-41855584",
+  "date": "2026-11-17",
+  "pmid": "41855584",
+  "pmcid": "PMC13185859",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41855584/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13185859/",
+  "category": "rc_koopman",
+  "category_label": "RC + Koopman制御",
+  "journal": "Advanced Science",
+  "impact_factor": 15.1,
+  "doi": "10.1002/advs.202517234",
+  "title_en": "Linearizing and Forecasting: A Reservoir Computing Route to Digital Twins of the Brain",
+  "title_ja": "線形化と予測：脳のデジタルツイン構築に向けたリザーバコンピューティングのアプローチ",
+  "tags": [
+    "Reservoir Computing",
+    "Koopman Operator Theory",
+    "Resting-state fMRI",
+    "Digital Twin",
+    "Autoregressive Model",
+    "Linear Recurrent Neural Network"
+  ],
+  "summary": {
+    "problem": "脳のような複雑系ダイナミクスの解読・モデル化は、内在する不確実性や高品質データの希少性、モデルのブラックボックス性によって困難を極めていた。さらに、神経記録や安静時fMRIに標準適用される帯域通過フィルタ処理により、従来の動的モード分解（Hankel-DMD）等のデータ駆動手法では減衰率がゼロに収束し、散逸構造を捉えられず偽の振動スペクトル（虚偽の極）が生じるという深刻な課題が存在していた。",
+    "solution_and_method": "リザーバコンピューティング（RC）の枠組みにおいて、ノイズを伴う連続時間線形再帰型ニューラルネットワーク（lRNN）の数学的理論を構築した。観測信号を入力として自律閉ループ型lRNNを学習させ、更新された結合行列 W~ = W + Win Wout の固有値分解からラプラス変換の極を解析的に導出することで、クープマン作用素の有限近似および連続時間自己回帰（AR）モデルの核と直接結びつけた。これにより前処理のフィルタリング下でも真の減衰率を含む線形スペクトルを正確に再構成できるデジタルツイン手法を確立した。",
+    "formula_block": "$$\\tau \\dot{\\mathbf{r}}(t) = (\\mathbf{W} + \\mathbf{W}_{\\mathrm{in}}\\mathbf{W}_{\\mathrm{out}})\\mathbf{r}(t) - \\mathbf{r}(t) = \\tilde{\\mathbf{W}}\\mathbf{r}(t) - \\mathbf{r}(t), \\quad \\sigma_k = \\frac{\\tilde{\\lambda}_k - 1}{\\tau}$$",
+    "diagram_caption": "Figure 1: Conceptual Architecture of the Stochastic lRNN-based Digital Twin and Koopman Spectral Mapping (確率的lRNNデジタルツインおよびクープマン・スペクトル同定の概念図)",
+    "diagram_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 350\" width=\"100%\" height=\"100%\"><rect width=\"800\" height=\"350\" fill=\"#f8fafc\" rx=\"12\"/><g transform=\"translate(30, 40)\"><rect x=\"0\" y=\"40\" width=\"140\" height=\"180\" rx=\"8\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"2\"/><text x=\"70\" y=\"70\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Brain Activity</text><text x=\"70\" y=\"95\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#64748b\" text-anchor=\"middle\">Resting fMRI / BOLD</text><path d=\"M20 140 Q40 110 60 140 T100 140 T120 140\" fill=\"none\" stroke=\"#0d9488\" stroke-width=\"2.5\"/><text x=\"70\" y=\"185\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#1e3a8a\" text-anchor=\"middle\">\\omega(t) \\in \\mathbb{R}^M</text></g><path d=\"M175 170 L235 170\" stroke=\"#2563eb\" stroke-width=\"2.5\" marker-end=\"url(#arrow)\" fill=\"none\"/><g transform=\"translate(240, 30)\"><rect x=\"0\" y=\"0\" width=\"280\" height=\"240\" rx=\"10\" fill=\"#ffffff\" stroke=\"#1e3a8a\" stroke-width=\"2\"/><text x=\"140\" y=\"30\" font-family=\"sans-serif\" font-size=\"15\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Stochastic lRNN Reservoir</text><circle cx=\"70\" cy=\"90\" r=\"20\" fill=\"#e0f2fe\" stroke=\"#0284c7\" stroke-width=\"1.5\"/><circle cx=\"140\" cy=\"80\" r=\"20\" fill=\"#e0f2fe\" stroke=\"#0284c7\" stroke-width=\"1.5\"/><circle cx=\"210\" cy=\"95\" r=\"20\" fill=\"#e0f2fe\" stroke=\"#0284c7\" stroke-width=\"1.5\"/><circle cx=\"90\" cy=\"150\" r=\"20\" fill=\"#e0f2fe\" stroke=\"#0284c7\" stroke-width=\"1.5\"/><circle cx=\"180\" cy=\"155\" r=\"20\" fill=\"#e0f2fe\" stroke=\"#0284c7\" stroke-width=\"1.5\"/><path d=\"M88 95 L122 85 M158 85 L192 92 M195 110 L185 137 M80 132 L72 108 M108 145 L162 153\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"140\" y=\"205\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#334155\" text-anchor=\"middle\">\\tau \\dot{r} = W r + W_{in}\\omega - r</text><text x=\"140\" y=\"225\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Generalized Synchronization</text></g><path d=\"M525 170 L585 170\" stroke=\"#2563eb\" stroke-width=\"2.5\" fill=\"none\"/><g transform=\"translate(590, 40)\"><rect x=\"0\" y=\"40\" width=\"180\" height=\"180\" rx=\"8\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"2\"/><text x=\"90\" y=\"70\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">Digital Twin &amp; Spectrum</text><text x=\"90\" y=\"95\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#64748b\" text-anchor=\"middle\">Linear Readout W_{out}</text><text x=\"90\" y=\"135\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#1e3a8a\" text-anchor=\"middle\">\\tilde{W} = W + W_{in}W_{out}</text><text x=\"90\" y=\"165\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#0d9488\" text-anchor=\"middle\">\\sigma_k = (\\tilde{\\lambda}_k - 1)/\\tau</text><text x=\"90\" y=\"195\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Koopman Modal Map</text></g><path d=\"M680 225 C680 300, 380 320, 380 275\" stroke=\"#2563eb\" stroke-width=\"2\" stroke-dasharray=\"5,5\" fill=\"none\"/><defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"5\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"#2563eb\"/></marker></defs></svg>",
+    "key_results": "GE 3Tスキャナによる健常被験者20名（平均年齢37±12歳、女性7名、男性13名、160ボリューム、TR/TE = 2500/40 ms、スライス厚4.5 mm）の安静時fMRIデータに適用された。従来のHankel-DMDでは0.01〜0.1 Hzの帯域通過フィルタ前処理によって極の実部が0に収縮し減衰率を喪失したが、確率的lRNNは連続時間固有モードの散逸構造と非ゼロの減衰率を正確に復元した。さらに、学習された自律lRNNの極分布（緩和時定数とスロープ）を用いることで、被験者間および脳領域間の差異を捉える低次元潜在空間マップ（ランドスケープ）への投影と生物学的クラスタリングを実証した。",
+    "discussion_and_implications": "安静時脳活動は、高次元空間における単一平衡点近傍の線形系ダイナミクスとして高精度に近似できることが示された。本手法は、深層強化学習（DRL）のように膨大な学習パイプラインや報酬設計を必要とせず、単純な線形回帰のみで高精度かつ解釈可能なデジタルツインを構築できる。個々の被験者を低次元固有モード空間内の点（ランドスケープ）として位置づけることで、神経変性疾患や加齢に伴う軌道ドリフトの追跡、病態関連不安定モードを抑制する個別化刺激制御や神経リハビリテーション介入の検証基盤となる。",
+    "relevance_to_my_research": "点過程心拍変動（HRV）解析やKoopman作用素ベースの自律神経・心血管ダイナミクス制御において極めて直結する示唆を与える。呼吸性不整脈（RSA）や圧反射フィードバックに伴う時系列データをlRNNリザーバへ射影し、閉ループ結合行列のラプラス極を推定することで、交感・副交感神経の減衰モードや固有周波数を帯域通過フィルタ歪みに影響されず同定できる。また、心血管点過程モデルの観測量と組み合わせることで、低次元潜在空間上での非線形閉ループ制御器や適応的刺激介入の設計に応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Introduction",
+        "title_ja": "導入",
+        "section_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 200\" width=\"100%\" height=\"100%\"><rect width=\"700\" height=\"200\" fill=\"#f8fafc\" rx=\"8\"/><text x=\"350\" y=\"30\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Reservoir Computing &amp; Koopman Duality</text><rect x=\"40\" y=\"60\" width=\"260\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"170\" y=\"85\" font-family=\"sans-serif\" font-size=\"13\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Reservoir Computing (RC)</text><text x=\"170\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Fixed recurrent reservoir couplings</text><text x=\"170\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">High computational efficiency</text><text x=\"170\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Linear Readout Optimization</text><path d=\"M310 115 L380 115\" stroke=\"#0d9488\" stroke-width=\"2\" marker-end=\"url(#arrow2)\"/><rect x=\"390\" y=\"60\" width=\"270\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"525\" y=\"85\" font-family=\"sans-serif\" font-size=\"13\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">Koopman Spectral Theory</text><text x=\"525\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Linearization in functional Hilbert space</text><text x=\"525\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Interpretable poles &amp; decay rates</text><text x=\"525\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#2563eb\" text-anchor=\"middle\">In Silico Digital Twin Construction</text><defs><marker id=\"arrow2\" viewBox=\"0 0 10 10\" refX=\"5\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"#0d9488\"/></marker></defs></svg>",
+        "paragraphs": [
+          {
+            "en": "The study of complex dynamical systems has a central role in contemporary scientific research. Over recent decades, a plethora of data‐driven methodologies has emerged, denoting a field in rapid evolution that is capable to addressing systems with increasing complexity. Among these methodologies, machine learning techniques have become increasingly popular due to their effectiveness in modeling complex datasets and delivering accurate predictions [1, 2, 3].",
+            "ja": "複雑な動的システムの解明は、現代の科学研究において極めて中心的な役割を担っている。ここ数十年で数多くのデータ駆動型手法が登場し、増大する複雑性を有する対象系に対処可能な急速に進化する研究領域が形成されてきた。これらの手法の中でも、機械学習技術は複雑なデータセットをモデル化し正確な予測を提供する有効性の高さから、急速に普及している。"
+          },
+          {
+            "en": "Within the landscape of machine learning methods, reservoir computing (RC) has emerged as a powerful framework for processing temporal data with remarkable computational efficiency. RC leverages high‐dimensional recurrent neural networks (RNNs) with fixed internal couplings to transform input time series into rich, high‐dimensional representations [4, 5]. This transformation enables the prediction of future samples by simply reading out the current state of the network, effectively capturing the system's dynamics [6, 7, 8]. The elegance of this approach lies in conceptualizing the readout as a projection onto a manifold learned through linear regression, echoing the efficient coding strategies observed in biological neural networks [9, 10, 11]. Consequently, RNNs have become invaluable tools in neuroscience, aiding in hypothesis generation and providing analytical frameworks for understanding neural computations [12, 13, 14, 15].",
+            "ja": "機械学習手法の潮流において、リザーバコンピューティング（RC）は卓越した計算効率で時系列データを処理する強力な枠組みとして頭角を現してきた。RCは固定された内部結合を持つ高次元の再帰型ニューラルネットワーク（RNN）を活用し、入力時系列を豊かで高次元な表現へと変換する。この変換により、ネットワークの現在状態を単純に読み出すだけで将来のサンプル予測が可能となり、対象系のダイナミクスを効果的に捉えることができる。この手法の優美さは、読み出しを線形回帰によって学習される多様体への射影として定式化する点にあり、これは生体神経網で観察される効率的符号化戦略とも響き合う。その結果、RNNは仮説生成を支援し神経計算を理解するための解析基盤を提供することで、神経科学において極めて有用なツールとなっている。"
+          },
+          {
+            "en": "However, as machine learning has become increasingly popular, some clarity of understanding may have been lost in the pursuit of better predictions. While the inferred models are often quite accurate, they can sometimes lack interpretability [16, 17, 18]. A valuable framework to address this limitation is provided by Koopman theory, which offers clear insights into the system dynamics by mapping nonlinear systems into simple yet higher‐dimensional dynamics [19, 20, 21, 22]. This approach involves the development of data‐driven methods aimed at computing finite‐dimensional linear representations of nonlinear systems within a suitable functional space. Once an equivalent linear system is inferred, interpretability becomes straightforward, allowing to gain understanding of the time scales and dynamical modes of the observed systems.",
+            "ja": "しかし、機械学習が普及するにつれて、より高精度な予測の追求の中で理解の明晰さが損なわれてきた側面がある。推論されたモデルは多くの場合極めて正確であるものの、解釈性に欠けることがある。この限界に対処する有益な枠組みを提供するのがクープマン理論であり、非線形システムを単純かつ高次元のダイナミクスへと写像することでシステムダイナミクスに対する明確な洞察を与える。このアプローチでは、適切な関数空間内において非線形システムの有限次元線形表現を計算することを目的としたデータ駆動手法が開発される。ひとたび等価な線形システムが推論されれば解釈性は明快となり、観測されたシステムの時間スケールや動的モードの把握が可能となる。"
+          },
+          {
+            "en": "The capability to predict future states of a dynamical system based on past observations allows, in principle, to build a replica of the same system. Indeed, predicted observations can be fed back as input resulting in a generative model. Both Koopman‐based methods (Figure 1A) and RC approaches (Figure 1B) have the potential to generate these digital copies by producing time series statistically equivalent to those generated by the original systems. The inferred generative models can then serve as ‘digital twins’ – a concept that has emerged as a transformative paradigm in the study of dynamical and natural systems [23, 24]. Such digital twins can be effective tools for analyzing and simulating their physical counterparts. Successful examples include digital copies of brain activity designed to assist neurosurgeons in dealing with drug‐resistant epileptic patients [25, 26, 27]. Furthermore, these tools can provide a complementary workbench for designing stimulation approaches to be tested in silico, ultimately leading to control systems for neurorehabilitation [28].",
+            "ja": "過去の観測に基づいて動的システムの将来状態を予測できる能力は、原理的にそのシステム自身の複製（レプリカ）の構築を可能にする。実際、予測された観測値を入力としてフィードバックすることで生成モデルが得られる。クープマンに基づく手法とRCアプローチはともに、元のシステムが生成するものと統計的に等価な時系列を生成することにより、これらデジタルコピーを作り出す可能性を秘めている。推論された生成モデルは、動的システムや自然科学の研究において変革的なパラダイムとして浮上した「デジタルツイン」として機能する。このようなデジタルツインは、物理的対象の解析やシミュレーションを行うための強力なツールとなり得る。その成功例としては、薬剤抵抗性てんかん患者の治療において脳神経外科医を支援するために設計された脳活動のデジタルコピーが挙げられる。さらに、これらのツールはin silicoで検証可能な刺激手法を設計するための補完的ワークベンチを提供し、最終的には神経リハビリテーションのための制御システムへと繋がる。"
+          }
+        ]
+      },
+      {
+        "id": "methods",
+        "title_en": "Methods",
+        "title_ja": "手法",
+        "section_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 200\" width=\"100%\" height=\"100%\"><rect width=\"700\" height=\"200\" fill=\"#f8fafc\" rx=\"8\"/><text x=\"350\" y=\"30\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Experimental Protocol &amp; Preprocessing Pipeline</text><rect x=\"30\" y=\"60\" width=\"190\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"125\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Subjects &amp; Scanning</text><text x=\"125\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">20 Healthy Subjects</text><text x=\"125\" y=\"128\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">GE 3T Scanner</text><text x=\"125\" y=\"146\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#64748b\" text-anchor=\"middle\">TR=2500ms, TE=40ms</text><path d=\"M225 115 L255 115\" stroke=\"#2563eb\" stroke-width=\"2\"/><rect x=\"260\" y=\"60\" width=\"210\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"365\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">AFNI Preprocessing</text><text x=\"365\" y=\"108\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">3D rigid-body motion corr.</text><text x=\"365\" y=\"126\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">WM &amp; CSF component reg.</text><text x=\"365\" y=\"144\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Band-pass: 0.01 - 0.1 Hz</text><path d=\"M475 115 L505 115\" stroke=\"#0d9488\" stroke-width=\"2\"/><rect x=\"510\" y=\"60\" width=\"160\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"590\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Dimensionality Red.</text><text x=\"590\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">PCA on BOLD signals</text><text x=\"590\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">MNI152 Standard Space</text><text x=\"590\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#2563eb\" text-anchor=\"middle\">Redundancy removal</text></svg>",
+        "paragraphs": [
+          {
+            "en": "The study included 20 healthy, right‐handed subjects (mean age ± SD = 37±12; 7 females, 13 males) with no history of neurological disorders. The study was approved by the Institutional Review Board at Memorial Sloan Kettering Cancer Center, and informed consent was obtained from each participant. During the resting‐state condition, subjects were instructed to lie in the scanner, keep their eyes open, try to think of nothing in particular, and maintain fixation on a central cross on the screen.",
+            "ja": "本研究には、神経疾患の既往歴のない右利きの健康な被験者20名（平均年齢±標準偏差＝37±12歳、女性7名、男性13名）が参加した。研究はメモリアル・スローン・ケタリングがんセンターの治験審査委員会（IRB）の承認を受け、各参加者からインフォームド・コンセントを得た。安静時状態の計測中、被験者はスキャナ内に横たわり、目を開けたまま特に何も考えないようにし、画面中央の十字を注視し続けるよう指示された。"
+          },
+          {
+            "en": "A GE 3T scanner (General Electric, Milwaukee, Wisconsin, USA) and a standard quadrature head coil was employed to acquire the MR images. Functional images covering the whole brain were acquired using a (T2*)‐weighted imaging sequence sensitive to blood oxygen level‐dependent (BOLD) signal (repetition time, TR/TE = 2500/40 ms; slice thickness = 4.5 mm; matrix = 128 × 128; FOV = 240 mm; volumes = 160). Functional matching axial T1‐weighted images (TR/TE = 600/8 ms; slice thickness = 1 mm) were acquired for anatomical co‐registration purposes.",
+            "ja": "MR画像の取得には、GE社製3Tスキャナ（General Electric、米国ウィスコンシン州ミルウォーキー）および標準的な直交位相ヘッドコイルが使用された。全脳をカバーする機能画像は、血中酸素濃度依存（BOLD）信号に感度を持つT2*強調画像シーケンス（反復時間 TR/TE = 2500/40 ms、スライス厚 = 4.5 mm、マトリクス = 128×128、視野 FOV = 240 mm、ボリューム数 = 160）を用いて取得された。解剖学的共位置合わせの目的で、機能画像と整合する軸位T1強調画像（TR/TE = 600/8 ms、スライス厚 = 1 mm）が取得された。"
+          },
+          {
+            "en": "Functional MRI data were processed and analyzed using the software program Analysis of Functional NeuroImages (AFNI; Cox, 1996). Head motion correction was performed using 3D rigid‐body registration. The first volume was selected to register all other volumes. The first volume was chosen because it was acquired before the anatomical scan. Both task and resting state fMRI scans were monitored using a real time post‐processing software BrainWave (BrainWave RT, Medical Numerics, Germantown, MD) to monitor brain activity and the head motion. For subjects showing severe head motion over time, generally, the scan was repeated. For small head motion (less than 2 voxel size), a motion correction algorism (iterated linearized weighted least squares) considering three translation and three rotation parameters against a reference volume was applied. The obtained six parameter time courses were also integrated in the statistical analysis to regress out residual motion‐correlated artifactual voxels. Spatial smoothing was applied to improve the signal‐to‐noise ratio using a Gaussian filter with a 6 mm full width of half maximum. Corrections for linear trend and high‐frequency noise were also applied. Resting‐state data requested some more preprocessing steps. They were corrected for head motion by regressing head motion data and the first five principal components of the white matter and CSF signals. They were also detrended, demeaned, and band‐pass filtered (frequency range 0.01–0.1 Hz). All fMRI data were registered to the standard space (Montreal Neurological Institute MNI152 standard map).",
+            "ja": "機能的MRIデータは、ソフトウェア解析プログラムAFNI（Analysis of Functional NeuroImages; Cox, 1996）を用いて処理および解析された。頭部体動補正は3次元剛体位置合わせを用いて実施された。解剖学的スキャン前に取得されたため、第1ボリュームが他の全ボリュームを位置合わせする基準として選択された。タスクおよび安静時fMRIスキャンの両方において、リアルタイム後処理ソフトウェアBrainWave（BrainWave RT、米国メリーランド州ジャーマンタウン）を用いて脳活動と頭部動揺がモニタリングされた。経時的に激しい頭部動揺を示した被験者については原則として再スキャンが行われた。軽微な頭部動揺（2ボクセルサイズ未満）に対しては、参照ボリュームに対する3つの並進パラメータおよび3つの回転パラメータを考慮した動動補正アルゴリズム（反復線形化重み付き最小二乗法）が適用された。取得された6パラメータの時系列は、残存する体動相関アーチファクトボクセルを回帰除去するため統計解析にも組み込まれた。信号対雑音比を向上させるため、半値全幅6 mmのガウスフィルタを用いた空間平滑化が適用された。線形トレンドおよび高周波ノイズの補正も行われた。安静時データにはさらなる前処理段階が必要とされた。頭部動揺データならびに白質および脳脊髄液（CSF）信号の最初の5つの主成分を回帰することにより頭部体動が補正された。さらにトレンド除去、平均値除去、および帯域通過フィルタリング（周波数範囲0.01〜0.1 Hz）が施された。すべてのfMRIデータは標準空間（モントリオール神経科学研究所 MNI152標準マップ）に位置合わせされた。"
+          },
+          {
+            "en": "Principal Component Analysis (PCA) is a widely used dimensionality reduction technique used to transform a dataset into a lower‐dimensional space while preserving most of the information in the original data [80]. In the context of the given problem, PCA was applied to the set of BOLD signals to reduce redundancy and keep only the relevant information.",
+            "ja": "主成分分析（PCA）は、元のデータの情報の大部分を保持しながらデータセットを低次元空間に変換するために広く使用されている次元削減手法である。本研究の課題において、PCAは冗長性を削減し関連する情報のみを保持するために一連のBOLD信号に適用された。"
+          }
+        ]
+      },
+      {
+        "id": "results",
+        "title_en": "Results",
+        "title_ja": "結果",
+        "section_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 200\" width=\"100%\" height=\"100%\"><rect width=\"700\" height=\"200\" fill=\"#f8fafc\" rx=\"8\"/><text x=\"350\" y=\"28\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Mathematical Architecture &amp; Autonomous lRNN Dynamics</text><rect x=\"40\" y=\"50\" width=\"180\" height=\"125\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"130\" y=\"75\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Driven Linear System</text><text x=\"130\" y=\"100\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">\\tau \\dot{r} = W r + W_{in}\\omega - r</text><text x=\"130\" y=\"125\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Spectral Radius \\rho &lt; 1</text><text x=\"130\" y=\"150\" font-family=\"sans-serif\" font-size=\"10\" fill=\"#64748b\" text-anchor=\"middle\">Stable origin r = 0</text><path d=\"M225 112 L255 112\" stroke=\"#2563eb\" stroke-width=\"2\"/><rect x=\"260\" y=\"50\" width=\"180\" height=\"125\" rx=\"6\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"350\" y=\"75\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">Autoregressive Kernel</text><text x=\"350\" y=\"100\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">G(s) = \\sum J_n e^{(\\lambda_n-1)s/\\tau}</text><text x=\"350\" y=\"125\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Continuous AR(N)</text><text x=\"350\" y=\"150\" font-family=\"sans-serif\" font-size=\"10\" fill=\"#64748b\" text-anchor=\"middle\">Effective Order &lt;&lt; N</text><path d=\"M445 112 L475 112\" stroke=\"#0d9488\" stroke-width=\"2\"/><rect x=\"480\" y=\"50\" width=\"180\" height=\"125\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"570\" y=\"75\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Closed-Loop Twin</text><text x=\"570\" y=\"100\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">\\tau \\dot{r} = (\\tilde{W} - I) r</text><text x=\"570\" y=\"125\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#2563eb\" text-anchor=\"middle\">Poles \\sigma_k = (\\tilde{\\lambda}_k - 1)/\\tau</text><text x=\"570\" y=\"150\" font-family=\"sans-serif\" font-size=\"10\" fill=\"#0d9488\" text-anchor=\"middle\">Koopman Modal Evolution</text></svg>",
+        "paragraphs": [
+          {
+            "en": "We start investigating the reservoir computing abilities of a RNN with N linear units (lRNN). The state of the lRNN is the vector r(t) whose elements are the activities ri(t) of each unit, following the linear dynamics (1) τr˙(t)=Wr(t)+Winω(t)−r(t) The synaptic matrix W∈RN×N determines the recurrent input Wr, which, together with the contributions from the external environment Winω(t), composes the total input h that each unit receives. In general, these currents are nonlinearly transformed by an input–output gain function Φ(h) we assume here to be Φ(h)=h – a condition usually associated with unit activities perturbatively fluctuating around the quiescent state (see Methods Section). Network units receive a source of external input due to the M observables ωi(t) of the systems under investigation, mediated by the synaptic matrix Win∈RN×M. From Equation (1) the network state at any time t results then to be (2) r(t)=∫−∞te(W−I)(t−t′)/τWinω(t′)dt′ where I∈RN×N is the identity matrix.",
+            "ja": "我々はまず、N個の線形ユニットを有するRNN（lRNN）のリザーバコンピューティング能力の検証から着手する。lRNNの状態は各ユニットの活動度ri(t)を要素とするベクトルr(t)であり、以下の線形ダイナミクスに従う：(1) τ r_dot(t) = W r(t) + Win ω(t) - r(t)。シナプス行列W∈R^(N×N)は再帰入力W rを決定し、これが外部環境からの寄与Win ω(t)とともに各ユニットが受け取る総入力hを構成する。一般にこれらの電流は入出力ゲイン関数Φ(h)によって非線形変換されるが、ここではΦ(h) = hと仮定する。この条件は通常、ユニット活動度が静止状態の周囲を摂動的に揺らいでいる状況に関連付けられる。ネットワークユニットは、シナプス行列Win∈R^(N×M)を介して、調査対象システムのM個の観測量ωi(t)による外部入力源を受け取る。式(1)より、任意の時刻tにおけるネットワーク状態は (2) r(t) = ∫_{-∞}^t e^{(W - I)(t - t')/τ} Win ω(t') dt' となる。ここでI∈R^(N×N)は単位行列である。"
+          },
+          {
+            "en": "If the lRNN is capable to display the so‐called ‘generalized synchronization’ property in response to the input Winω [29, 30], r(t) effectively embeds the dynamics of the ‘whole’ observed system into its state space. This because the lRNN incorporates the ‘echo’ [4, 31, 32] of past observations implementing a dimensional embedding a la Takens [33, 34, 35]. In this RC framework, for sufficiently high N a simple linear transformation capable to approximately map the network state to a target output exists (3) ω(t)≈Woutr(t)=∫0∞G(s)ω(t−s)ds with synaptic weights Wout∈RM×N computed via a simple linear regression [4, 5]. The linear kernels G(s)=WoutE(W−I)(s)/τWin∈RM×M (i.e., the Green functions) resulting from Equation (2) reveals the autoregressive nature of the RC approach in this lRNN case.",
+            "ja": "もしlRNNが入力Win ωに応答して、いわゆる「一般化同期」特性を示すことができるならば、r(t)は観測されたシステム「全体」のダイナミクスを自身の状態空間内へと効果的に埋め込む。これは、lRNNが過去の観測の「エコー」を取り込み、ターケンス流の次元埋め込みを実現するためである。このRCの枠組みにおいて、十分に大きなNに対しては、ネットワーク状態を目的の出力へと近似的に写像可能な単純な線形変換 (3) ω(t) ≈ Wout r(t) = ∫_0^∞ G(s) ω(t - s) ds が存在し、シナプス重みWout∈R^(M×N)は単純な線形回帰によって計算される。式(2)から導かれる線形カーネル G(s) = Wout e^{(W - I)s/τ} Win ∈ R^(M×M)（すなわちグリーン関数）は、このlRNNにおけるRCアプローチの自己回帰的性質を明らかにする。"
+          },
+          {
+            "en": "This concept can be better clarified by resorting to the eigendecomposition of the synaptic matrix W=QΛQ−1. Here, Λ is the diagonal matrix of the eigenvalues (Λii=λi) and the eigenvectors are the columns of Q: W|Qi⟩=λi|Qi⟩. By applying this decomposition to the kernel expression, a superposition of N exponential modes results: (4) G(s)=∑n=1NJne(λn−1)s/τ where Jn=Wout|Qn⟩⟨Qn−1|Win are N rank‐1 matrices with ⟨Qn−1| being the n‐th row of the inverse matrix Q−1 (see Methods Section). The convolution in Equation (3) is integrable if the spectral radius ρ=maxn∈[1,N]Reλn of W is smaller than 1. Under this condition, unperturbed lRNNs (ω=0) have a stable equilibrium point at r=0, and self‐consistency equation Equation (3) describes a continuous‐time autoregressive (AR) model with order N (number of exponential modes in G(s)). This relationship between RC with lRNNs and AR models generalizes previous results obtained in the discrete‐time domain [36, 37]. As we will see later, the order of the equivalent AR model can be much smaller than N as many Jn are usually close to 0.",
+            "ja": "この概念は、シナプス行列の固有値分解 W = Q Λ Q^(-1) を用いることでより明確に説明できる。ここでΛは固有値の対角行列（Λii = λi）であり、固有ベクトルはQの列ベクトルである：W|Qi⟩ = λi|Qi⟩。この分解をカーネル表現に適用すると、N個の指数モードの重ね合わせが得られる：(4) G(s) = ∑_{n=1}^N Jn e^{(λn - 1)s/τ}。ここで Jn = Wout |Qn⟩ ⟨Qn^(-1)| Win はN個のランク1行列であり、⟨Qn^(-1)| は逆行列Q^(-1)の第n行である。Wのスペクトル半径 ρ = max_{n∈[1,N]} Re(λn) が1未満であれば、式(3)の畳み込みは積分可能となる。この条件下で、摂動のないlRNN（ω = 0）は r = 0 に安定な平衡点を持ち、自己無撞着方程式である式(3)は次数N（G(s)中の指数モード数）の連続時間自己回帰（AR）モデルを記述する。lRNNを用いたRCとARモデルの間のこの関係は、離散時間領域で得られた従来の結果を一般化するものである。後に示すように、多くのJnは通常0に近いため、等価なARモデルの有効次数はNよりも大幅に小さくなり得る。"
+          },
+          {
+            "en": "By replacing the observables ω(t) provided as input with the reconstructed once from Equation (3), the lRNN results to follow the autonomous dynamics (5) τr˙=W∼r−r where W∼=W+WinWout is the updated (i.e., ‘learned') synaptic matrix. If the network can correctly predict the future of the target output, Equation (5) provides a linear representation of the system under analysis. Relying as above on the eigenmode decomposition W∼=Q∼Λ∼Q∼−1, the projections v(t)≡Q∼−1r(t) evolve in time as a set of decoupled variables: (6) vk(t)=vk(0)e(λ∼k−1)t/τ∀k∈[1,N] This last step makes it apparent the relationship with the Koopman‐operator theory, as a suited linear combination of these modes eventually implements an effective decomposition of the time series ω(t): (7) ω(t)=Woutr(t)≡Ξv(t) with Ξ=WoutQ∼. The Laplace transform of the reconstructed observable will then have N poles σk=(λ∼k−1)/τ with their related residues, allowing us to represent the dynamical properties of the ‘digital twin’ (i.e., the autonomous lRNN), and linking it to AR models and finite approximations of the Koopman operator (see Methods Section). Indeed, the k‐th residue is proportional to Ξjkvk(0) and provides in absolute value the relevance of the k‐th mode in describing the observable ωj, given the initial network state r(0).",
+            "ja": "入力として与えられる観測量ω(t)を式(3)から再構成された観測量に置き換えることで、lRNNは以下の自律ダイナミクスに従うことになる：(5) τ r_dot = W~ r - r。ここで W~ = W + Win Wout は更新された（すなわち『学習された』）シナプス行列である。ネットワークが目的出力の将来を正確に予測できる場合、式(5)は解析対象システムの線形表現を提供する。上記と同様に固有モード分解 W~ = Q~ Λ~ Q~^(-1) に依拠すると、射影 v(t) ≡ Q~^(-1) r(t) は非干渉化された変数の集合として時間発展する：(6) vk(t) = vk(0) e^{(λ~k - 1)t/τ} （すべての k ∈ [1, N]）。この最終段階により、クープマン作用素理論との関係が明白となる。これらのモードの適切な線形結合が時系列ω(t)の効果的な分解を実現するためである：(7) ω(t) = Wout r(t) ≡ Ξ v(t)（ただし Ξ = Wout Q~）。再構成された観測量のラプラス変換は、関連する留数とともにN個の極 σk = (λ~k - 1)/τ を持つことになり、これにより「デジタルツイン」（すなわち自律lRNN）の動的特性を表現し、それをARモデルおよびクープマン作用素の有限近似と結びつけることが可能になる。実際、第kの留数は Ξjk vk(0) に比例し、初期ネットワーク状態r(0)が与えられたときに観測量ωjを記述する上での第kモードの寄与の大きさを絶対値として提供する。"
+          }
+        ]
+      },
+      {
+        "id": "discussion",
+        "title_en": "Discussion",
+        "title_ja": "考察",
+        "section_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 200\" width=\"100%\" height=\"100%\"><rect width=\"700\" height=\"200\" fill=\"#f8fafc\" rx=\"8\"/><text x=\"350\" y=\"30\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Comparison: Hankel-DMD vs. Stochastic lRNN</text><rect x=\"40\" y=\"60\" width=\"280\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#ef4444\" stroke-width=\"1.5\"/><text x=\"180\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#b91c1c\" text-anchor=\"middle\">Hankel-DMD under Filter</text><text x=\"180\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Fourier-like spectrum collapse</text><text x=\"180\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Poles Re(\\sigma) \\to 0 (purely oscillatory)</text><text x=\"180\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#ef4444\" text-anchor=\"middle\">Dissipative decay obscured</text><rect x=\"380\" y=\"60\" width=\"280\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"520\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">Stochastic lRNN Framework</text><text x=\"520\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Preserves continuous decay rates</text><text x=\"520\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Endogenous memory-less noise handling</text><text x=\"520\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Robust subject-level twin inference</text></svg>",
+        "paragraphs": [
+          {
+            "en": "The successful application of linear recurrent neural networks within the reservoir computing framework represents a significant methodological contribution to model resting‐state fMRI data. Our results show that lRNNs effectively capture brain dynamics, suggesting that resting‐state activity can be approximated as a linear system in a high‐dimensional space, supporting recent studies advocating for linear models in this context [51]. Our approach provides valuable and easily accessible insights into the functional connectivity structure as similarity patterns between vectors associated with the eigenmode decomposition of the inferred lRNN. This low‐dimensional description of the whole brain activity moves the focus to the mode's subspace offering a normative framework where brain areas and inter‐subject comparisons are more straightforward.",
+            "ja": "リザーバコンピューティングの枠組み内での線形再帰型ニューラルネットワークの適用成功は、安静時fMRIデータをモデル化するための重要な方法論的貢献を示すものである。我々の結果はlRNNが脳ダイナミクスを効果的に捉えることを示しており、安静時活動が高次元空間における線形システムとして近似可能であることを示唆し、この文脈において線形モデルを提唱する最近の研究を支持している。我々のアプローチは、推論されたlRNNの固有モード分解に関連するベクトル間の類似度パターンとして、機能的結合構造に対する価値ある容易にアクセス可能な洞察を提供する。全脳活動のこの低次元記述はモードの部分空間へと焦点を移行させ、脳領域間および被験者間の比較がより直接的になる規範的な枠組みを提供する。"
+          },
+          {
+            "en": "Notably, the mode dynamics described in Equation (6) provides an equivalent linear representation for the observables of the system under investigation – namely, the single‐subject voxel‐wise BOLD activity. The resulting vector of all time derivatives (see Methods Section) serves as an alternative descriptor of the system's state [52], potentially encapsulating the trajectory evolution at any given time. This concept is reminiscent of the dynamic mode decomposition with Hankel matrix [41, 42], but with a significantly reduced dimensionality constraint. However, we showed that Hankel‐DMD in practice tends to converge toward a Fourier‐like representation when the data undergo standard frequency‐band filtering (as commonly done in fMRI analysis pipelines), while our lRNN formulation can still recover the correct continuous‐time spectrum, including nonzero decay rates. In filtered conditions, Hankel‐DMD often yields poles whose real parts collapse toward 0, effectively favoring purely oscillatory modes and obscuring the dissipative structure of the underlying dynamics (Figure 3). This result also stems from considering an optimal amount of memory‐less fluctuations integrated into the lRNN units’ endogenous activity. This feature enables effective modeling of non‐informative fast fluctuations in BOLD activity without requiring inference of additional high‐frequency, fast‐decaying modes, thereby reducing the dimensionality of the latent state space visited by the deterministic components of the inferred lRNNs. This characteristic makes the presented method particularly advantageous and flexible, allowing the inference of lRNN‐based digital twins at the single‐subject level using a limited amount of experimental data. In contrast, several recent approaches have applied deep reinforcement learning (DRL) to fMRI timeseries or brain‐network analysis [53, 54]. These DRL‐based methods typically require reward‐driven optimization strategies and substantially larger training pipelines [55]. Differently from these approaches, we show that our stochastic lRNN framework achieves accurate, robust, and interpretable data‐driven modeling by ‘learning’ only a limited number of readout weights through straightforward linear regression, similarly to classical echo state networks [4].",
+            "ja": "特筆すべきことに、式(6)で記述されるモードダイナミクスは、解析対象システムの観測量、すなわち単一被験者のボクセル単位のBOLD活動に対する等価な線形表現を提供する。すべての時間導関数からなる結果のベクトルはシステム状態の代替記述子として機能し、任意の時刻における軌道の発展を潜在的に要約する。この概念はハンケル行列を用いた動的モード分解（Hankel-DMD）を想起させるが、大幅に次元の制約が緩和されている。しかし、fMRI解析パイプラインで一般的に行われる標準的な周波数帯域フィルタリングをデータが受けた場合、Hankel-DMDは実際にはフーリエ様の表現へと収束する傾向があるのに対し、我々のlRNN定式化は非ゼロの減衰率を含む正しい連続時間スペクトルを依然として復元できることを示した。フィルタ処理された条件下では、Hankel-DMDは極の実部が0へと収縮することが多く、実質的に純粋な振動モードを優遇し、基底にあるダイナミクスの散逸構造を不明瞭にしてしまう（図3）。この結果はまた、lRNNユニットの内因性活動に統合された最適量の記憶のない揺らぎ（ホワイトノイズ）を考慮したことにも起因する。この特徴により、追加の高周波かつ高速減衰モードの推論を必要とすることなく、BOLD活動における非情報的な高速揺らぎを効果的にモデル化でき、推論されたlRNNの決定論的成分が探索する潜在状態空間の次元を低減できる。この特性によって本手法は特に有利かつ柔軟なものとなり、限られた量の実験データを用いて単一被験者レベルでのlRNNベースのデジタルツインの推論が可能となる。対照的に、近年のいくつかのアプローチは深層強化学習（DRL）をfMRI時系列や脳ネットワーク解析に適用している。これらのDRLベースの手法は通常、報酬駆動型の最適化戦略と大幅に大規模な学習パイプラインを必要とする。これらとは異なり、我々の確率的lRNNフレームワークは、古典的なエコーステートネットワークと同様に、直接的な線形回帰を通じて限定された数の読み出し重みを『学習』するだけで、高精度、ロバスト、かつ解釈可能なデータ駆動型モデリングを達成することを示している。"
+          }
+        ]
+      },
+      {
+        "id": "conclusion",
+        "title_en": "Conclusion",
+        "title_ja": "結論",
+        "section_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 700 200\" width=\"100%\" height=\"100%\"><rect width=\"700\" height=\"200\" fill=\"#f8fafc\" rx=\"8\"/><text x=\"350\" y=\"30\" font-family=\"sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Clinical &amp; Translational Horizon of Brain Digital Twins</text><rect x=\"40\" y=\"60\" width=\"280\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/><text x=\"180\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#1e3a8a\" text-anchor=\"middle\">Longitudinal Subject Landscape</text><text x=\"180\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Tracking trajectory drift in aging</text><text x=\"180\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Neurodegenerative progression</text><text x=\"180\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#0d9488\" text-anchor=\"middle\">Fully data-driven landscape</text><rect x=\"380\" y=\"60\" width=\"280\" height=\"110\" rx=\"6\" fill=\"#ffffff\" stroke=\"#0d9488\" stroke-width=\"1.5\"/><text x=\"520\" y=\"85\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#0f766e\" text-anchor=\"middle\">Therapeutic Control &amp; Criticality</text><text x=\"520\" y=\"110\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Suppress pathology-related modes</text><text x=\"520\" y=\"130\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#334155\" text-anchor=\"middle\">Targeted neuromodulation / rehab</text><text x=\"520\" y=\"150\" font-family=\"sans-serif\" font-size=\"11\" fill=\"#2563eb\" text-anchor=\"middle\">Stability tracking across states</text></svg>",
+        "paragraphs": [
+          {
+            "en": "The reported results have the potential to open up several avenues for future research. Indeed, the possibility offered to represent the single‐subject as a point into a low‐dimensional map – i.e., a landscape (Figure 7B) – allows in principle to follow in time its drift in longitudinal studies like those focused on neurodegenerative diseases [56] or aging [57, 58, 59]. Here, the novelty is the fully data‐driven nature of the approach to build such a landscape of subjects compared to those relying on model‐driven inferences [60]. Characterizing the trajectory followed in this landscape by each subject could provide valuable insights into the alterations in functional connectivity and dynamics. For instance, the emergence of unstable modes may be linked to transitions into pathological states of a specific neurological disease. By perturbing the system with specific and personalized rehabilitative or pharmacological treatments that aim to suppress these “pathology‐related” modes, we may gain a means to intervene and reduce the occurrence of such transitions, ultimately helping to tailor optimal therapeutic strategies [28, 61].",
+            "ja": "報告された結果は、将来の研究に向けた複数の新たな道を切り拓く可能性を秘めている。実際、単一の被験者を低次元マップ、すなわちランドスケープ上の点として表現できる可能性（図7B）により、神経変性疾患や加齢に焦点を当てた縦断研究において、その経時的なドリフトを追跡することが原理的に可能となる。ここでの新規性は、モデル駆動型の推論に依存する手法と比較して、このような被験者ランドスケープを構築するアプローチの完全なデータ駆動的性質にある。このランドスケープ内で各被験者が辿る軌道を特徴付けることは、機能的結合およびダイナミクスの変容に対する貴重な洞察をもたらす可能性がある。例えば、不安定モードの出現は、特定の神経疾患の病態への遷移と結びついている可能性がある。これら『病態関連』モードを抑制することを目的とした、個別化された特異的なリハビリテーションや薬物療法によってシステムに摂動を与えることで、そのような状態遷移の発生を抑止・介入する手段が得られ、最終的には最適な治療戦略の個別化に寄与する可能性がある。"
+          },
+          {
+            "en": "In line with this, as in classic digital twins, the inferred lRNN can incorporate any additional available information about the system simply as new input. An external stimulation can potentially act as a selector for different dynamical regimes, allowing for two distinct representations with a single network [62]. The functional connectivity itself could be a proxy for state transition. Indeed, a significant change in functional connectivity might indicate that the decomposition has also changed, suggesting that the observed system is close to a different equilibrium point [63]. These changes can be tracked following the distribution of poles that characterize the autonomous dynamics of the inferred linear RNN. This is the case for transitions in global brain states – such as those governing the sleep‐wake cycle – that arise from network destabilization, a hallmark of criticality [64, 65, 66]. Under these conditions, pole distributions correlate with longer relaxation time scales and steeper slopes (as illustrated in Figure 7B), possibly underlying previously observed state‐dependent spectral signatures [67]. This metastable dynamics results in broader excursions within the latent state space of neural activity, making predictions of future BOLD activity more challenging for the inferred lRNN. The quality of lRNN predictions can then serve as a proxy for dynamical stability, akin to findings in intracortical local field potentials (LFPs) of macaque monkeys during anesthesia‐induced transitions between wakefulness and unconsciousness [68].",
+            "ja": "これに伴い、古典的なデジタルツインと同様に、推論されたlRNNはシステムに関するあらゆる利用可能な追加情報を単に新たな入力として組み込むことができる。外部刺激は異なる動的レジームのセレクターとして機能する可能性があり、単一のネットワークで2つの異なる表現を持たせることが可能となる。機能的結合そのものが状態遷移の代理指標となり得る。実際、機能的結合の顕著な変化は分解構造も変化したことを示唆し、観測されたシステムが別の平衡点の近傍にあることを示している可能性がある。これらの変化は、推論された線形RNNの自律ダイナミクスを特徴付ける極の分布を追跡することでモニターできる。これは、臨界性の特徴であるネットワークの不安定化から生じる睡眠・覚醒サイクルを制御するような全脳状態の遷移に当てはまる。このような条件下では、極の分布はより長い緩和時間スケールおよび急峻なスロープと相関し（図7Bに示すように）、過去に観察された状態依存的なスペクトルシグネチャの根底にあると考えられる。この準安定ダイナミクスは神経活動の潜在状態空間内でのより広範な逸脱をもたらし、推論されたlRNNにとって将来のBOLD活動の予測をより困難なものとする。したがって、lRNNの予測精度は、覚醒と無意識の間の麻酔誘発性遷移時におけるアカゲザルの皮質内局所場電位（LFP）の知見と同様に、動的安定性の代理指標として機能することができる。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "reservoir computing": {
+      "ipa": "/ˈrɛzərvwɑːr kəmˈpjuːtɪŋ/",
+      "pos": "noun",
+      "ja": "リザーバコンピューティング",
+      "nuance": "固定された高次元ランダム再帰結合を持つネットワーク（リザーバ）を用い、出力層の線形読み出し重みのみを最適化する機械学習パラダイム。"
+    },
+    "digital twin": {
+      "ipa": "/ˈdɪdʒɪtl twɪn/",
+      "pos": "noun",
+      "ja": "デジタルツイン",
+      "nuance": "物理的対象や生体システムの振る舞い・動的状態をin silico（計算機上）で忠実にシミュレート・予測・最適化するための自律複製モデル。"
+    },
+    "koopman operator": {
+      "ipa": "/ˈkoʊpmən ˈɒpəreɪtər/",
+      "pos": "noun",
+      "ja": "クープマン作用素",
+      "nuance": "非線形動的システムの状態観測量を無限次元関数空間における線形ダイナミクスへと変換し、線形スペクトル解析を可能にする作用素。"
+    },
+    "eigendecomposition": {
+      "ipa": "/ˌaɪɡənˌdiːkɒmpəˈzɪʃən/",
+      "pos": "noun",
+      "ja": "固有値分解",
+      "nuance": "正方行列を固有値と固有ベクトルの積へと分解する手法であり、システムのモード分解や時間発展の非干渉化に用いられる。"
+    },
+    "spectral radius": {
+      "ipa": "/ˈspɛktrəl ˈreɪdiəs/",
+      "pos": "noun",
+      "ja": "スペクトル半径",
+      "nuance": "行列の固有値の絶対値（連続時間系では実部）の最大値であり、システムの安定性やエコーステート特性の成立条件を決定する指標。"
+    },
+    "autoregressive": {
+      "ipa": "/ˌɔːtoʊrɪˈɡrɛsɪv/",
+      "pos": "adj.",
+      "ja": "自己回帰の",
+      "nuance": "過去の自身の観測値の線形結合によって将来の値をモデル化する時系列解析の基本構造を指す。"
+    },
+    "laplace transform": {
+      "ipa": "/ləˈplɑːs ˈtrænsfɔːrm/",
+      "pos": "noun",
+      "ja": "ラプラス変換",
+      "nuance": "時間領域の微分方程式を複素周波数領域の代数方程式へと変換し、極（pole）と留数（residue）のスペクトル解析を行う積分変換。"
+    },
+    "quiescent state": {
+      "ipa": "/kwiˈɛsnt steɪt/",
+      "pos": "noun",
+      "ja": "静止状態、休止状態",
+      "nuance": "外部刺激や自発発火の過剰な励起がない基底平衡状態を指し、近傍での線形近似の妥当性を担保する前提となる。"
+    },
+    "generalized synchronization": {
+      "ipa": "/ˈdʒɛnrəlaɪzd ˌsɪŋkrənaɪˈzeɪʃən/",
+      "pos": "noun",
+      "ja": "一般化同期",
+      "nuance": "駆動系と応答系の状態間に一対一の関数関係が成立する非線形同期現象であり、RCが系の状態を完全埋め込みできる条件。"
+    },
+    "dynamic mode decomposition": {
+      "ipa": "/daɪˈnæmɪk moʊd ˌdiːkɒmpəˈzɪʃən/",
+      "pos": "noun",
+      "ja": "動的モード分解 (DMD)",
+      "nuance": "時系列データから空間コヒーレントな動的モードと対応する時間周波数・減衰率を線形近似的に抽出するデータ駆動解析法。"
+    },
+    "dissipative": {
+      "ipa": "/ˈdɪsɪpeɪtɪv/",
+      "pos": "adj.",
+      "ja": "散逸的な",
+      "nuance": "エネルギーが減衰・散逸してシステムが安定平衡点へと収束する性質を表し、固有モードの負の実部と対応する。"
+    },
+    "metastable": {
+      "ipa": "/ˌmɛtəˈsteɪbl/",
+      "pos": "adj.",
+      "ja": "準安定な",
+      "nuance": "システムが完全な固定点には捕捉されず、複数の潜在的アトラクタ間を一時的に滞留・遷移し続ける動的状態。"
+    },
+    "criticality": {
+      "ipa": "/krɪtɪˈkæləti/",
+      "pos": "noun",
+      "ja": "臨界性",
+      "nuance": "秩序相と無秩序相の境界近傍にシステムが自己組織化し、相関長や緩和時間の長大化が生じるダイナミクスの特徴。"
+    },
+    "encapsulate": {
+      "ipa": "/ɪnˈkæpsjuleɪt/",
+      "pos": "verb",
+      "ja": "要約する、内包する",
+      "nuance": "複雑で多変量な情報や動的軌道の発展を、簡潔な数式・記述子の中に過不足なく凝縮して表現すること。"
+    }
+  }
+}
