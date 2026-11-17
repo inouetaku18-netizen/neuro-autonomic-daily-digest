@@ -1,0 +1,86 @@
+{
+  "id": "paper-2026-11-17-31109966",
+  "date": "2026-11-17",
+  "pmid": "31109966",
+  "pmcid": "PMC6996447",
+  "doi_url": "https://doi.org/10.1101/cshperspect.a034173",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/31109966/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6996447/",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "Cold Spring Harbor perspectives in medicine (2020)",
+  "impact_factor": 7.8,
+  "doi": "10.1101/cshperspect.a034173",
+  "title_en": "Vagus Nerve Stimulation and the Cardiovascular System.",
+  "title_ja": "迷走神経刺激と心血管系",
+  "tags": [
+    "Vagus Nerve Stimulation",
+    "Heart Rate Variability",
+    "Cardiovascular System",
+    "Autonomic Control"
+  ],
+  "summary": {
+    "problem": "自律神経系（迷走神経）による心機能調節機構の解明と、心停止・心筋梗塞・脳卒中等の心血管障害に対するVNS（迷走神経刺激）の治療的応用可能性の整理。",
+    "solution_and_method": "迷走神経緊張とHRV高周波（HF）成分の関係性に基づき、てんかん等の既存適応症から心血管疾患（心停止、急性心筋梗塞、脳卒中）へと拡大しつつあるVNSの前臨床・臨床研究を包括的に整理・レビューした。",
+    "formula_block": "$$\\text{HF-HRV} \\propto \\text{Vagal Tone}$$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31109966</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1101/cshperspect.a034173</text>\n</svg>",
+    "key_results": "迷走神経の興奮性とHRVの高周波成分（HF）との相関性が改めて裏付けられた。また、心臓への神経支配を介して、VNSが各種心血管障害に対する有望な治療介入となり得ることが示された。",
+    "discussion_and_implications": "VNSは心血管系の恒常性を制御・回復させる新しい治療アプローチであり、今後の臨床応用に向けた更なるメカニズム解明が期待される。",
+    "relevance_to_my_research": "迷走神経刺激とHRV-HFの関係性や自律神経反射制御の生理的メカニズムは、脳心臓点過程モデルにおけるフィードバック制御機構の構築やKoopman制御モデルの実装に極めて重要である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31109966</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1101/cshperspect.a034173</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The vagus nerve plays an important role in maintaining physiological homeostasis, which includes reflex pathways that regulate cardiac function. The link between vagus nerve activity and the high-frequency component of heart rate variability (HRV) has been well established, correlating with vagal tone. Recently, vagus nerve stimulation (VNS) has been investigated as a therapeutic for a multitude of diseases, such as treatment-resistant epilepsy, rheumatoid arthritis, Crohn's disease, and asthma. Because of the vagus nerve's innervation of the heart, VNS has been identified as a potential therapy for cardiovascular disorders, such as cardiac arrest, acute myocardial infarction, and stroke. Here, we review the current state of preclinical and clinical studies, as well as the potential application of VNS in relation to the cardiovascular system.",
+            "ja": "迷走神経は、心機能を調節する反射経路を含む生理学的恒常性の維持において重要な役割を果たしている。迷走神経活動と心拍変動（HRV）の高周波成分（HF）との関係は十分に確立されており、迷走神経緊張（vagal tone）と相関している。近年、迷走神経刺激（VNS）は、治療抵抗性てんかん、関節リウマチ、クローン病、喘息などの多数の疾患に対する治療法として研究されている。心臓に対する迷走神経の支配のため、VNSは心停止、急性心筋梗塞、脳卒中などの心血管障害に対する潜在的な治療法として特定されている。ここでは、前臨床および臨床研究の現状、ならびに心血管系に関連したVNSの潜在的な応用についてレビューする。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "vagus nerve": {
+      "ipa": "/ˈveɪ.ɡəs nɜːv/",
+      "pos": "noun",
+      "ja": "迷走神経",
+      "nuance": "副交感神経系の主要経路として内臓機能を支配する第10脳神経"
+    },
+    "homeostasis": {
+      "ipa": "/ˌhəʊ.mi.əʊˈsteɪ.sɪs/",
+      "pos": "noun",
+      "ja": "恒常性",
+      "nuance": "生体が外部環境変化に対して内部状態を一定に保つ生理機能"
+    },
+    "vagal tone": {
+      "ipa": "/ˈveɪ.ɡəl təʊn/",
+      "pos": "noun",
+      "ja": "迷走神経緊張",
+      "nuance": "迷走神経が持続的に発揮している抑制的・調整的な活動力覚"
+    },
+    "cardiovascular": {
+      "ipa": "/ˌkɑː.di.əʊˈvæs.kjə.lər/",
+      "pos": "adjective",
+      "ja": "心血管系の",
+      "nuance": "心臓および血管（循環器系）に関連する用語"
+    },
+    "therapeutic": {
+      "ipa": "/ˌθer.əˈpjuː.tɪk/",
+      "pos": "adjective",
+      "ja": "治療の",
+      "nuance": "疾患の治療や症状改善を目的とした介入に関する表現"
+    },
+    "innervation": {
+      "ipa": "/ˌɪn.ɜːˈveɪ.ʃən/",
+      "pos": "noun",
+      "ja": "神経支配",
+      "nuance": "特定の臓器や組織に神経が進入し興奮伝達を行う状態"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "id": "paper-2026-11-17-33994976",
+  "date": "2026-11-17",
+  "pmid": "33994976",
+  "pmcid": "PMC8119624",
+  "doi_url": "https://doi.org/10.3389/fnhum.2021.628417",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/33994976/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8119624/",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "Frontiers in human neuroscience (2021)",
+  "impact_factor": 3.2,
+  "doi": "10.3389/fnhum.2021.628417",
+  "title_en": "Contrasting Electroencephalography-Derived Entropy and Neural Oscillations With Highly Skilled Meditators.",
+  "title_ja": "高度な技術を持つ瞑想者を対象とした脳波由来エントロピーと神経振動の対比",
+  "tags": [
+    "EEG",
+    "Lempel-Ziv complexity",
+    "Meditation",
+    "Nonlinear dynamics"
+  ],
+  "summary": {
+    "problem": "瞑想の臨床的活用が進む一方、異なる瞑想スタイルが神経生理学的レベル（非線形脳ダイナミクスや周波数特性）でどのように異なるかという電気生理学的相関の解明が求められていた。",
+    "solution_and_method": "熟練した瞑想者を対象に6種類の瞑想スタイル（シャマタ、ヴィパッサナー、座禅、ゾクチェン、トンレン、視覚化）および対照課題（マインドワンダリング）施行中のEEGを測定し、Lempel-Ziv複雑性（非線形エントロピー）と6つの周波数帯域におけるパワースペクトルを評価・比較した。",
+    "formula_block": "$$LZC = \\lim_{n \\to \\infty} \\frac{c(n)}{n / \\log_{\\alpha}(n)}$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33994976</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fnhum.2021.628417</text>\n</svg>",
+    "key_results": "Lempel-Ziv複雑性はマインドワンダリング時と比較して瞑想中に顕著な違いを示し、瞑想が神経の複雑性に影響を与えることが確認された。一方で、6つの周波数帯域におけるパワースペクトル全体では統計的差が見られなかったが、探索的分析では各瞑想スタイル間の神経学的違いが示唆された。",
+    "discussion_and_implications": "瞑想実践はスタイルを問わず脳の非線形ダイナミクス（複雑性）に影響を及ぼす。個々の瞑想手法が持つ独自の神経学的効果を解明するために、詳細なEEG解析の重要性が示された。",
+    "relevance_to_my_research": "瞑想状態における非線形ダイナミクスやLempel-Ziv複雑性の変化は、脳心臓相互作用における神経状態遷移の点過程モデル化や非線形HRV解析の評価指標として応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33994976</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fnhum.2021.628417</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Meditation is an umbrella term for a number of mental training practices designed to improve the monitoring and regulation of attention and emotion. Some forms of meditation are now being used for clinical intervention. To accompany the increased clinical interest in meditation, research investigating the neural basis of these practices is needed. A central hypothesis of contemplative neuroscience is that meditative states, which are unique on a phenomenological level, differ on a neurophysiological level. To identify the electrophysiological correlates of meditation practice, the electrical brain activity of highly skilled meditators engaging in one of six meditation styles (shamatha, vipassana, zazen, dzogchen, tonglen, and visualization) was recorded. A mind-wandering task served as a control. Lempel-Ziv complexity showed differences in nonlinear brain dynamics (entropy) during meditation compared with mind wandering, suggesting that meditation, regardless of practice, affects neural complexity. In contrast, there were no differences in power spectra at six different frequency bands, likely due to the fact that participants engaged in different meditation practices. Finally, exploratory analyses suggest neurological differences among meditation practices. These findings highlight the importance of studying the electroencephalography (EEG) correlates of different meditative practices.",
+            "ja": "瞑想は、注意と感情のモニタリングおよび調節を改善するために設計された数々の精神的トレーニング実践の総称である。一部の形式の瞑想は現在、臨床的介入に使用されている。瞑想に対する臨床的関心の高まりに伴い、これらの実践の神経学的基盤を調査する研究が必要とされている。観照的神経科学の中心的仮説は、現象学的なレベルで独特である瞑想状態は、神経生理学的レベルでも異なるというものである。瞑想実践の電気生理学的相関を特定するために、6つの瞑想スタイル（シャマタ、ヴィパッサナー、座禅、ゾクチェン、トンレン、視覚化）のいずれかに従事する高度な技術を持つ瞑想者の脳電位活動が記録された。マインドワンダリングタスクが対照として機能した。Lempel-Ziv複雑性は、マインドワンダリングと比較して瞑想中の非線形脳ダイナミクス（エントロピー）の違いを示し、実践に関わらず瞑想が神経複雑性に影響を与えることを示唆した。対照的に、6つの異なる周波数帯域におけるパワースペクトルには差異が見られなかったが、これは参加者が異なる瞑想実践に従事したという事実に起因する可能性が高い。最後に、探索的分析により、瞑想実践間の神経学的差異が示唆された。これらの知見は、さまざまな瞑想実践の脳波（EEG）相関を研究することの重要性を強調している。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "meditation": {
+      "ipa": "/ˌmed.ɪˈteɪ.ʃən/",
+      "pos": "noun",
+      "ja": "瞑想",
+      "nuance": "注意や感情の自己調節能力を高める精神的トレーニングの総称"
+    },
+    "neurophysiological": {
+      "ipa": "/ˌnjʊə.rəʊˌfɪz.i.əˈlɒdʒ.ɪ.kəl/",
+      "pos": "adjective",
+      "ja": "神経生理学的な",
+      "nuance": "脳および神経系の生理学的機能・メカニズムに関連する表現"
+    },
+    "electroencephalography": {
+      "ipa": "/ɪˌlek.trəʊ.ɪnˌsef.əˈlɒɡ.rə.fi/",
+      "pos": "noun",
+      "ja": "脳波測定",
+      "nuance": "頭皮から脳の電気的活動を記録する非侵襲的計測手法（EEG）"
+    },
+    "entropy": {
+      "ipa": "/ˈen.trə.pi/",
+      "pos": "noun",
+      "ja": "エントロピー",
+      "nuance": "信号やダイナミクスの乱雑さ・複雑さを定量化する指標"
+    },
+    "power spectra": {
+      "ipa": "/ˈpaʊ.ər ˈspek.trə/",
+      "pos": "noun",
+      "ja": "パワースペクトル",
+      "nuance": "信号に含まれる各周波数成分の強度分布"
+    },
+    "mind-wandering": {
+      "ipa": "/maɪnd ˈwɒn.dər.ɪŋ/",
+      "pos": "noun",
+      "ja": "マインドワンダリング",
+      "nuance": "目の前の課題から意識が逸れ自発的な思考に迷い込む状態"
+    }
+  }
+}

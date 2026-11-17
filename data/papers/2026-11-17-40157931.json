@@ -1,0 +1,86 @@
+{
+  "id": "paper-2026-11-17-40157931",
+  "date": "2026-11-17",
+  "pmid": "40157931",
+  "pmcid": "PMC11955002",
+  "doi_url": "https://doi.org/10.1038/s41467-025-58349-6",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40157931/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11955002/",
+  "category": "ai_control",
+  "category_label": "④ AI・数理神経制御",
+  "journal": "Nature communications (2025)",
+  "impact_factor": 16.6,
+  "doi": "10.1038/s41467-025-58349-6",
+  "title_en": "Stochastic reservoir computers.",
+  "title_ja": "確率的リザーバコンピュータ",
+  "tags": [
+    "Reservoir Computing",
+    "Stochastic Systems",
+    "Universal Approximation",
+    "Chaotic Time Series"
+  ],
+  "summary": {
+    "problem": "確率的なリザーバ状態を用いる計算モデルにおける数学的な普遍近似性の証明、および小型ハードウェアでの表現能力拡大とノイズ影響の克服。",
+    "solution_and_method": "リザーバの状態値の代わりに「各状態の生起確率」をリードアウトとして利用する計算スキームを提案。確率的エコーステートネットワーク（Stochastic ESN）の普遍近似性を数学的に証明し、分類課題とカオス時系列予測タスクで性能を検証した。",
+    "formula_block": "$$y(t) = \\mathbf{W}_{\\text{out}} \\mathbf{p}(t)$$",
+    "diagram_caption": "④ AI・数理神経制御 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40157931</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41467-025-58349-6</text>\n</svg>",
+    "key_results": "リードアウト数がハードウェアサイズに対して指数関数的に増加可能であることを実証した。ノイズが極めて小さい条件では、同等サイズの決定論的リザーバと比較して大幅な性能向上を確認した（ショットノイズが主な制約要因となることも特定）。",
+    "discussion_and_implications": "提案する確率的リザーバコンピューティングは小型デバイスで極めて高い計算能力を実現可能であり、量子リザーバ等の物理実装への広範な応用が期待される。",
+    "relevance_to_my_research": "状態確率をリードアウトとするアプローチや普遍近似性の証明は、Reservoir ComputingやKoopman演算子理論を用いた生体信号の適応制御や生体非線形時系列予測に直結する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40157931</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41467-025-58349-6</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Reservoir computing is a form of machine learning that utilizes nonlinear dynamical systems to perform complex tasks in a cost-effective manner when compared to typical neural networks. Recent advancements in reservoir computing, in particular quantum reservoir computing, use reservoirs that are inherently stochastic. In this paper, we investigate the universality of stochastic reservoir computers which use the probabilities of each stochastic reservoir state as the readout instead of the states themselves. This allows the number of readouts to scale exponentially with the size of the reservoir hardware, offering the advantage of compact device size. We prove that classes of stochastic echo state networks form universal approximating classes. We also investigate the performance of two practical examples in classification and chaotic time series prediction. While shot noise is a limiting factor, we show significantly improved performance compared to a deterministic reservoir computer with similar hardware when noise effects are small.",
+            "ja": "リザーバコンピューティングは、機械学習の一形態であり、一般的なニューラルネットワークと比較してコスト効率の高い方法で複雑なタスクを実行するために非線形力学系を利用する。リザーバコンピューティングの最近の進展、特に量子リザーバコンピューティングでは、本質的に確率的であるリザーバが使用されている。本論文では、状態そのものではなく、各確率的リザーバ状態の確率を読み出し（リードアウト）として使用する確率的リザーバコンピュータの普遍性を調査する。これにより、リードアウトの数をリザーバハードウェアのサイズに伴って指数関数的に拡張することが可能になり、コンパクトなデバイスサイズという利点がもたらされる。我々は、確率的エコーステートネットワークのクラスが普遍近似クラスを形成することを証明する。また、分類およびカオス時系列予測における2つの実用的な例の性能を調べる。ショットノイズは制限要因であるものの、ノイズの影響が小さい場合には、同等のハードウェアを持つ決定論的リザーバコンピュータと比較して大幅に向上した性能を示すことを明らかにする。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "reservoir computing": {
+      "ipa": "/ˈrez.ə.vwɑːr kəmˈpjuː.tɪŋ/",
+      "pos": "noun",
+      "ja": "リザーバコンピューティング",
+      "nuance": "固定された非線形力学系（リザーバ）を利用して時系列処理を行う機械学習手法"
+    },
+    "stochastic": {
+      "ipa": "/stəˈkæs.tɪk/",
+      "pos": "adjective",
+      "ja": "確率的な",
+      "nuance": "確率過程やランダムな揺らぎを含む性質"
+    },
+    "universal approximation": {
+      "ipa": "/ˌjuː.nɪˈvɜː.səl əˌprɒk.sɪˈmeɪ.ʃən/",
+      "pos": "noun",
+      "ja": "普遍近似",
+      "nuance": "任意の連続関数を望む精度で近似できる数学的能力"
+    },
+    "readout": {
+      "ipa": "/ˈriːd.aʊt/",
+      "pos": "noun",
+      "ja": "リードアウト",
+      "nuance": "リザーバ層の状態から出力を算出する変換・線形結合部"
+    },
+    "chaotic time series": {
+      "ipa": "/keɪˈɒt.ɪk taɪm ˈsɪə.riːz/",
+      "pos": "noun",
+      "ja": "カオス時系列",
+      "nuance": "決定論的ルールに従いながらも長期予測が困難な複雑な時系列データ"
+    },
+    "shot noise": {
+      "ipa": "/ʃɒt nɔɪz/",
+      "pos": "noun",
+      "ja": "ショットノイズ",
+      "nuance": "粒子（電子や光子）の離散的なゆらぎに起因する確率的雑音"
+    }
+  }
+}

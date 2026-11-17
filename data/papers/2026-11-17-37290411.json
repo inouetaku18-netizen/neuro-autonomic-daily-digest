@@ -1,0 +1,86 @@
+{
+  "id": "paper-2026-11-17-37290411",
+  "date": "2026-11-17",
+  "pmid": "37290411",
+  "pmcid": "PMC10614455",
+  "doi_url": "https://doi.org/10.1159/000530376",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37290411/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10614455/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Neuropsychobiology (2023)",
+  "impact_factor": 2.5,
+  "doi": "10.1159/000530376",
+  "title_en": "Heart Rate Variability for Evaluating Psychological Stress Changes in Healthy Adults: A Scoping Review.",
+  "title_ja": "健常成人における心理的ストレス変化評価のための心拍変動：スコーピングレビュー",
+  "tags": [
+    "Heart Rate Variability",
+    "Psychological Stress",
+    "Scoping Review",
+    "Autonomic Nervous System"
+  ],
+  "summary": {
+    "problem": "HRVを用いた心理的ストレス評価において、対象集団やストレス誘発法、評価尺度などの方法論的異質性が大きく、有効なHRV指標の整理が課題であった。",
+    "solution_and_method": "PRISMAガイドラインに準拠し、反復測定および検証済みの心理尺度を用いた15件の研究（対象者10〜403名、18〜60歳）を網羅的に解析し、実験的/実生活ストレス、使用されたHRV指標（RMSSD, LF/HF, HF等）および心理評価法を分類整理した。",
+    "formula_block": "$$\\text{RMSSD} = \\sqrt{\\frac{1}{N-1}\\sum_{i=1}^{N-1} (RR_{i+1} - RR_i)^2}$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37290411</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1159/000530376</text>\n</svg>",
+    "key_results": "RMSSDがストレスと有意に関連する最も主要なHRV指標（10件）であり、次いでLF/HF（7件）、HFパワー（6件）であった。心理測定ではSTAIが最も多く使用されていた（10件）。非線形HRV指標の使用割合は低かった。",
+    "discussion_and_implications": "HRVは心理的ストレス評価の有効な生体指標である。今後は標準化されたストレス負荷プロトコルとドメイン毎の検証済み指標の組み合わせが知見の妥当性向上に不可欠である。",
+    "relevance_to_my_research": "心理的ストレスに対するHRV（RMSSD、LF/HF、HF）の感度評価結果は、非線形HRV解析や瞬時自律神経応答の点過程モデルを評価する際のベースライン設定に直接役立つ。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37290411</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1159/000530376</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The utility of heart rate variability (HRV) for characterizing psychological stress is primarily impacted by methodological considerations such as study populations, experienced versus induced stress, and method of stress assessment. Here, we review studies on the associations between HRV and psychological stress, examining the nature of stress, ways stress was assessed, and HRV metrics used. The review was performed according to the PRISMA guidelines on select databases. Studies that examined the HRV-stress relationship via repeated measurements and validated psychometric instruments were included (n = 15). Participant numbers and ages ranged between 10 and 403 subjects and 18 and 60 years, respectively. Both experimental (n = 9) and real-life stress (n = 6) have been explored. While RMSSD was the most reported HRV metric (n = 10) significantly associated with stress, other metrics, including LF/HF (n = 7) and HF power (n = 6) were also reported. Various linear and nonlinear HRV metrics have been utilized, with nonlinear metrics used less often. The most frequently used psychometric instrument was the State-Trait Anxiety Inventory (n = 10), though various other instruments have been reported. In conclusion, HRV is a valid measure of the psychological stress response. Standard stress induction and assessment protocols combined with validated HRV measures in different domains will improve the validity of findings.",
+            "ja": "心理的ストレスの特徴付けにおける心拍変動（HRV）の有用性は、研究対象集団、経験されたストレス対誘発されたストレス、およびストレス評価の方法などの方法論的配慮によって主に影響を受ける。本稿では、HRVと心理的ストレスとの関連に関する研究をレビューし、ストレスの性質、ストレスの評価方法、および使用されたHRV指標を検証した。レビューは、選択されたデータベースにおいてPRISMAガイドラインに従って実施された。反復測定および検証された心理測定ツールを通じてHRVとストレスの関係を調べた研究が含まれた（n = 15）。参加者の人数および年齢は、それぞれ10〜403人、18〜60歳の範囲であった。実験的ストレス（n = 9）と実生活ストレス（n = 6）の両方が探索された。RMSSDは、ストレスと有意に関連する最も報告されたHRV指標であったが（n = 10）、LF/HF（n = 7）やHFパワー（n = 6）を含む他の指標も報告された。多様な線形および非線形HRV指標が利用されてきたが、非線形指標の使用頻度は低かった。最も頻繁に使用された心理測定ツールは状態・特性不安検査（n = 10）であったが、他の多様なツールも報告された。結論として、HRVは心理的ストレス反応の有効な測定法である。標準化されたストレス誘発および評価プロトコルと異なる領域における検証済みHRV測定を組み合わせることで、知見の妥当性が向上する。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "psychological stress": {
+      "ipa": "/ˌsaɪ.kəˈlɒdʒ.ɪ.kəl stres/",
+      "pos": "noun",
+      "ja": "心理的ストレス",
+      "nuance": "心理的負荷に対する生体の複合的応答"
+    },
+    "scoping review": {
+      "ipa": "/ˈskəʊ.pɪŋ rɪˈvjuː/",
+      "pos": "noun",
+      "ja": "スコーピングレビュー",
+      "nuance": "特定領域の研究の概念・範囲・証拠を迅速にマッピングする総説手法"
+    },
+    "repeated measurements": {
+      "ipa": "/rɪˈpiː.tɪd ˈmeʒ.ə.mənts/",
+      "pos": "noun",
+      "ja": "反復測定",
+      "nuance": "同一被験者から時間を変えて複数回のデータを取得する実験設計"
+    },
+    "psychometric": {
+      "ipa": "/ˌsaɪ.kəʊˈmet.rɪk/",
+      "pos": "adjective",
+      "ja": "心理測定の",
+      "nuance": "心理的状態や行動特性を客観的に数値化する評価手法に関する"
+    },
+    "non-linear metrics": {
+      "ipa": "/nɒn ˈlɪn.i.ər ˈmet.rɪks/",
+      "pos": "noun",
+      "ja": "非線形指標",
+      "nuance": "複雑系やフラクタル性などの非線形特性を定量化する計算尺度"
+    },
+    "validity": {
+      "ipa": "/vəˈlɪd.ə.ti/",
+      "pos": "noun",
+      "ja": "妥当性",
+      "nuance": "測定結果が測定対象の実態を正確に反映している度合い"
+    }
+  }
+}
