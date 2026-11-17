@@ -253,7 +253,7 @@ DOI: {meta['doi']}
 {source_material}
 """
     response = client.models.generate_content(
-        model="gemini-2.5-pro",
+        model="gemini-3.1-pro-preview",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -310,7 +310,7 @@ def generate_clinical_review_json(papers_meta: List[dict], review_topic: dict, t
 {papers_text}
 """
     response = client.models.generate_content(
-        model="gemini-2.5-pro",
+        model="gemini-3.1-pro-preview",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
