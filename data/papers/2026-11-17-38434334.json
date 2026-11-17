@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-17-38434334",
+  "entry_type": "daily_paper",
+  "date": "2026-11-17",
+  "pmid": "38434334",
+  "pmcid": "PMC10907652",
+  "doi_url": "https://doi.org/10.1016/j.heliyon.2024.e26664",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38434334/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10907652/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Heliyon (2024)",
+  "impact_factor": 3.4,
+  "doi": "10.1016/j.heliyon.2024.e26664",
+  "title_en": "Automated extraction of heart rate variability from magnetoencephalography signals.",
+  "title_ja": "脳磁図信号からの心拍変動の自動抽出",
+  "tags": [
+    "MEG",
+    "Heart Rate Variability",
+    "ECG",
+    "Artificial Intelligence"
+  ],
+  "summary": {
+    "problem": "MEG測定時に破棄されていた心臓アーチファクトから、自律神経機能のバイオマーカーであるHRVを自動かつ正確に抽出する方法の確立。",
+    "solution_and_method": "AIベースの自動抽出ツールを開発し、生MEGデータから心臓信号を抽出。同時計測したECGをグランドトゥルースとして、時間・周波数・非線形ドメインでの比較評価を行った。",
+    "formula_block": "$$RMSE = \\sqrt{\\frac{1}{N} \\sum_{i=1}^{N} (RR_{MEG,i} - RR_{ECG,i})^2}$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38434334</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.heliyon.2024.e26664</text>\n</svg>",
+    "key_results": "整列後のRR間隔の二乗平均平根誤差（RMSE）は、5回のスキャンでそれぞれ2 ms, 2 ms, 8 ms, 4 ms, 13 msであり、高精度な抽出が可能であることが示された。",
+    "discussion_and_implications": "MEGの不要ノイズとされていた心臓信号から十分な心拍変動情報が得られることを証明し、脳計測と同時に自律神経評価を行う新たな道を開いた。",
+    "relevance_to_my_research": "MEGノイズからの心拍抽出手法および非線形HRV解析の適用は、脳磁場と心拍の同期・脳心臓連関点過程モデル構築のデータソース拡張に寄与する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38434334</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.heliyon.2024.e26664</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Magnetoencephalography (MEG) measures magnetic fluctuations in the brain generated by neural processes, some of which, such as cardiac signals, are generally removed as artifacts and discarded. However, heart rate variability (HRV) has long been regarded as a biomarker related to autonomic function, suggesting the cardiac signal in MEG contains valuable information that can provide supplemental health information about a patient. To enable access to these ancillary HRV data, we created an automated extraction tool capable of capturing HRV directly from raw MEG data with artificial intelligence. Five scans were conducted with simultaneous MEG and electrocardiogram (ECG) acquisition, which provides a ground truth metric for assessing our algorithms and data processing pipeline. In addition to directly comparing R-peaks between the MEG and ECG signals, this work explores the variation of the corresponding HRV output in time, frequency, and non-linear domains. After removing outlier intervals and aligning the ECG and derived cardiac MEG signals, the RMSE between the RR-intervals of each was RMSE1 = 2 ms, RMSE2 = 2 ms, RMSE3 = 8 ms, RMSE4 = 4 ms, RMSE5 = 13 ms. The findings indicate that cardiac artifacts from MEG data carry sufficient signal to approximate an individual's HRV metrics.",
+            "ja": "脳磁図（MEG）は神経プロセスによって生成される脳内の磁気変動を測定しますが、心臓信号などの一部は一般にアーチファクトとして除去され廃棄されます。しかし、心拍変動（HRV）は自律神経機能に関連するバイオマーカーとして長年考慮されており、MEGにおける心臓信号には患者に関する補助的な健康情報を提供できる貴重な情報が含まれていることを示唆しています。これらの補助的なHRVデータへのアクセスを可能にするために、人工知能を用いて生MEGデータから直接HRVを捕獲できる自動抽出ツールを作成しました。同時のMEGおよび心電図（ECG）取得を伴う5回のスキャンが実施され、これによりアルゴリズムとデータ処理パイプラインを評価するためのグランドトゥルース指標が提供されました。MEG信号とECG信号の間でRピークを直接比較することに加えて、本研究では時間、周波数、および非線形ドメインにおける対応するHRV出力の変動を調査します。外れ値区間を除去し、ECGと導出された心臓MEG信号を整列させた後、それぞれのRR間隔間のRMSEはRMSE1 = 2 ms、RMSE2 = 2 ms、RMSE3 = 8 ms、RMSE4 = 4 ms、RMSE5 = 13 msでした。これらの結果は、MEGデータからの心臓アーチファクトが個人のHRV指標を近似するのに十分な信号を保持していることを示しています。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "magnetoencephalography": {
+      "ipa": "/mæɡˌniː.təʊ.en.sef.əˈlɒɡ.rə.fi/",
+      "pos": "noun",
+      "ja": "脳磁図（MEG）",
+      "nuance": "脳の神経活動に伴う微小な磁場変化を非侵襲的に計測する技術。"
+    },
+    "artifact": {
+      "ipa": "/ˈɑː.tɪ.fækt/",
+      "pos": "noun",
+      "ja": "アーチファクト、ノイズ混入",
+      "nuance": "測定対象以外の生理的・環境的要因によって信号に混入する歪み。"
+    },
+    "ground truth": {
+      "ipa": "/ɡraʊnd truːθ/",
+      "pos": "noun",
+      "ja": "真値、グランドトゥルース",
+      "nuance": "機械学習や精度検証において、絶対的な基準・正解として扱われる測定データ。"
+    },
+    "ancillary": {
+      "ipa": "/ænˈsɪl.ər.i/",
+      "pos": "adjective",
+      "ja": "補助的な、付随する",
+      "nuance": "主たる目的（脳計測）に対して副次的に得られる有用な情報を指す。"
+    },
+    "non-linear domains": {
+      "ipa": "/nɒnˈlɪn.i.ər dəʊˈmeɪnz/",
+      "pos": "noun",
+      "ja": "非線形領域",
+      "nuance": "カオス理論やエントロピーなど、非線形力学系の手法を用いた解析領域。"
+    }
+  }
+}

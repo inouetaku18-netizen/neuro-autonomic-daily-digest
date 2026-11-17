@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-17-38547812",
+  "entry_type": "daily_paper",
+  "date": "2026-11-17",
+  "pmid": "38547812",
+  "pmcid": "",
+  "doi_url": "https://doi.org/10.1016/j.cortex.2024.02.013",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38547812/",
+  "pmc_url": "",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "Cortex; a journal devoted to the study of the nervous system and behavior (2024)",
+  "impact_factor": 3.7,
+  "doi": "10.1016/j.cortex.2024.02.013",
+  "title_en": "Oscillatory attention in groove.",
+  "title_ja": "グルーヴにおける振動的注意",
+  "tags": [
+    "Oscillatory Attention",
+    "Pupillometry",
+    "EEG",
+    "Groove"
+  ],
+  "summary": {
+    "problem": "注意の時間的変動がどのように特定のイベント処理を優先させるか、またリズムの複雑さが振動的注意やグルーヴ感にどのように影響を与えるかという点。",
+    "solution_and_method": "参加者に異なる複雑さのドラムビートを聴かせ、瞳孔測定と頭皮EEGを同時記録。ビート周波数の試行間位相同期（ITPC）を用いて引き込み現象を解析した。",
+    "formula_block": "$$ITPC(f) = \\left| \\frac{1}{N} \\sum_{k=1}^{N} e^{i \\theta_k(f)} \\right|$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38547812</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cortex.2024.02.013</text>\n</svg>",
+    "key_results": "音響刺激中および無音時の想像中において瞳孔活動とEEGがビートに引き込まれることを確認。リズムの複雑さが増すと引き込みは悪化し、瞳孔散大とグルーヴ評価の間には逆U字型の関係が認められた。",
+    "discussion_and_implications": "振動的注意がリズムの複雑さおよび音楽的グルーヴと密接に関連していることを実証し、認知・感覚処理の神経メカニズムの一端を解明した。",
+    "relevance_to_my_research": "外部刺激や内部イメージに対する瞳孔・脳波の位相引き込み（entrainment）解析は、脳心臓点過程モデルや非線形HRVにおける周波数・位相同期解析の参考になる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38547812</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cortex.2024.02.013</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Attention is not constant but rather fluctuates over time and these attentional fluctuations may prioritize the processing of certain events over others. In music listening, the pleasurable urge to move to music (termed 'groove' by music psychologists) offers a particularly convenient case study of oscillatory attention because it engenders synchronous and oscillatory movements which also vary predictably with stimulus complexity. In this study, we simultaneously recorded pupillometry and scalp electroencephalography (EEG) from participants while they listened to drumbeats of varying complexity that they rated in terms of groove afterwards. Using the intertrial phase coherence of the beat frequency, we found that while subjects were listening, their pupil activity became entrained to the beat of the drumbeats and this entrained attention persisted in the EEG even as subjects imagined the drumbeats continuing through subsequent silent periods. This entrainment in both the pupillometry and EEG worsened with increasing rhythmic complexity, indicating poorer sensory precision as the beat became more obscured. Additionally, sustained pupil dilations revealed the expected, inverted U-shaped relationship between rhythmic complexity and groove ratings. Taken together, this work bridges oscillatory attention to rhythmic complexity in relation to musical groove.",
+            "ja": "注意は一定ではなく時間とともに変動し、これらの注意の変動は他のイベントよりも特定のイベントの処理を優先する可能性があります。音楽鑑賞において、音楽に合わせて動きたいという快い衝動（音楽心理学者によって「グルーヴ」と呼ばれる）は、刺激の複雑さに応じて予測通りに変化する同期した振動運動を引き起こすため、振動的注意の特に便利なケーススタディを提供します。本研究では、参加者が後でグルーヴの観点から評価した様々な複雑さのドラムビートを聴いている間、瞳孔測定と頭皮電位（EEG）を同時に記録しました。ビート周波数の試行間位相同期を使用することで、被験者が聴いている間、彼らの瞳孔活動はドラムビートのビートに引き込まれ（entrained）、この引き込まれた注意は、被験者がその後の無音期間を通じてドラムビートが続いていると想像しているときでもEEGにおいて持続することを発見しました。瞳孔測定とEEGの両方におけるこの引き込みは、リズムの複雑さが増すにつれて悪化し、ビートがより不明瞭になるにつれて感覚的精度が低下することを示しました。さらに、持続的な瞳孔散大は、リズムの複雑さとグルーヴ評価との間の予想された逆U字型の関係を明らかにしました。総合すると、本研究は音楽のグルーヴに関連するリズムの複雑さに振動的注意を橋渡しするものです。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "entrainment": {
+      "ipa": "/ɪnˈtreɪnmənt/",
+      "pos": "noun",
+      "ja": "引き込み、同期",
+      "nuance": "外部のリズムや振動周期に生物学的リズムが同調する現象を指す。"
+    },
+    "oscillatory": {
+      "ipa": "/ˈɒs.ɪ.lə.tər.i/",
+      "pos": "adjective",
+      "ja": "振動的な",
+      "nuance": "周期的に変動する性質を表し、神経振動や注意の波を描写する際に用いられる。"
+    },
+    "intertrial phase coherence": {
+      "ipa": "/ˌɪn.təˈtraɪ.əl feɪz kəʊˈhɪə.rəns/",
+      "pos": "noun",
+      "ja": "試行間位相コヒーレンス（ITPC）",
+      "nuance": "複数試行間で脳波等の位相がどれだけ揃っているかを示す指標。"
+    },
+    "pupillometry": {
+      "ipa": "/ˌpjuː.pɪˈlɒm.ə.tri/",
+      "pos": "noun",
+      "ja": "瞳孔計測",
+      "nuance": "瞳孔径の変動を測定し、自律神経や注意・認知負荷を評価する手法。"
+    },
+    "groove": {
+      "ipa": "/ɡruːv/",
+      "pos": "noun",
+      "ja": "グルーヴ（音楽に合わせて身体を動かしたくなる感覚）",
+      "nuance": "音楽心理学において身体的運動を誘発するリズム的快感を表す学術用語。"
+    }
+  }
+}

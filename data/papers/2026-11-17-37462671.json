@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-17-37462671",
+  "entry_type": "daily_paper",
+  "date": "2026-11-17",
+  "pmid": "37462671",
+  "pmcid": "PMC10411970",
+  "doi_url": "https://doi.org/10.7554/eLife.80263",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37462671/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10411970/",
+  "category": "ai_control",
+  "category_label": "④ AI・数理神経制御",
+  "journal": "eLife (2023)",
+  "impact_factor": 7.7,
+  "doi": "10.7554/eLife.80263",
+  "title_en": "State-dependent coupling of hippocampal oscillations.",
+  "title_ja": "海馬振動の状態依存的結合",
+  "tags": [
+    "Hippocampus",
+    "Oscillations",
+    "State Space",
+    "Multivariate Analysis"
+  ],
+  "summary": {
+    "problem": "従来の2変量解析法では捉えきれなかった、睡眠・覚醒時における海馬の複数振動成分の同時共変動とニューロン発火への影響の解明。",
+    "solution_and_method": "海馬振動の状態空間を構築する多変量解析フレームワークを開発。種を越えた共起パターンの検証および状態空間上への神経発火マッピングを行った。",
+    "formula_block": "$$\\mathbf{S}(t) = [o_1(t), o_2(t), \\dots, o_n(t)]^T \\in \\mathbb{R}^n$$",
+    "diagram_caption": "④ AI・数理神経制御 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37462671</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.7554/eLife.80263</text>\n</svg>",
+    "key_results": "睡眠時と覚醒時で異なる周波数間相互作用とネットワーク制約が存在することを確認。移動（ナビゲーション）時に活動する個々のニューロンは、睡眠中の特定の振動セットに同調していた。",
+    "discussion_and_implications": "提案された多変量解析手法は、脳振動と神経集団の多次元的相互作用を解明するための新たな枠組みを提供する。",
+    "relevance_to_my_research": "高次元状態空間上での振動結合解析や周波数間相互作用の定量化は、Koopmanモード分解やリザバーコンピューティング（RC）を用いたダイナミクス非線形制御のモデル化に直接応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37462671</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.7554/eLife.80263</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Oscillations occurring simultaneously in a given area represent a physiological unit of brain states. They allow for temporal segmentation of spikes and support distinct behaviors. To establish how multiple oscillatory components co-vary simultaneously and influence neuronal firing during sleep and wakefulness in mice, we describe a multivariate analytical framework for constructing the state space of hippocampal oscillations. Examining the co-occurrence patterns of oscillations on the state space, across species, uncovered the presence of network constraints and distinct set of cross-frequency interactions during wakefulness compared to sleep. We demonstrated how the state space can be used as a canvas to map the neural firing and found that distinct neurons during navigation were tuned to different sets of simultaneously occurring oscillations during sleep. This multivariate analytical framework provides a window to move beyond classical bivariate pipelines for investigating oscillations and neuronal firing, thereby allowing to factor-in the complexity of oscillation-population interactions.",
+            "ja": "特定の領域で同時に発生する振動は、脳状態の生理的ユニットを表します。これらはスパイクの時間的分割を可能にし、異なる行動をサポートします。マウスの睡眠中および覚醒中において、複数の振動成分がどのように同時に共変動し神経発火に影響を与えるかを確立するために、我々は海馬振動の状態空間を構築するための多変量解析フレームワークを記述します。状態空間上で振動の共起パターンを種を超えて調べることで、覚醒時には睡眠時と比較してネットワーク制約の存在と異なる周波数間相互作用のセットが明らかになりました。我々は状態空間を神経発火をマッピングするためのキャンバスとしてどのように使用できるかを示し、ナビゲーション中の異なるニューロンが、睡眠中に同時発生する異なる振動セットにチューニングされていることを発見しました。この多変量解析フレームワークは、振動とニューロン発火を調査するための従来の2変量パイプラインを超えて進む窓を提供し、これにより振動と集団相互作用の複雑さを考慮に入れることを可能にします。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "state space": {
+      "ipa": "/steɪt speɪs/",
+      "pos": "noun",
+      "ja": "状態空間",
+      "nuance": "システムの全可能状態を多次元座標で表現した空間。"
+    },
+    "co-vary": {
+      "ipa": "/kəʊˈveə.ri/",
+      "pos": "verb",
+      "ja": "共に変動する、共変動する",
+      "nuance": "複数の変数が相互に関連し合いながら時間的・空間的に変化すること。"
+    },
+    "bivariate": {
+      "ipa": "/baɪˈvær.i.ət/",
+      "pos": "adjective",
+      "ja": "2変量の",
+      "nuance": "2つの変数のみの相関や結合を扱う従来の解析手法を指す。"
+    },
+    "temporal segmentation": {
+      "ipa": "/ˈtem.pər.əl seɡ.menˈteɪ.ʃən/",
+      "pos": "noun",
+      "ja": "時間的分割、時間区切り",
+      "nuance": "神経発火タイミングを特定の位相や時間枠に切り分ける作用。"
+    },
+    "cross-frequency interactions": {
+      "ipa": "/krɒs ˈfriː.kwən.si ˌɪn.tərˈæk.ʃənz/",
+      "pos": "noun",
+      "ja": "周波数間相互作用",
+      "nuance": "位相-振幅結合（PAC）など、異なる周波数帯域の振動間の相互作用。"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-17-33390146",
+  "entry_type": "daily_paper",
+  "date": "2026-11-17",
+  "pmid": "33390146",
+  "pmcid": "PMC8950456",
+  "doi_url": "https://doi.org/10.2174/1573403X16999201231203854",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/33390146/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8950456/",
+  "category": "brain_heart",
+  "category_label": "③ 脳-心臓連関・迷走神経",
+  "journal": "Current cardiology reviews (2021)",
+  "impact_factor": 3.5,
+  "doi": "10.2174/1573403X16999201231203854",
+  "title_en": "Analysis of Heart Rate Variability and Implication of Different Factors on Heart Rate Variability.",
+  "title_ja": "心拍変動の解析と心拍変動への多様な因子の影響",
+  "tags": [
+    "Heart Rate Variability",
+    "Autonomic Nervous System",
+    "Sympathetic Nervous System",
+    "Parasympathetic Nervous System"
+  ],
+  "summary": {
+    "problem": "自律神経系による心拍変動（HRV）の調整機構と、HRVに影響を与える多様な生理的・環境的・病理的因子の包括的な整理・解明。",
+    "solution_and_method": "Google Scholar, Science Direct, PubMed, Web of Science等を用いた包括的な文献レビュー。交感神経・副交感神経と洞房結節の相互作用に焦点を当てた。",
+    "formula_block": "$$HRV = f(ANS_{sympathetic}, ANS_{parasympathetic}, Factors_{env, psych, phys})$$",
+    "diagram_caption": "③ 脳-心臓連関・迷走神経 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33390146</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.2174/1573403X16999201231203854</text>\n</svg>",
+    "key_results": "HRVは自律神経機能の非侵襲的指標であり、低いHRVは成人の死亡率上昇や心疾患リスクと関連する。高HRVは健康状態、低HRVは病態に関連する。",
+    "discussion_and_implications": "心臓自体の神経系（神経心臓システム）とANSの複雑な相互作用が示され、HRV解析が臨床におけるリスク評価や自律神経状態の把握に極めて有効であると結論づけた。",
+    "relevance_to_my_research": "交感神経・迷走神経の遠心性刺激と洞房結節の応答関係の包括的整理は、脳心臓連関における点過程モデルや非線形HRV指標の解釈に不可欠な基礎知見となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33390146</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.2174/1573403X16999201231203854</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "[BACKGROUND] The heart is the central organ of the circulatory system, which maintains the flow of blood along with the transport of nutrients to different cells and tissues. A well-functioning cardiac state is a complicated mode of changeability. A healthy heart is not only about oscillation, as the rhythmometer is not the same in every circumstance. Heart rate shows variations so that it can be regulated according to psychophysiological conditions to maintain the effect of the internal-external stimulus.\n\n[OBJECTIVE] The main objective of this review is to provide a piece of all-inclusive information about heart rate variability (HRV) and different variables affecting HRV. The direct interconnection so that HRV can be used in clinical practices.\n\n[METHODS] This review article contains a detailed survey of literature about HRV available in different online sources such as; Google Scholar, Science Direct, PubMed, and Web of Science, etc. In this review, the authors have focused on the role of the autonomic nervous system in the regulation of HRV and the role of various factors affecting HRV.\n\n[RESULTS] The variation in the time between two heartbeats is termed as HRV. It is one of the indicators of many pathological conditions related to cardiovascular health. It provided reliable information about the interaction of the sympathetic and parasympathetic nervous systems. The analysis of the variation of heart rate is a well-known non-invasive technique to identify the functioning of the autonomic nervous system. The autonomic nervous system (ANS) depends on the sympathetic and parasympathetic nervous system for transferring information. The cardio-accelerating center, lungs, and non-striated muscles are innervated by cardiac sympathetic nerves. This division of ANS latches upon the heart accordingly via the cervicothoracic ganglion and vagus nerve. It is found that cardiac normal variability depends upon this stimulation towards the sinoatrial node (pacemaker), which can be evaluated by analyzing the HRV. In human-based studies, it has been found that a low level of HRV is one of the main causes of death rate among adults. Hence, HRV helps in identifying the risk of cardiac diseases and the state of ANS.\n\n[CONCLUSION] The heart plays a vital role in the human body and the well-functioning of the cardiac system is the need for a healthy life. The heart contains its nervous system termed as neurocardio system in which ANS plays a key role in which the sympathetic and parasympathetic systems interplay to regulate HRV. High HRV is associated with healthy condition, while low HRV is associated with pathological conditions. The HRV is influenced by various variables such as; pathological, physiological, psychological, environmental factors, lifestyle factors, and genetic factors, etc.",
+            "ja": "【背景】心臓は循環器系の中心器官であり、様々な細胞や組織への栄養素の輸送とともに血液の取り送りを維持しています。良好に機能している心臓の状態は、複雑な変化性のモードです。健康な心臓は振動だけが全てではなく、リズムメーターはあらゆる状況において同じではありません。心拍数は、内部・外部刺激の効果を維持するために心理生理学的条件に従って調節できるように変動を示します。【目的】本レビューの主な目的は、心拍変動（HRV）およびHRVに影響を与える多様な変数についての包括的な情報を提供することです。HRVが臨床現場で使用できるような直接的な相互接続を提供します。【方法】本レビュー記事には、Google Scholar、Science Direct、PubMed、Web of Scienceなどの異なるオンライン情報源で利用可能なHRVに関する詳細な文献調査が含まれています。本レビューにおいて、著者らはHRVの調節における自律神経系の役割およびHRVに影響を与える多様な因子の役割に焦点を当てました。【結果】2回の心拍間の時間の変動はHRVと呼ばれます。これは心血管健康に関連する多くの病理学的状態の指標の一つです。これは交感神経系と副交感神経系の相互作用に関する信頼性の高い情報を提供しました。心拍数の変動の解析は、自律神経系の機能を識別するためのよく知られた非侵襲的技術です。自律神経系（ANS）は情報伝達を交感神経系と副交感神経系に依存しています。心拍促進中枢、肺、および平滑筋は心臓交感神経によって支配されています。ANSのこの部門は、頚胸神経節および迷走神経を介して適宜心臓にラッチします。心臓の正常な変動性はこの洞房結節（ペースメーカー）への刺激に依存しており、これはHRVを解析することによって評価できることが見出されています。ヒトを対象とした研究では、低いレベルのHRVが成人における死亡率の主な原因の一つであることが見出されています。したがって、HRVは心臓疾患のリスクおよびANSの状態を特定するのに役立ちます。【結論】心臓は人体において重要な役割を果たしており、心臓システムの良好な機能は健康な生活のために必要です。心臓は神経心臓システムと呼ばれる独自の神経系を含んでおり、そこではANSが重要な役割を果たし、交感神経系と副交感神経系が相互作用してHRVを調節します。高いHRVは健康な状態に関連し、低いHRVは病理学的状態に関連しています。HRVは病理学的、生理学的、心理学的、環境的因子、ライフスタイル因子、遺伝的因子などの多様な変数によって影響を受けます。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "innervate": {
+      "ipa": "/ˈɪn.ə.veɪt/",
+      "pos": "verb",
+      "ja": "（神経を）支配する、分布させる",
+      "nuance": "特定器官に神経線維が進入し制御網を形成している状態を表す。"
+    },
+    "sinoatrial node": {
+      "ipa": "/ˌsaɪ.nəʊˈeɪ.tri.əl nəʊd/",
+      "pos": "noun",
+      "ja": "洞房結節",
+      "nuance": "心臓の自然のペースメーカーとして歩調とり電位を発生させる部位。"
+    },
+    "cervicothoracic ganglion": {
+      "ipa": "/ˌsɜː.vɪ.kəʊ.θəˈræs.ɪk ˈɡæŋ.ɡli.ən/",
+      "pos": "noun",
+      "ja": "頚胸神経節（星状神経節）",
+      "nuance": "心臓への交感神経支配ルートを構成する重要な神経節。"
+    },
+    "non-striated muscles": {
+      "ipa": "/nɒnˈstraɪ.eɪ.tɪd ˈmʌs.əl/",
+      "pos": "noun",
+      "ja": "平滑筋",
+      "nuance": "横紋を持たない不随意筋であり、自律神経系によって制御される。"
+    },
+    "rhythmometer": {
+      "ipa": "/rɪðˈmɒm.ɪ.tər/",
+      "pos": "noun",
+      "ja": "リズム測定器",
+      "nuance": "生体リズムや周期性を測定・表現するための概念的・装置的用語。"
+    }
+  }
+}

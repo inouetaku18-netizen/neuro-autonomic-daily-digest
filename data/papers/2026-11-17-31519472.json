@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-17-31519472",
+  "entry_type": "daily_paper",
+  "date": "2026-11-17",
+  "pmid": "31519472",
+  "pmcid": "PMC7017451",
+  "doi_url": "https://doi.org/10.1016/S1474-4422(19)30153-X",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/31519472/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7017451/",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "The Lancet. Neurology (2020)",
+  "impact_factor": 46.5,
+  "doi": "10.1016/S1474-4422(19)30153-X",
+  "title_en": "New evidence on the management of Lewy body dementia.",
+  "title_ja": "レビー小体型認知症の管理に関する新しいエビデンス",
+  "tags": [
+    "Lewy Body Dementia",
+    "Parkinson's Disease Dementia",
+    "Autonomic Dysfunction",
+    "Clinical Trials"
+  ],
+  "summary": {
+    "problem": "レビー小体型認知症は症状が多岐にわたり変動するため、一律の治療が困難であり、ある症状の治療が他の症状（自律神経障害等）を悪化させる問題がある。",
+    "solution_and_method": "最近の臨床試験およびメタアナリシスのエビデンスベース、および関連疾患治療薬の適用に関する専門家コンセンサスの検討。",
+    "formula_block": "$$Effectiveness = \\sum_{i} (Benefit_i - AdverseEffect_i)$$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31519472</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/S1474-4422(19)30153-X</text>\n</svg>",
+    "key_results": "認知・精神・運動症状に対するエビデンスが蓄積され、自律神経機能障害に対してはパーキンソン病等の関連疾患治療の流用が支持されているが、依然としてエビデンスのギャップが存在する。",
+    "discussion_and_implications": "今後は個別の専門医による分断された管理を避け、レビー小体型認知症特有の症状に対するターゲット臨床試験が必要である。",
+    "relevance_to_my_research": "レビー小体型認知症における自律神経機能障害の定量評価や症状トレードオフの制御において、非線形HRV解析や脳心臓モデルを用いた精密バイオマーカー構築が貢献できる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31519472</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/S1474-4422(19)30153-X</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Dementia with Lewy bodies and Parkinson's disease dementia, jointly known as Lewy body dementia, are common neurodegenerative conditions. Patients with Lewy body dementia present with a wide range of cognitive, neuropsychiatric, sleep, motor, and autonomic symptoms. Presentation varies between patients and can vary over time within an individual. Treatments can address one symptom but worsen another, which makes disease management difficult. Symptoms are often managed in isolation and by different specialists, which makes high-quality care difficult to accomplish. Clinical trials and meta-analyses now provide an evidence base for the treatment of cognitive, neuropsychiatric, and motor symptoms in patients with Lewy body dementia. Furthermore, consensus opinion from experts supports the application of treatments for related conditions, such as Parkinson's disease, for the management of common symptoms (eg, autonomic dysfunction) in patients with Lewy body dementia. However, evidence gaps remain and future clinical trials need to focus on the treatment of symptoms specific to patients with Lewy body dementia.",
+            "ja": "レビー小体型認知症とパーキンソン病認知症は、まとめてレビー小体型認知症として知られ、一般的な神経変性疾患です。レビー小体型認知症の患者は、広範囲の認知、精神神経、睡眠、運動、および自律神経の症状を呈します。プレゼンテーションは患者間で異なり、個人内でも時間とともに変化する可能性があります。治療はある症状に対処できても別の症状を悪化させる可能性があり、これが病気管理を困難にします。症状はしばしば単独で、異なる専門医によって管理されるため、高品質なケアを達成することが困難になります。臨床試験とメタアナリシスは現在、レビー小体型認知症患者における認知、精神神経、および運動症状の治療のためのエビデンスベースを提供しています。さらに、専門家からのコンセンサス意見は、レビー小体型認知症患者における共通の症状（例：自律神経機能障害）の管理のための、パーキンソン病などの関連疾患に対する治療の適用を支持しています。しかし、エビデンスのギャップは残っており、将来の臨床試験はレビー小体型認知症患者に特有の症状の治療に焦点を当てる必要があります。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "lewy body dementia": {
+      "ipa": "/ˈluː.i bɒd.i dɪˈmen.ʃə/",
+      "pos": "noun",
+      "ja": "レビー小体型認知症",
+      "nuance": "αシヌクレインの蓄積を特徴とする神経変性疾患群の総称。"
+    },
+    "autonomic dysfunction": {
+      "ipa": "/ˌɔː.təˈnɒm.ɪk dɪsˈfʌŋk.ʃən/",
+      "pos": "noun",
+      "ja": "自律神経機能障害",
+      "nuance": "血圧調節や消化機能、心拍調節などの自律神経系が障害された状態。"
+    },
+    "in isolation": {
+      "ipa": "/ɪn ˌaɪ.səlˈeɪ.ʃən/",
+      "pos": "adverb",
+      "ja": "孤立して、単独で",
+      "nuance": "各症状が統合的・多角的に診療されず個別に扱われている状態を非難・懸念する文脈で使われる。"
+    },
+    "meta-analysis": {
+      "ipa": "/ˌmet.ə.əˈnæl.ə.sɪs/",
+      "pos": "noun",
+      "ja": "メタアナリシス",
+      "nuance": "複数の臨床研究結果を統計的に統合して高いエビデンスレベルを得る解析手法。"
+    },
+    "consensus opinion": {
+      "ipa": "/kənˈsen.səs əˈpɪn.jən/",
+      "pos": "noun",
+      "ja": "コンセンサス意見、専門家合意",
+      "nuance": "明確な直接的エビデンスが乏しい場合に専門家間で合意されたガイドライン的見解。"
+    }
+  }
+}
