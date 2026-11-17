@@ -2744,7 +2744,6 @@
           title_ja: sec.title_ja || `セクション ${idx + 1}`,
           paragraphs: Array.isArray(sec.paragraphs) ? sec.paragraphs : [],
           takeaways: Array.isArray(sec.takeaways) ? sec.takeaways : [],
-          // セクション内のダミーSVG枠は非表示にして重要ポイントを広く見せる
           diagram_svg: '',
           diagram_url: '',
           diagram_caption: '',
@@ -2752,7 +2751,6 @@
         }));
       };
 
-      // 未解読論文で精読ビューを開いた場合は、Abstractを流用せずPDFアップロード案内を表示する
       const _origRenderFullTextReader = typeof renderFullTextReader === 'function' ? renderFullTextReader : null;
       window.renderFullTextReader = function() {
         const item = items.find((i) => i.id === selectedItemId) || items[0];
@@ -2901,7 +2899,7 @@
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（全パラグラフ網羅抽出＋重要ポイント拡充）
+      // PDFアップロード＆全文AI解読モーダル（全パラグラフ完全抽出対応）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -2930,7 +2928,7 @@
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の本文を抽出し、<strong>全5セクションのすべての主要パラグラフ（英文原文＋日本語対訳）・詳細な重要ポイント・英語論文表現集</strong>を生成します。
+              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の本文を抽出し、<strong>全5セクションの最初〜最終パラグラフまで省略なしの英文原文＋日本語対訳・詳細な重要ポイント・英語論文表現集</strong>を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -2983,23 +2981,29 @@
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           let fullText = '';
-          const maxPages = Math.min(pdf.numPages, 35);
+          const maxPages = Math.min(pdf.numPages, 40);
+          const refStartThreshold = Math.max(3, Math.floor(pdf.numPages * 0.55));
+
           for (let i = 1; i <= maxPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
             const pageText = content.items.map(item => item.str).join(' ');
-            // References以降は除外して本文を最大限保持
-            if (i > 2 && /\bReferences\b/i.test(pageText)) {
-              const beforeRef = pageText.split(/\bReferences\b/i)[0];
-              fullText += `\n--- Page ${i} ---\n${beforeRef}`;
-              break;
+
+            // 論文後半ページで「References」見出し＋文献番号が出現した場合のみ参考文献として打ち切る
+            if (i >= refStartThreshold) {
+              const refHeadingMatch = pageText.match(/(?:^|\s)(?:References|REFERENCES|Bibliography)\s+(?:\[1\]|1\.|[A-Z][a-z]+,\s+[A-Z]\.)/);
+              if (refHeadingMatch) {
+                const beforeRef = pageText.slice(0, refHeadingMatch.index);
+                fullText += `\n--- Page ${i} ---\n${beforeRef}`;
+                break;
+              }
             }
             fullText += `\n--- Page ${i} ---\n${pageText}`;
           }
           return fullText;
         }
 
-        async function fetchWithTimeout(url, options, timeoutMs = 60000) {
+        async function fetchWithTimeout(url, options, timeoutMs = 75000) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           try {
@@ -3010,12 +3014,13 @@
         }
 
         async function getAvailableGeminiModels(apiKey) {
+          // 段落省略を防ぐため、抽出精度の高い標準Flashモデルを最優先にする
           const preferred = [
-            'gemini-3.8-flash-lite',
             'gemini-3.8-flash',
             'gemini-3.5-flash',
             'gemini-3-flash-preview',
-            'gemini-3.0-flash'
+            'gemini-3.0-flash',
+            'gemini-3.8-flash-lite'
           ];
           try {
             const res = await fetchWithTimeout(
@@ -3061,11 +3066,13 @@
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
 以下は査読済み論文PDFから抽出した実際の本文テキストです。
 
-【厳守ルール（捏造禁止・全パラグラフ網羅抽出）】
+【厳守ルール（捏造禁止・各セクションの最終パラグラフまで1段落も落とさないこと）】
 1. sections は必ず id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成してください。
-2. **重要：各セクションの "paragraphs" は1段落だけに省略せず、そのセクションに含まれるすべての主要パラグラフ（各セクション3〜8段落程度、論文全体の流れが完全に追える分量）を原文の順序通りに抽出し、一字一句改変せず "en" に入れてください（存在しない英文の創作厳禁）。**
-3. "ja" にはそれぞれの "en" パラグラフの忠実で読みやすい学術日本語訳を入れてください。
-4. 各セクションの "takeaways"（重要ポイント）は、画像表示を廃止した代わりに情報量を充実させるため、**必ず4〜6個の具体的かつ詳細な日本語ポイント（数値・手法・生理学的メカニズムを含む）**を記述してください。
+2. **最重要：各セクション（Introduction / Methods / Results / Discussion / Conclusion）について、そのセクションの【第1パラグラフ】から【次のセクション見出しの直前にある最終パラグラフ】まで、途中の段落も最後の段落も1つも省略せず、すべてのパラグラフを原文の順序通りに "paragraphs" 配列へ格納してください。**
+   - 特に「各セクションの最後のパラグラフ（小結・研究目的の宣言・限界や展望の締めくくり段落）」が抜け落ちないよう、セクション境界の直前まで必ず確認してすべて含めてください。
+   - "en" にはPDF本文に書かれている英文を一字一句改変・創作せずそのまま入れてください。
+3. "ja" にはそれぞれの "en" パラグラフの忠実で正確な学術日本語訳を入れてください。
+4. 各セクションの "takeaways"（重要ポイント）は、必ず**4〜6個の具体的かつ詳細な日本語ポイント（数値・手法・生理学的メカニズムを含む）**を記述してください。
 5. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
 6. 以下のJSON形式のみを出力してください（SVGコードは不要です）。
 
@@ -3086,6 +3093,11 @@
       "id": "intro",
       "title_en": "1. Introduction",
       "title_ja": "1. 序論",
+      "paragraphs": [
+        { "en": "セクション第1段落の英文", "ja": "その日本語訳" },
+        { "en": "セクション中間段落の英文", "ja": "その日本語訳" },
+        { "en": "セクション最終段落（次の見出し直前）の英文", "ja": "その日本語訳" }
+      ],
       "takeaways": [
         "詳細な重要ポイント1（背景・既存手法の限界など）",
         "詳細な重要ポイント2（生理学的・工学的メカニズム）",
@@ -3094,11 +3106,6 @@
       ],
       "writing_expressions": [
         { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
-      ],
-      "paragraphs": [
-        { "en": "PDF内の実際の英文段落1", "ja": "その日本語訳1" },
-        { "en": "PDF内の実際の英文段落2", "ja": "その日本語訳2" },
-        { "en": "PDF内の実際の英文段落3", "ja": "その日本語訳3" }
       ]
     }
   ],
@@ -3108,7 +3115,7 @@
 }
 
 【PDF抽出テキスト】
-${rawPdfText.slice(0, 45000)}
+${rawPdfText.slice(0, 65000)}
 `;
 
             const candidateModels = await getAvailableGeminiModels(apiKey);
@@ -3116,7 +3123,7 @@ ${rawPdfText.slice(0, 45000)}
             let lastErrMsg = '';
 
             for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクションの全パラグラフ対訳・重要ポイントを生成中（約25〜45秒）...`;
+              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクションの最初〜最終パラグラフまで完全抽出・翻訳中（約30〜55秒）...`;
               try {
                 const apiRes = await fetchWithTimeout(
                   `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -3128,11 +3135,11 @@ ${rawPdfText.slice(0, 45000)}
                       generationConfig: {
                         responseMimeType: 'application/json',
                         temperature: 0.1,
-                        maxOutputTokens: 32768
+                        maxOutputTokens: 65536
                       }
                     })
                   },
-                  60000
+                  75000
                 );
 
                 if (apiRes.ok) {
@@ -3238,7 +3245,7 @@ ${rawPdfText.slice(0, 45000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = '✅ PDFの全パラグラフ対訳・重要ポイントの生成が完了しました！';
+            statusBox.textContent = '✅ PDFの最初〜最終パラグラフまで完全抽出が完了しました！';
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
