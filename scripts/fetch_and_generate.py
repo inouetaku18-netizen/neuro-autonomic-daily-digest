@@ -231,9 +231,10 @@ def get_active_client_and_model():
         http_options={"api_version": "v1beta"}
     )
     preferred = [
-        "gemini-2.5-flash",
+        "gemini-3.8-flash",
+        "gemini-3.5-flash",
         "gemini-3-flash-preview",
-        "gemini-2.0-flash",
+        "gemini-3.0-flash",
     ]
     available = []
     try:
@@ -251,10 +252,17 @@ def get_active_client_and_model():
             print(f"Selected Gemini model: {candidate}")
             return client, candidate
 
-    fallback = available[0] if available else "gemini-2.5-flash"
-    print(f"Selected Gemini model (fallback): {fallback}")
-    return client, fallback
+    # preferredに一致しない場合でも、Proや旧2.x系を避けて最新のflash系を自動選択
+    flash_models = sorted(
+        [m for m in available if "flash" in m and "2.0" not in m and "2.5" not in m and "lite" not in m],
+        reverse=True
+    )
+    if flash_models:
+        print(f"Selected Gemini model (auto-flash): {flash_models[0]}")
+        return client, flash_models[0]
 
+    print("Selected Gemini model (direct): gemini-3.8-flash")
+    return client, "gemini-3.8-flash"
 
 def generate_daily_paper_json(meta: dict, full_text: str, track: dict, today_str: str) -> dict:
     client, model_name = get_active_client_and_model()
