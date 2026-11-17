@@ -2730,7 +2730,174 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       // =========================================================================
-      // 全文精読ビュー制御（PDF解読済みの論文のみ本文・詳細ポイントをフル表示）
+      // 点線下線語（学術英単語辞書ハイライト＆ポップアップ登録）の完全実装
+      // =========================================================================
+      window.annotateEnglishWithVocab = function(enText) {
+        if (!enText) return '';
+        const escapeHtml = (s) => s
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        const glossary = (typeof ACADEMIC_GLOSSARY !== 'undefined' && ACADEMIC_GLOSSARY) ? ACADEMIC_GLOSSARY : {};
+        const terms = Object.keys(glossary)
+          .filter(t => t && t.length >= 3)
+          .sort((a, b) => b.length - a.length);
+
+        if (terms.length === 0) return escapeHtml(enText);
+
+        const escapedTerms = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const regex = new RegExp(`\\b(${escapedTerms.join('|')})\\b`, 'gi');
+
+        let result = '';
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(enText)) !== null) {
+          result += escapeHtml(enText.slice(lastIndex, match.index));
+          const matchedWord = match[0];
+          const key = matchedWord.toLowerCase();
+          result += `<span class="vocab-term border-b-2 border-dotted border-indigo-500 text-indigo-950 font-medium cursor-pointer hover:bg-indigo-100 rounded-xs px-0.5 transition" data-vocab-key="${encodeURIComponent(key)}">${escapeHtml(matchedWord)}</span>`;
+          lastIndex = regex.lastIndex;
+        }
+        result += escapeHtml(enText.slice(lastIndex));
+        return result;
+      };
+
+      function setupVocabPopup() {
+        if (document.getElementById('custom-vocab-popover')) return;
+        const pop = document.createElement('div');
+        pop.id = 'custom-vocab-popover';
+        pop.className = 'fixed z-50 hidden max-w-sm w-80 bg-white rounded-2xl shadow-2xl border border-indigo-200 p-4 text-left';
+        pop.innerHTML = `
+          <div class="flex items-start justify-between gap-2 mb-1">
+            <div>
+              <div id="vp-word" class="text-base font-extrabold text-indigo-950"></div>
+              <div id="vp-ipa" class="text-xs font-mono text-slate-500"></div>
+            </div>
+            <button id="vp-close" class="text-slate-400 hover:text-slate-700 text-xl leading-none cursor-pointer">&times;</button>
+          </div>
+          <div id="vp-meaning" class="text-sm font-bold text-slate-900 mt-2 mb-1.5"></div>
+          <div id="vp-nuance" class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100 mb-3"></div>
+          <div class="flex items-center gap-2">
+            <button id="vp-speak" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">🔊 発音</button>
+            <button id="vp-add" class="flex-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer">＋ マイ単語帳に登録</button>
+          </div>
+        `;
+        document.body.appendChild(pop);
+
+        let currentTerm = '';
+        let currentEntry = null;
+
+        document.getElementById('vp-close').onclick = () => pop.classList.add('hidden');
+        document.getElementById('vp-speak').onclick = () => {
+          if (!currentTerm || !('speechSynthesis' in window)) return;
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(currentTerm);
+          u.lang = 'en-US';
+          window.speechSynthesis.speak(u);
+        };
+        document.getElementById('vp-add').onclick = () => {
+          if (!currentTerm || !currentEntry) return;
+          if (typeof wordbook !== 'undefined' && Array.isArray(wordbook)) {
+            if (!wordbook.some(w => (w.term || w.word || '').toLowerCase() === currentTerm.toLowerCase())) {
+              wordbook.unshift({
+                term: currentTerm,
+                word: currentTerm,
+                ipa: currentEntry.ipa || '',
+                pos: currentEntry.pos || 'term',
+                ja: currentEntry.ja || currentEntry.meaning || '',
+                meaning: currentEntry.meaning || currentEntry.ja || '',
+                nuance: currentEntry.nuance || '',
+                addedAt: new Date().toISOString().slice(0, 10)
+              });
+              if (typeof saveState === 'function') saveState();
+              if (typeof updateHeaderStats === 'function') updateHeaderStats();
+            }
+          }
+          const addBtn = document.getElementById('vp-add');
+          addBtn.textContent = '✓ 単語帳に登録済み';
+          setTimeout(() => { addBtn.textContent = '＋ マイ単語帳に登録'; }, 1500);
+        };
+
+        document.addEventListener('click', (e) => {
+          const target = e.target.closest('.vocab-term');
+          if (!target) {
+            if (!e.target.closest('#custom-vocab-popover')) {
+              pop.classList.add('hidden');
+            }
+            return;
+          }
+          e.stopPropagation();
+          const key = decodeURIComponent(target.dataset.vocabKey || '').toLowerCase();
+          const glossary = (typeof ACADEMIC_GLOSSARY !== 'undefined' && ACADEMIC_GLOSSARY) ? ACADEMIC_GLOSSARY : {};
+          const entry = glossary[key];
+          if (!entry) return;
+
+          currentTerm = target.textContent.trim();
+          currentEntry = entry;
+          document.getElementById('vp-word').textContent = currentTerm;
+          document.getElementById('vp-ipa').textContent = `${entry.ipa || ''} ${entry.pos ? `(${entry.pos})` : ''}`.trim();
+          document.getElementById('vp-meaning').textContent = entry.ja || entry.meaning || '';
+          document.getElementById('vp-nuance').textContent = entry.nuance || '学術論文で頻出する専門表現です。';
+
+          const rect = target.getBoundingClientRect();
+          const top = Math.min(window.innerHeight - 230, rect.bottom + 8);
+          const left = Math.min(window.innerWidth - 335, Math.max(12, rect.left));
+          pop.style.top = `${Math.max(12, top)}px`;
+          pop.style.left = `${left}px`;
+          pop.classList.remove('hidden');
+        });
+      }
+
+      // =========================================================================
+      // 1文ごとの分割・アライメント補助関数
+      // =========================================================================
+      function splitIntoAlignedSentences(pair) {
+        // すでに1文ごとの配列（pair.sentences）がある場合はそれを使用
+        if (Array.isArray(pair.sentences) && pair.sentences.length > 0) {
+          return pair.sentences;
+        }
+        const enText = (pair.en || '').trim();
+        const jaText = (pair.ja || '').trim();
+        if (!enText) return [];
+
+        // 略語（et al., Fig., Eq., i.e., e.g., vs., Dr., Mr.）を保護して英文を1文ずつ分割
+        const protectedEn = enText
+          .replace(/\b(et al|Fig|Figs|Eq|Eqs|Ref|Refs|vs|Dr|Prof|Mr|Ms|i\.e|e\.g|cf|approx|ca)\./gi, '$1__DOT__')
+          .replace(/(\d)\.(\d)/g, '$1__DOT__$2');
+        const enSentences = protectedEn
+          .split(/(?<=[.!?])\s+(?=[A-Z0-9"“(\[])/)
+          .map(s => s.replace(/__DOT__/g, '.').trim())
+          .filter(Boolean);
+
+        // 日本語訳を「。」で1文ずつ分割
+        const jaSentences = jaText
+          .split(/(?<=。)\s*/)
+          .map(s => s.trim())
+          .filter(Boolean);
+
+        // 文数が一致する場合は1対1で完全ペアリング
+        if (enSentences.length > 1 && enSentences.length === jaSentences.length) {
+          return enSentences.map((en, i) => ({ en, ja: jaSentences[i] }));
+        }
+
+        // 文数がわずかに異なる場合も、英文1文ごとに最も近い日本語文を割り当てる
+        if (enSentences.length > 1 && jaSentences.length > 1) {
+          return enSentences.map((en, i) => {
+            const startIdx = Math.floor((i * jaSentences.length) / enSentences.length);
+            const endIdx = Math.max(startIdx + 1, Math.floor(((i + 1) * jaSentences.length) / enSentences.length));
+            return {
+              en,
+              ja: jaSentences.slice(startIdx, endIdx).join('')
+            };
+          });
+        }
+
+        return [{ en: enText, ja: jaText }];
+      }
+
+      // =========================================================================
+      // 全文精読ビュー制御（PDF解読済みのみ表示・1文ごとのカーソル連動）
       // =========================================================================
       window.getFullTextSections = function(item) {
         if (!item || !item.pdfDecoded) return [];
@@ -2744,23 +2911,22 @@
           title_ja: sec.title_ja || `セクション ${idx + 1}`,
           paragraphs: Array.isArray(sec.paragraphs) ? sec.paragraphs : [],
           takeaways: Array.isArray(sec.takeaways) ? sec.takeaways : [],
-          diagram_svg: '',
-          diagram_url: '',
-          diagram_caption: '',
           writing_expressions: Array.isArray(sec.writing_expressions) ? sec.writing_expressions : []
         }));
       };
 
-      const _origRenderFullTextReader = typeof renderFullTextReader === 'function' ? renderFullTextReader : null;
       window.renderFullTextReader = function() {
         const item = items.find((i) => i.id === selectedItemId) || items[0];
         if (!item) return;
 
+        document.getElementById("readerJournalMeta").textContent = `${item.journal} (IF: ${item.impact_factor ?? "N/A"}) • ${item.date}`;
+        document.getElementById("readerTitleJa").textContent = item.title_ja;
+
+        const navEl = document.getElementById("readerSectionNav");
+        const containerEl = document.getElementById("readerSectionsContainer");
+
         if (!item.pdfDecoded) {
-          document.getElementById("readerJournalMeta").textContent = `${item.journal} (IF: ${item.impact_factor ?? "N/A"}) • ${item.date}`;
-          document.getElementById("readerTitleJa").textContent = item.title_ja;
-          document.getElementById("readerSectionNav").innerHTML = '';
-          const containerEl = document.getElementById("readerSectionsContainer");
+          navEl.innerHTML = '';
           containerEl.className = "space-y-6";
           containerEl.innerHTML = `
             <div class="rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/60 p-8 sm:p-12 text-center max-w-2xl mx-auto my-6">
@@ -2781,8 +2947,143 @@
           return;
         }
 
-        if (_origRenderFullTextReader) {
-          _origRenderFullTextReader();
+        const sections = getFullTextSections(item);
+        navEl.innerHTML = sections
+          .map(
+            (sec) => `
+            <a
+              href="#${sec.id}"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-indigo-600 hover:text-white transition shrink-0"
+            >${sec.title_en}</a>
+          `
+          )
+          .join("");
+
+        containerEl.className = `space-y-8 ${
+          readerMode === "blur-ja" ? "blur-ja-mode" : readerMode === "en-only" ? "english-only-mode" : ""
+        }`;
+
+        containerEl.innerHTML = sections
+          .map((sec, sIdx) => {
+            const paragraphsHTML = sec.paragraphs
+              .map((pair, pIdx) => {
+                const sentencePairs = splitIntoAlignedSentences(pair);
+                const sentencesHTML = sentencePairs
+                  .map((sp, sentIdx) => {
+                    const rowId = `sent-${sIdx}-${pIdx}-${sentIdx}`;
+                    const annotatedEn = annotateEnglishWithVocab(sp.en);
+                    return `
+                      <div
+                        id="${rowId}"
+                        data-en-raw="${encodeURIComponent(sp.en)}"
+                        onmouseenter="highlightPair('${rowId}', true)"
+                        onmouseleave="highlightPair('${rowId}', false)"
+                        class="bilingual-pair-row grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 rounded-xl p-2 -mx-2 transition-colors duration-150 hover:bg-indigo-50/80"
+                      >
+                        <!-- 左カラム：1文ごとの日本語訳 -->
+                        <div class="ja-col-wrapper">
+                          <div class="ja-cell h-full rounded-lg border border-slate-200/80 bg-white px-3.5 py-2.5 text-sm sm:text-[15px] text-slate-800 leading-relaxed">
+                            <span class="inline-block text-[10px] font-mono font-bold text-slate-400 mr-1.5">[${pIdx + 1}-${sentIdx + 1}]</span>
+                            <span class="ja-text-content">${sp.ja}</span>
+                          </div>
+                        </div>
+
+                        <!-- 右カラム：1文ごとの英語原文 -->
+                        <div class="en-col-wrapper">
+                          <div class="en-cell h-full rounded-lg border border-slate-200/80 bg-white px-3.5 py-2.5 text-sm sm:text-[15px] text-slate-900 leading-relaxed font-sans flex items-start justify-between gap-2">
+                            <div class="en-text-content flex-1">
+                              <span class="inline-block text-[10px] font-mono font-bold text-indigo-500 mr-1.5">[${pIdx + 1}-${sentIdx + 1}]</span>${annotatedEn}
+                            </div>
+                            <button
+                              onclick="speakSingleRow('${rowId}')"
+                              class="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition cursor-pointer"
+                              title="この1文の英語音声を再生"
+                            >🔊</button>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  })
+                  .join("");
+
+                return `
+                  <div class="rounded-2xl border border-slate-200/90 bg-white/70 p-3.5 sm:p-4 shadow-2xs space-y-1.5">
+                    <div class="text-[11px] font-mono font-bold text-slate-400 pb-1 border-b border-slate-100">
+                      Paragraph #${sIdx + 1}.${pIdx + 1}（1文ごとにカーソル連動）
+                    </div>
+                    ${sentencesHTML}
+                  </div>
+                `;
+              })
+              .join("");
+
+            const expressionsBlock =
+              Array.isArray(sec.writing_expressions) && sec.writing_expressions.length > 0
+                ? `
+                  <div class="mt-4 pt-4 border-t border-indigo-200/70">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-indigo-900 mb-2.5 flex items-center gap-1.5">
+                      <span>✍️ このセクションから学ぶ英語論文ライティング表現</span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      ${sec.writing_expressions
+                        .map(
+                          (exp) => `
+                          <div class="bg-white rounded-xl border border-indigo-100 p-3.5 text-xs">
+                            <div class="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded mb-1.5">${exp.pattern}</div>
+                            <p class="text-slate-800 italic mb-1.5">"${exp.example}"</p>
+                            <p class="text-slate-600 leading-relaxed">${exp.note}</p>
+                          </div>
+                        `
+                        )
+                        .join("")}
+                    </div>
+                  </div>
+                `
+                : "";
+
+            return `
+              <section id="${sec.id}" class="scroll-mt-36 rounded-2xl border border-slate-200 bg-slate-100/60 p-4 sm:p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">${sec.title_en}</h3>
+                    <p class="text-xs sm:text-sm font-bold text-indigo-700">${sec.title_ja}</p>
+                  </div>
+                  <div class="hidden lg:grid grid-cols-2 gap-8 text-xs font-bold text-slate-500 pr-4">
+                    <span>左：日本語訳（1文ごとに連動）</span>
+                    <span>右：Original English（点線語クリックで辞書）</span>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  ${paragraphsHTML}
+                </div>
+
+                <div class="mt-5 rounded-2xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-50/90 via-white to-teal-50/70 p-5 shadow-xs">
+                  <div class="flex items-center gap-2 text-indigo-950 font-extrabold text-sm sm:text-base mb-3">
+                    <span class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white text-xs">セクション要点まとめ</span>
+                    <span>${sec.title_ja} の重要ポイント</span>
+                  </div>
+                  <ul class="space-y-2.5 text-xs sm:text-sm text-slate-800">
+                    ${(sec.takeaways || [])
+                      .map(
+                        (pt) => `
+                        <li class="flex items-start gap-2.5">
+                          <span class="text-indigo-600 font-extrabold mt-0.5">✓</span>
+                          <span class="leading-relaxed font-medium">${pt}</span>
+                        </li>
+                      `
+                      )
+                      .join("")}
+                  </ul>
+                  ${expressionsBlock}
+                </div>
+              </section>
+            `;
+          })
+          .join("");
+
+        if (typeof renderMathInTarget === 'function') {
+          renderMathInTarget(containerEl);
         }
       };
 
@@ -2809,13 +3110,13 @@
 
             if (raw.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
               Object.entries(raw.vocabulary).forEach(([k, v]) => {
-                if (!ACADEMIC_GLOSSARY[k.toLowerCase()]) {
-                  ACADEMIC_GLOSSARY[k.toLowerCase()] = {
-                    ipa: v.ipa || '',
-                    meaning: v.ja || v.meaning || '',
-                    nuance: v.nuance || ''
-                  };
-                }
+                ACADEMIC_GLOSSARY[k.toLowerCase()] = {
+                  ipa: v.ipa || '',
+                  pos: v.pos || '',
+                  ja: v.ja || v.meaning || '',
+                  meaning: v.meaning || v.ja || '',
+                  nuance: v.nuance || ''
+                };
               });
             }
 
@@ -2899,7 +3200,7 @@
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（全パラグラフ完全抽出対応）
+      // PDFアップロード＆全文AI解読モーダル（1文ごとの対訳アライメント＋用語辞書抽出）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -2928,7 +3229,7 @@
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の本文を抽出し、<strong>全5セクションの最初〜最終パラグラフまで省略なしの英文原文＋日本語対訳・詳細な重要ポイント・英語論文表現集</strong>を生成します。
+              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の本文を抽出し、<strong>全5セクションの最初〜最終パラグラフまで1文ごとの英文原文＋日本語対訳・学術英単語辞書・重要ポイント</strong>を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -2989,7 +3290,6 @@
             const content = await page.getTextContent();
             const pageText = content.items.map(item => item.str).join(' ');
 
-            // 論文後半ページで「References」見出し＋文献番号が出現した場合のみ参考文献として打ち切る
             if (i >= refStartThreshold) {
               const refHeadingMatch = pageText.match(/(?:^|\s)(?:References|REFERENCES|Bibliography)\s+(?:\[1\]|1\.|[A-Z][a-z]+,\s+[A-Z]\.)/);
               if (refHeadingMatch) {
@@ -3014,7 +3314,6 @@
         }
 
         async function getAvailableGeminiModels(apiKey) {
-          // 段落省略を防ぐため、抽出精度の高い標準Flashモデルを最優先にする
           const preferred = [
             'gemini-3.8-flash',
             'gemini-3.5-flash',
@@ -3066,15 +3365,15 @@
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
 以下は査読済み論文PDFから抽出した実際の本文テキストです。
 
-【厳守ルール（捏造禁止・各セクションの最終パラグラフまで1段落も落とさないこと）】
+【厳守ルール（捏造禁止・1文ごとのアライメント＆全段落完全抽出）】
 1. sections は必ず id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成してください。
-2. **最重要：各セクション（Introduction / Methods / Results / Discussion / Conclusion）について、そのセクションの【第1パラグラフ】から【次のセクション見出しの直前にある最終パラグラフ】まで、途中の段落も最後の段落も1つも省略せず、すべてのパラグラフを原文の順序通りに "paragraphs" 配列へ格納してください。**
-   - 特に「各セクションの最後のパラグラフ（小結・研究目的の宣言・限界や展望の締めくくり段落）」が抜け落ちないよう、セクション境界の直前まで必ず確認してすべて含めてください。
+2. **各セクションの第1パラグラフから次の見出し直前の最終パラグラフまで、1段落も省略せずすべて抽出してください。**
+3. **各パラグラフの中では、さらに "sentences" 配列に【1文ずつの英語原文（en）】と【その1文に対応する日本語訳（ja）】を1対1で対応させて格納してください。**
    - "en" にはPDF本文に書かれている英文を一字一句改変・創作せずそのまま入れてください。
-3. "ja" にはそれぞれの "en" パラグラフの忠実で正確な学術日本語訳を入れてください。
 4. 各セクションの "takeaways"（重要ポイント）は、必ず**4〜6個の具体的かつ詳細な日本語ポイント（数値・手法・生理学的メカニズムを含む）**を記述してください。
 5. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
-6. 以下のJSON形式のみを出力してください（SVGコードは不要です）。
+6. **"vocabulary" には、抽出した英文内に実際に登場する専門用語・学術動詞を15〜25個選び、小文字キーで登録してください（点線下線による辞書ポップアップに使われます）。**
+7. 以下のJSON形式のみを出力してください。
 
 {
   "title_en": "英語タイトル",
@@ -3094,15 +3393,20 @@
       "title_en": "1. Introduction",
       "title_ja": "1. 序論",
       "paragraphs": [
-        { "en": "セクション第1段落の英文", "ja": "その日本語訳" },
-        { "en": "セクション中間段落の英文", "ja": "その日本語訳" },
-        { "en": "セクション最終段落（次の見出し直前）の英文", "ja": "その日本語訳" }
+        {
+          "en": "段落全体の英文",
+          "ja": "段落全体の日本語訳",
+          "sentences": [
+            { "en": "第1文の英文.", "ja": "第1文の日本語訳。" },
+            { "en": "第2文の英文.", "ja": "第2文の日本語訳。" }
+          ]
+        }
       ],
       "takeaways": [
-        "詳細な重要ポイント1（背景・既存手法の限界など）",
-        "詳細な重要ポイント2（生理学的・工学的メカニズム）",
-        "詳細な重要ポイント3（本研究の仮説とアプローチ）",
-        "詳細な重要ポイント4（本研究の新規性と位置づけ）"
+        "詳細な重要ポイント1",
+        "詳細な重要ポイント2",
+        "詳細な重要ポイント3",
+        "詳細な重要ポイント4"
       ],
       "writing_expressions": [
         { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
@@ -3110,7 +3414,7 @@
     }
   ],
   "vocabulary": {
-    "term_lowercase": { "ipa": "/.../", "meaning": "日本語訳", "nuance": "用法解説" }
+    "term_lowercase": { "ipa": "/.../", "pos": "noun", "ja": "日本語訳", "meaning": "日本語訳", "nuance": "用法解説" }
   }
 }
 
@@ -3123,7 +3427,7 @@ ${rawPdfText.slice(0, 65000)}
             let lastErrMsg = '';
 
             for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクションの最初〜最終パラグラフまで完全抽出・翻訳中（約30〜55秒）...`;
+              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクションの1文ごと対訳・用語辞書を生成中（約30〜55秒）...`;
               try {
                 const apiRes = await fetchWithTimeout(
                   `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -3176,6 +3480,8 @@ ${rawPdfText.slice(0, 65000)}
               Object.entries(parsed.vocabulary).forEach(([k, v]) => {
                 ACADEMIC_GLOSSARY[k.toLowerCase()] = {
                   ipa: v.ipa || '',
+                  pos: v.pos || '',
+                  ja: v.ja || v.meaning || '',
                   meaning: v.meaning || v.ja || '',
                   nuance: v.nuance || ''
                 };
@@ -3196,6 +3502,7 @@ ${rawPdfText.slice(0, 65000)}
                 ...items[targetIdx],
                 entry_type: 'daily_paper',
                 pdfDecoded: true,
+                vocabulary: parsed.vocabulary || items[targetIdx].vocabulary,
                 problem: parsed.problem || items[targetIdx].problem,
                 method: parsed.solution_and_method || items[targetIdx].method,
                 formula: parsed.formula_block || items[targetIdx].formula,
@@ -3212,6 +3519,7 @@ ${rawPdfText.slice(0, 65000)}
                 entry_type: 'daily_paper',
                 type: 'paper',
                 pdfDecoded: true,
+                vocabulary: parsed.vocabulary || {},
                 date: new Date().toISOString().slice(0, 10),
                 category: 'brain_heart',
                 category_label: '📄 PDF全文解読',
@@ -3245,7 +3553,7 @@ ${rawPdfText.slice(0, 65000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = '✅ PDFの最初〜最終パラグラフまで完全抽出が完了しました！';
+            statusBox.textContent = '✅ PDFの1文ごと対訳・用語辞書の生成が完了しました！';
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
@@ -3257,6 +3565,7 @@ ${rawPdfText.slice(0, 65000)}
       }
 
       initApp();
+      setupVocabPopup();
       setupPdfDecoderUI();
       loadRemoteManifest();
       setTimeout(() => renderMathInTarget(document.body), 350);
