@@ -2731,7 +2731,6 @@
     window.addEventListener("DOMContentLoaded", () => {
       async function loadRemoteManifest() {
         try {
-          // 初期ダミーサンプルを除外
           const dummyIds = new Set(INITIAL_ITEMS.map(i => i.id));
           items = items.filter(i => !dummyIds.has(i.id));
 
@@ -2791,7 +2790,6 @@
 
           if (Array.isArray(manifest.papers)) {
             for (const item of [...manifest.papers].reverse()) {
-              // テスト時の旧ファイル(2026-11-17.json)はスキップし、個別PMIDファイルのみ読み込む
               if (item.path === 'data/papers/2026-11-17.json') continue;
 
               const pRes = await fetch('./' + item.path + '?t=' + Date.now());
@@ -2841,7 +2839,7 @@
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（ブラウザ完結型・pdf.js + Gemini API）
+      // PDFアップロード＆全文AI解読モーダル（混雑時の自動モデル切替対応）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -2933,6 +2931,33 @@
           return fullText;
         }
 
+        async function getAvailableGeminiModels(apiKey) {
+          const preferred = [
+            'gemini-3.8-flash',
+            'gemini-3.8-flash-lite',
+            'gemini-3.5-flash',
+            'gemini-3-flash-preview',
+            'gemini-3.0-flash'
+          ];
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+            if (!res.ok) return preferred;
+            const data = await res.json();
+            const available = (data.models || [])
+              .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+              .map(m => m.name.replace('models/', ''))
+              .filter(n => n.includes('gemini') && !n.includes('2.0') && !n.includes('2.5') && !n.includes('embedding') && !n.includes('imagen'));
+
+            const ordered = preferred.filter(m => available.includes(m));
+            for (const m of available.sort().reverse()) {
+              if (!ordered.includes(m) && !m.includes('pro')) ordered.push(m);
+            }
+            return ordered.length > 0 ? ordered : preferred;
+          } catch (_) {
+            return preferred;
+          }
+        }
+
         async function handlePdfFile(file) {
           const apiKey = keyInput.value.trim();
           if (!apiKey) {
@@ -2949,8 +2974,6 @@
             if (rawPdfText.length < 500) {
               throw new Error('PDFからテキストを抽出できませんでした（スキャン画像PDFの可能性があります）。');
             }
-
-            statusBox.textContent = '2/2 Gemini (gemini-3.8-flash) で全5セクションの日英対訳・数式・図解を生成中（約30〜60秒）...';
 
             const prompt = `
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
@@ -2997,27 +3020,47 @@
 ${rawPdfText.slice(0, 32000)}
 `;
 
-            const apiRes = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: prompt }] }],
-                  generationConfig: {
-                    responseMimeType: 'application/json',
-                    temperature: 0.1
-                  }
-                })
-              }
-            );
+            const candidateModels = await getAvailableGeminiModels(apiKey);
+            let result = null;
+            let lastErrMsg = '';
 
-            if (!apiRes.ok) {
-              const errJson = await apiRes.json().catch(() => ({}));
-              throw new Error(errJson.error?.message || `API Error: ${apiRes.status}`);
+            for (const modelName of candidateModels) {
+              statusBox.textContent = `2/2 Gemini (${modelName}) で全5セクションの日英対訳・数式・図解を生成中...`;
+              const apiRes = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                      responseMimeType: 'application/json',
+                      temperature: 0.1
+                    }
+                  })
+                }
+              );
+
+              if (apiRes.ok) {
+                result = await apiRes.json();
+                break;
+              } else {
+                const errJson = await apiRes.json().catch(() => ({}));
+                lastErrMsg = errJson.error?.message || `API Error: ${apiRes.status}`;
+                // 503(混雑)・429(上限)・404(未提供)の場合は次のモデルへ自動切替
+                if ([404, 429, 500, 503].includes(apiRes.status)) {
+                  statusBox.textContent = `⚠️ ${modelName} が混雑中のため別モデルへ自動切替しています...`;
+                  await new Promise(r => setTimeout(r, 1500));
+                  continue;
+                }
+                throw new Error(lastErrMsg);
+              }
             }
 
-            const result = await apiRes.json();
+            if (!result) {
+              throw new Error(lastErrMsg || '利用可能なGeminiモデルがすべて混雑しています。少し時間を置いてお試しください。');
+            }
+
             const jsonText = result.candidates[0].content.parts[0].text;
             const parsed = JSON.parse(jsonText);
 
