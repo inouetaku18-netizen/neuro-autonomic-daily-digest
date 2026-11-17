@@ -5,7 +5,7 @@ import time
 import datetime
 import requests
 import xml.etree.ElementTree as ET
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
@@ -14,115 +14,75 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 NCBI_EMAIL = "research-digest@example.com"
 
 # =========================================================================
-# 1. 毎日取得する5分野の研究トラック定義（すべて PMC Open Access 限定）
+# 1. 毎日取得する5分野の研究トラック（すべて Free Full Text / OA 限定）
 # =========================================================================
 DAILY_RESEARCH_TRACKS = [
     {
         "category": "brain",
         "category_label": "① 脳・神経ダイナミクス",
-        "query": '("electroencephalography" OR "neural dynamics" OR "cortical oscillations") AND ("sample entropy" OR "complexity" OR "nonlinear" OR "synchronization") AND "open access"[filter]'
+        "query": '("electroencephalography"[Title/Abstract] OR "neural dynamics"[Title/Abstract] OR "cortical oscillations"[Title/Abstract]) AND ("sample entropy"[Title/Abstract] OR "complexity"[Title/Abstract] OR "nonlinear"[Title/Abstract]) AND "free full text"[filter]'
     },
     {
         "category": "heart",
         "category_label": "② 心臓・非線形HRV",
-        "query": '("heart rate variability" OR "baroreflex" OR "cardiac autonomic") AND ("sample entropy" OR "Poincare plot" OR "surrogate data" OR "nonlinear") AND "open access"[filter]'
+        "query": '("heart rate variability"[Title/Abstract] OR "baroreflex"[Title/Abstract]) AND ("sample entropy"[Title/Abstract] OR "Poincare plot"[Title/Abstract] OR "surrogate"[Title/Abstract] OR "nonlinear"[Title/Abstract]) AND "free full text"[filter]'
     },
     {
         "category": "brain_heart",
         "category_label": "③ 脳-心臓連関・迷走神経",
-        "query": '("brain-heart" OR "central autonomic network" OR "vagus nerve" OR "gut-brain axis") AND ("heart rate variability" OR "electroencephalography" OR "interoceptive") AND "open access"[filter]'
+        "query": '("brain-heart"[Title/Abstract] OR "central autonomic network"[Title/Abstract] OR "vagus nerve"[Title/Abstract] OR "gut-brain axis"[Title/Abstract]) AND ("heart rate variability"[Title/Abstract] OR "electroencephalography"[Title/Abstract] OR "interoceptive"[Title/Abstract]) AND "free full text"[filter]'
     },
     {
         "category": "ai_control",
         "category_label": "④ AI・数理神経制御",
-        "query": '("Koopman operator" OR "reservoir computing" OR "closed-loop control" OR "state-space model") AND ("neural" OR "autonomic" OR "physiological" OR "dynamical systems") AND "open access"[filter]'
+        "query": '("Koopman operator"[Title/Abstract] OR "reservoir computing"[Title/Abstract] OR "closed-loop control"[Title/Abstract] OR "state-space"[Title/Abstract]) AND ("neural"[Title/Abstract] OR "autonomic"[Title/Abstract] OR "physiological"[Title/Abstract]) AND "free full text"[filter]'
     },
     {
         "category": "clinical",
         "category_label": "⑤ 臨床応用・バイオマーカー",
-        "query": '("prodromal Alzheimer" OR "dementia" OR "epilepsy" OR "vagus nerve stimulation" OR "locus coeruleus") AND ("autonomic" OR "heart rate variability" OR "biomarker") AND "open access"[filter]'
-    }
-]
-
-CLINICAL_REVIEW_TOPICS = [
-    {
-        "domain_label": "認知症の早期バイオマーカーと自律神経・青斑核連関",
-        "query": '("locus coeruleus" OR "prodromal Alzheimer" OR "dementia") AND ("autonomic" OR "heart rate variability") AND "open access"[filter]'
-    },
-    {
-        "domain_label": "てんかん・神経疾患における脳心臓連関と迷走神経制御",
-        "query": '("epilepsy" OR "vagus nerve stimulation") AND ("heart rate variability" OR "brain-heart") AND "open access"[filter]'
+        "query": '("prodromal Alzheimer"[Title/Abstract] OR "dementia"[Title/Abstract] OR "epilepsy"[Title/Abstract] OR "vagus nerve stimulation"[Title/Abstract] OR "locus coeruleus"[Title/Abstract]) AND ("autonomic"[Title/Abstract] OR "heart rate variability"[Title/Abstract]) AND "free full text"[filter]'
     }
 ]
 
 # =========================================================================
-# 2. 構造化出力用 Pydantic スキーマ
+# 2. 構造化出力用 Pydantic スキーマ（アブストラクト事実ベース限定）
 # =========================================================================
-class ParagraphPair(BaseModel):
-    en: str = Field(description="PMCフルテキストから抽出した実際の英語原文パラグラフ（改変・創作厳禁）")
-    ja: str = Field(description="上記英語原文パラグラフの忠実な学術日本語訳")
-
-class PaperSection(BaseModel):
-    id: str = Field(description="intro, methods, results, discussion, conclusion のいずれか")
-    title_en: str
-    title_ja: str
-    section_svg: str = Field(description="このセクションの内容を視覚化するクリーンなインラインSVGコード（<svg ...>...</svg>）")
-    paragraphs: List[ParagraphPair]
-
 class VocabularyItem(BaseModel):
-    term: str = Field(description="英語原文内に実際に登場する学術用語・重要動詞")
+    term: str = Field(description="英語アブストラクト内に実際に登場する学術用語・重要動詞")
     ipa: str = Field(description="国際音声記号（例: /ˌbæroʊˈriːflɛks/）")
     pos: str = Field(description="品詞（noun, verb, adj 等）")
     ja: str = Field(description="学術的な日本語訳")
     nuance: str = Field(description="論文読解・執筆における用法とニュアンス解説")
 
-class PaperSummary(BaseModel):
-    problem: str = Field(description="従来研究の課題と本研究の問い（日本語）")
-    solution_and_method: str = Field(description="提案手法・実験プロトコル・数理モデルの要点（日本語）")
-    formula_block: str = Field(description="論文中の主要な数式または評価指標のLaTeX表記（例: $$...$$）")
-    diagram_caption: str = Field(description="概念図のタイトル（英語・日本語併記）")
-    diagram_svg: str = Field(description="研究全体のアーキテクチャや生理学的経路を示すインラインSVGコード（<svg ...>...</svg>）")
-    key_results: str = Field(description="論文中に実際に記載された定量的結果・統計値（日本語）")
-    discussion_and_implications: str = Field(description="著者の考察と生理学的・工学的意義（日本語）")
-    relevance_to_my_research: str = Field(description="脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用ヒント（日本語）")
-
-class DailyPaperSchema(BaseModel):
-    title_ja: str = Field(description="論文タイトルの正確な日本語訳")
+class AbstractDigestSchema(BaseModel):
+    title_ja: str = Field(description="英語論文タイトルの正確な日本語訳")
+    abstract_ja: str = Field(description="英語アブストラクト原文の一文一文に対応した忠実な日本語訳（推測・補完禁止）")
     impact_factor: float = Field(description="掲載誌の直近インパクトファクター概算値（不明な場合は3.5）")
-    tags: List[str] = Field(description="日本語・英語の専門タグ4〜6個")
-    summary: PaperSummary
-    sections: List[PaperSection]
+    tags: List[str] = Field(description="専門タグ4〜6個")
+    problem: str = Field(description="アブストラクトに記載された研究背景・課題（記載のない推測は禁止）")
+    solution_and_method: str = Field(description="アブストラクトに記載された手法・対象・解析方法（記載のない推測は禁止）")
+    formula_block: str = Field(description="この分野・手法に関連する基本数式または評価指標のLaTeX表記（例: $$...$$）")
+    diagram_caption: str = Field(description="概念図のタイトル（英語・日本語併記）")
+    diagram_svg: str = Field(description="アブストラクトで述べられている因果関係・処理フローを示すクリーンなインラインSVG（<svg ...>...</svg>）")
+    key_results: str = Field(description="アブストラクトに明記されている結果・数値のみ（記載がない場合は『詳細はPDF本文参照』と明記）")
+    discussion_and_implications: str = Field(description="アブストラクトの結論・意義の忠実な要約")
+    relevance_to_my_research: str = Field(description="脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用観点からのコメント")
     vocabulary_list: List[VocabularyItem]
 
-class ReviewPaperEntry(BaseModel):
-    pmid: str
-    doi: str
-    title_en: str
-    title_ja: str
-    journal: str
-    key_finding_ja: str
-
-class ClinicalReviewSchema(BaseModel):
-    title_ja: str
-    title_en: str
-    papers: List[ReviewPaperEntry]
-    synthesis: str = Field(description="複数論文を統合した臨床・数理モデリング横断レビュー（日本語）")
-
 # =========================================================================
-# 3. PubMed Central (PMC) Open Access フルテキスト実取得関数
+# 3. PubMed 公式API 実データ取得関数
 # =========================================================================
 def sanitize_svg(svg_str: str, min_height: int = 220) -> str:
     if not svg_str or "<svg" not in svg_str:
-        return f'<svg viewBox="0 0 600 {min_height}" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="{min_height}" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text x="300" y="{min_height//2}" text-anchor="middle" fill="#475569" font-size="14">Conceptual Diagram</text></svg>'
+        return f'<svg viewBox="0 0 600 {min_height}" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="{min_height}" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text x="300" y="{min_height//2}" text-anchor="middle" fill="#475569" font-size="14">Abstract Flow Diagram</text></svg>'
     match = re.search(r"<svg[\s\S]*?</svg>", svg_str, re.IGNORECASE)
     return match.group(0) if match else svg_str
 
 
-def search_pmc_open_access(query: str, max_results: int = 35) -> List[str]:
-    """PubMed Central (db=pmc) から Open Access Subset の PMCID リストを取得する"""
+def search_pubmed_free_fulltext(query: str, max_results: int = 30) -> List[str]:
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     params = {
-        "db": "pmc",
+        "db": "pubmed",
         "term": query,
         "retmax": max_results,
         "sort": "relevance",
@@ -134,11 +94,10 @@ def search_pmc_open_access(query: str, max_results: int = 35) -> List[str]:
     return resp.json().get("esearchresult", {}).get("idlist", [])
 
 
-def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, str]]:
-    """PMC XMLから実在メタデータ（PMID/PMCID/DOI/Title/Journal/Abstract）と本文フルテキストを一括抽出する"""
+def fetch_pubmed_verified_metadata(pmid: str) -> Optional[dict]:
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    params = {"db": "pmc", "id": numeric_pmcid, "retmode": "xml", "email": NCBI_EMAIL}
-    resp = requests.get(url, params=params, timeout=25)
+    params = {"db": "pubmed", "id": pmid, "retmode": "xml", "email": NCBI_EMAIL}
+    resp = requests.get(url, params=params, timeout=20)
     if resp.status_code != 200:
         return None
 
@@ -147,79 +106,53 @@ def fetch_pmc_article_and_fulltext(numeric_pmcid: str) -> Optional[Tuple[dict, s
     except ET.ParseError:
         return None
 
-    article = root.find(".//article")
+    article = root.find(".//PubmedArticle")
     if article is None:
         return None
 
-    pmid = ""
+    title_el = article.find(".//ArticleTitle")
+    title_en = " ".join("".join(title_el.itertext()).split()) if title_el is not None else ""
+
+    journal_el = article.find(".//Journal/Title")
+    journal = " ".join("".join(journal_el.itertext()).split()) if journal_el is not None else "Peer-Reviewed Journal"
+
+    pub_year_el = article.find(".//JournalIssue/PubDate/Year")
+    pub_year = pub_year_el.text.strip() if pub_year_el is not None and pub_year_el.text else ""
+
+    abstract_texts = []
+    for ab in article.findall(".//Abstract/AbstractText"):
+        label = ab.attrib.get("Label", "")
+        text = " ".join("".join(ab.itertext()).split())
+        if text:
+            abstract_texts.append(f"[{label}] {text}" if label else text)
+    abstract_en = "\n\n".join(abstract_texts)
+
     doi = ""
-    pmcid_str = f"PMC{numeric_pmcid}"
-    for aid in article.findall(".//article-meta/article-id"):
-        id_type = aid.attrib.get("pub-id-type", "")
-        if id_type == "pmid" and aid.text:
-            pmid = aid.text.strip()
-        elif id_type == "doi" and aid.text:
+    pmcid = ""
+    for aid in article.findall(".//PubmedData/ArticleIdList/ArticleId"):
+        id_type = aid.attrib.get("IdType", "")
+        if id_type == "doi" and aid.text:
             doi = aid.text.strip()
         elif id_type == "pmc" and aid.text:
-            val = aid.text.strip()
-            pmcid_str = val if val.startswith("PMC") else f"PMC{val}"
+            pmcid = aid.text.strip()
 
-    if not pmid or not doi:
+    # 実在確認のため DOI と 十分な長さの Abstract がある論文のみ採用
+    if not doi or not title_en or len(abstract_en) < 200:
         return None
 
-    title_el = article.find(".//article-meta/title-group/article-title")
-    title_en = " ".join("".join(title_el.itertext()).split()) if title_el is not None else ""
-    if not title_en:
-        return None
-
-    journal_el = article.find(".//journal-meta/journal-title-group/journal-title")
-    if journal_el is None:
-        journal_el = article.find(".//journal-meta/journal-title")
-    journal = " ".join("".join(journal_el.itertext()).split()) if journal_el is not None else "Peer-Reviewed Open Access Journal"
-
-    abstract_parts = []
-    for ab in article.findall(".//article-meta/abstract"):
-        txt = " ".join("".join(ab.itertext()).split())
-        if txt:
-            abstract_parts.append(txt)
-    abstract = "\n".join(abstract_parts)
-
-    body = article.find(".//body")
-    if body is None:
-        return None
-
-    extracted_blocks = []
-    total_chars = 0
-    for sec in body.findall("./sec"):
-        sec_title_el = sec.find("./title")
-        sec_title = " ".join("".join(sec_title_el.itertext()).split()) if sec_title_el is not None else "Section"
-        paragraphs = []
-        for p in sec.findall(".//p"):
-            p_text = " ".join("".join(p.itertext()).split())
-            if len(p_text) > 40:
-                paragraphs.append(p_text)
-                total_chars += len(p_text)
-        if paragraphs:
-            selected_p = "\n\n".join(paragraphs[:4])
-            extracted_blocks.append(f"=== SECTION: {sec_title} ===\n{selected_p}")
-
-    if total_chars < 1500 or len(extracted_blocks) < 2:
-        return None
-
-    meta = {
+    return {
         "pmid": pmid,
-        "pmcid": pmcid_str,
+        "pmcid": pmcid,
         "doi": doi,
+        "pub_year": pub_year,
         "title_en": title_en,
         "journal": journal,
-        "abstract": abstract
+        "abstract_en": abstract_en
     }
-    full_text = "\n\n".join(extracted_blocks)[:24000]
-    return meta, full_text
 
 
 # =========================================================================
-# 4. Gemini API クライアント & 生成ロジック
+# 4. Gemini API クライアント & アブストラクト忠実翻訳
 # =========================================================================
 def get_active_client_and_model():
     client = genai.Client(
@@ -257,46 +190,39 @@ def get_active_client_and_model():
     return client, "gemini-3.8-flash"
 
 
-def generate_daily_paper_json(client, model_name: str, meta: dict, full_text: str, track: dict, today_str: str) -> dict:
+def generate_abstract_digest_json(client, model_name: str, meta: dict, track: dict, today_str: str) -> dict:
     prompt = f"""
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル編集者です。
-以下は PubMed Central (PMC) から実際に取得された Open Access 査読済み論文（分野：{track['category_label']}）のメタデータおよびフルテキスト原文です。
+以下は PubMed から取得した実在の Free Full Text（Open Access）論文のメタデータおよびアブストラクト原文です。
 
-【厳守ルール（捏造・ハルシネーションの完全禁止）】
-1. `sections` 内の各パラグラフの `en` フィールドには、**下記の【PMC Full Text 原文】に実際に書かれている英文パラグラフを一字一句改変・創作せずそのまま引用**してください。元の論文に存在しない英文を作ることは厳禁です。
-2. `ja` フィールドには、その `en` パラグラフの忠実で正確な学術日本語訳を記述してください。
-3. `sections` は論文の実際のセクション構成に対応させて `intro`, `methods`, `results`, `discussion`, `conclusion` の5つに整理してください（元の論文に独立したConclusionがない場合はDiscussion後半の結論パラグラフを原文のまま割り当ててください）。
-4. `summary` の `key_results` には、本文中に実際に記載されている統計値・実験結果のみを記載し、記載のない数値を推測しないでください。
-5. `diagram_svg` および各セクションの `section_svg` は、背景淡色（#f8fafc）、青系（#1e3a8a, #2563eb）・ティール系（#0d9488）を基調とした図解SVGを記述してください。
-6. `vocabulary_list` には、抽出した `en` テキスト内に実際に登場する専門用語・学術動詞を10〜15個選び解説してください。
+【厳守ルール（捏造・推測の完全禁止）】
+1. **アブストラクト原文に書かれている事実のみ**を忠実に日本語訳・構造化してください。アブストラクトに記載されていない実験データ、サンプル数、統計値、手法の詳細を推測・創作することは厳禁です。
+2. 本文全体（Introduction〜Conclusion）はユーザーが別途PDFをダウンロードしてサイト上で解読するため、現時点ではアブストラクトの範囲を超えた本文の補完は絶対に行わないでください。
+3. `diagram_svg` は背景淡色（#f8fafc）、青系（#1e3a8a, #2563eb）・ティール系（#0d9488）を基調とした概念図SVGを記述してください。
+4. `vocabulary_list` には、下記の【Abstract 原文】に実際に登場する専門用語・学術動詞を8〜12個選び解説してください。
 
-【論文メタデータ（実在確認済み）】
+【実在論文メタデータ】
 PMID: {meta['pmid']}
-PMCID: {meta['pmcid']}
+PMCID: {meta['pmcid'] if meta['pmcid'] else 'Publisher Open Access'}
 DOI: {meta['doi']}
-Title: {meta['title_en']}
+Year: {meta['pub_year']}
 Journal: {meta['journal']}
+Title: {meta['title_en']}
 
-【Abstract】
-{meta['abstract']}
-
-【PMC Full Text 原文】
-{full_text}
+【Abstract 原文】
+{meta['abstract_en']}
 """
     response = client.models.generate_content(
         model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
-            response_schema=DailyPaperSchema,
+            response_schema=AbstractDigestSchema,
             temperature=0.1
         )
     )
     parsed = json.loads(response.text)
-
-    parsed["summary"]["diagram_svg"] = sanitize_svg(parsed["summary"]["diagram_svg"], 240)
-    for sec in parsed["sections"]:
-        sec["section_svg"] = sanitize_svg(sec["section_svg"], 210)
+    diagram_svg = sanitize_svg(parsed["diagram_svg"], 230)
 
     vocab_dict = {}
     for v in parsed.pop("vocabulary_list", []):
@@ -307,65 +233,57 @@ Journal: {meta['journal']}
             "nuance": v["nuance"]
         }
 
+    # 現時点では「原文アブストラクト」のみを正確に格納（PDFアップロード後に5セクション全文へ展開）
+    abstract_section = [
+        {
+            "id": "intro",
+            "title_en": "Abstract (Verified Original Text — Upload PDF for Full-Text Sections)",
+            "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右上の「PDF全文解読」へドロップしてください）",
+            "section_svg": diagram_svg,
+            "paragraphs": [
+                {
+                    "en": meta["abstract_en"],
+                    "ja": parsed["abstract_ja"]
+                }
+            ]
+        }
+    ]
+
     return {
         "id": f"paper-{today_str}-{meta['pmid']}",
         "date": today_str,
         "pmid": meta["pmid"],
         "pmcid": meta["pmcid"],
+        "doi_url": f"https://doi.org/{meta['doi']}",
         "pubmed_url": f"https://pubmed.ncbi.nlm.nih.gov/{meta['pmid']}/",
-        "pmc_url": f"https://pmc.ncbi.nlm.nih.gov/articles/{meta['pmcid']}/",
+        "pmc_url": f"https://pmc.ncbi.nlm.nih.gov/articles/{meta['pmcid']}/" if meta["pmcid"] else "",
         "category": track["category"],
         "category_label": track["category_label"],
-        "journal": meta["journal"],
+        "journal": f"{meta['journal']} ({meta['pub_year']})" if meta["pub_year"] else meta["journal"],
         "impact_factor": parsed["impact_factor"],
         "doi": meta["doi"],
         "title_en": meta["title_en"],
         "title_ja": parsed["title_ja"],
         "tags": parsed["tags"],
-        "summary": parsed["summary"],
+        "summary": {
+            "problem": parsed["problem"],
+            "solution_and_method": parsed["solution_and_method"],
+            "formula_block": parsed["formula_block"],
+            "diagram_caption": parsed["diagram_caption"],
+            "diagram_svg": diagram_svg,
+            "key_results": parsed["key_results"],
+            "discussion_and_implications": parsed["discussion_and_implications"],
+            "relevance_to_my_research": parsed["relevance_to_my_research"]
+        },
         "full_text": {
-            "sections": parsed["sections"]
+            "sections": abstract_section
         },
         "vocabulary": vocab_dict
     }
 
 
-def generate_clinical_review_json(client, model_name: str, papers_meta: List[dict], review_topic: dict, today_str: str) -> dict:
-    papers_text = "\n\n".join([
-        f"[{i+1}] PMID: {m['pmid']} | PMCID: {m['pmcid']} | DOI: {m['doi']}\nTitle: {m['title_en']}\nJournal: {m['journal']}\nAbstract: {m['abstract']}"
-        for i, m in enumerate(papers_meta)
-    ])
-
-    prompt = f"""
-あなたは臨床神経科学および生体医工学のシニアリサーチャーです。
-以下の実際にPubMed Central (PMC) で Open Access 公開されている査読済み論文のみに基づき、「{review_topic['domain_label']}」に関する横断レビューをJSON形式で作成してください。記載のない論文や数値を創作することは厳禁です。
-
-{papers_text}
-"""
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=ClinicalReviewSchema,
-            temperature=0.1
-        )
-    )
-    parsed = json.loads(response.text)
-    return {
-        "id": f"rev-{today_str}",
-        "date": today_str,
-        "domain_label": review_topic["domain_label"],
-        "title_ja": parsed["title_ja"],
-        "title_en": parsed["title_en"],
-        "paper_count": len(parsed["papers"]),
-        "papers": parsed["papers"],
-        "synthesis": parsed["synthesis"]
-    }
-
-
 # =========================================================================
-# 5. メイン実行フロー（全5分野から1本ずつ＝計5本取得）
+# 5. メイン実行フロー（5分野から1本ずつ＝計5本取得）
 # =========================================================================
 def main():
     jst = datetime.timezone(datetime.timedelta(hours=9))
@@ -386,35 +304,29 @@ def main():
     client, model_name = get_active_client_and_model()
     print(f"Using Gemini model: {model_name}")
 
-    # 5つの研究分野すべてを順番に巡回し、各分野1本ずつ（計5本）取得する
     generated_count = 0
     for idx, track in enumerate(DAILY_RESEARCH_TRACKS):
         print(f"\n--- [{idx+1}/{len(DAILY_RESEARCH_TRACKS)}] Track: {track['category_label']} ---")
         try:
-            pmc_ids = search_pmc_open_access(track["query"], max_results=35)
-            print(f"Found {len(pmc_ids)} candidate PMCIDs")
+            pmids = search_pubmed_free_fulltext(track["query"], max_results=30)
+            print(f"Found {len(pmids)} candidate Free Full Text PMIDs")
 
             selected_meta = None
-            selected_full_text = None
-
-            for num_id in pmc_ids:
-                time.sleep(0.4)
-                res = fetch_pmc_article_and_fulltext(num_id)
-                if not res:
+            for pmid in pmids:
+                if pmid in processed_set:
                     continue
-                meta, full_text = res
-                if meta["pmid"] in processed_set:
-                    continue
-                selected_meta = meta
-                selected_full_text = full_text
-                print(f"Verified Open Access paper: PMID={meta['pmid']}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
-                break
+                time.sleep(0.35)
+                meta = fetch_pubmed_verified_metadata(pmid)
+                if meta:
+                    selected_meta = meta
+                    print(f"Verified paper: PMID={pmid}, PMCID={meta['pmcid']}, DOI={meta['doi']}")
+                    break
 
-            if not selected_meta or not selected_full_text:
+            if not selected_meta:
                 print(f"Warning: No new paper found for {track['category_label']}, skipping.")
                 continue
 
-            paper_data = generate_daily_paper_json(client, model_name, selected_meta, selected_full_text, track, today_str)
+            paper_data = generate_abstract_digest_json(client, model_name, selected_meta, track, today_str)
             out_path = f"data/papers/{today_str}-{selected_meta['pmid']}.json"
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(paper_data, f, ensure_ascii=False, indent=2)
@@ -431,56 +343,23 @@ def main():
             processed_set.add(selected_meta["pmid"])
             generated_count += 1
 
-            # 1分野ごとにmanifestを保存（途中経過の保護）
             manifest["processed_pmids"] = list(processed_set)
             with open(manifest_path, "w", encoding="utf-8") as f:
                 json.dump(manifest, f, ensure_ascii=False, indent=2)
 
-            # Gemini API無料枠のレート制限（RPM）を回避するため15秒待機
             if idx < len(DAILY_RESEARCH_TRACKS) - 1:
-                print("Waiting 15s to respect Gemini API rate limits...")
-                time.sleep(15)
+                print("Waiting 12s to respect Gemini API rate limits...")
+                time.sleep(12)
 
         except Exception as e:
             print(f"Error processing track {track['category_label']}: {e}")
-            time.sleep(15)
+            time.sleep(12)
             continue
-
-    # 日曜日の場合は追加で臨床横断レビューも生成
-    if now.weekday() == 6:
-        try:
-            topic = CLINICAL_REVIEW_TOPICS[now.isocalendar()[1] % len(CLINICAL_REVIEW_TOPICS)]
-            pmc_ids = search_pmc_open_access(topic["query"], max_results=20)
-            metas = []
-            for num_id in pmc_ids:
-                res = fetch_pmc_article_and_fulltext(num_id)
-                if res:
-                    metas.append(res[0])
-                if len(metas) >= 4:
-                    break
-                time.sleep(0.4)
-
-            if metas:
-                review_data = generate_clinical_review_json(client, model_name, metas, topic, today_str)
-                out_path = f"data/reviews/{today_str}.json"
-                with open(out_path, "w", encoding="utf-8") as f:
-                    json.dump(review_data, f, ensure_ascii=False, indent=2)
-                manifest["reviews"] = [r for r in manifest["reviews"] if r["id"] != review_data["id"]]
-                manifest["reviews"].insert(0, {
-                    "id": review_data["id"],
-                    "date": today_str,
-                    "path": out_path,
-                    "title_ja": review_data["title_ja"]
-                })
-                with open(manifest_path, "w", encoding="utf-8") as f:
-                    json.dump(manifest, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"Error generating Sunday review: {e}")
 
     if generated_count == 0:
         raise RuntimeError("Failed to generate any papers across all 5 tracks.")
 
-    print(f"\nCompleted! Successfully generated {generated_count} papers today.")
+    print(f"\nCompleted! Successfully generated {generated_count} verified Open Access digests today.")
 
 
 if __name__ == "__main__":
