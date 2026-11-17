@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroCardio & Koopman Research Intelligence | 論文デイリー要約・臨床レビュー統合基盤</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter, Noto Sans JP & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- KaTeX (LaTeX数式レンダリング) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.65rem 0.75rem;
+      margin: 0.6rem 0;
+      background: #ffffff;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+    }
+    .diagram-container svg {
+      width: 100%;
+      height: auto;
+      max-height: 360px;
+      display: block;
+    }
+    /* 双方向対訳ハイライト */
+    .bilingual-pair-row {
+      transition: background-color 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .bilingual-pair-row.is-hovered .ja-cell,
+    .bilingual-pair-row.is-hovered .en-cell {
+      background-color: #fef9c3;
+      border-color: #facc15;
+      box-shadow: 0 2px 10px -2px rgba(202, 138, 4, 0.18);
+    }
+    .bilingual-pair-row.is-hovered .ja-cell {
+      border-left: 4px solid #eab308;
+    }
+    .bilingual-pair-row.is-hovered .en-cell {
+      border-left: 4px solid #4f46e5;
+    }
+    .bilingual-pair-row.is-speaking .ja-cell,
+    .bilingual-pair-row.is-speaking .en-cell {
+      background-color: #e0e7ff;
+      border-color: #6366f1;
+      box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.22);
+    }
+    /* 日本語ぼかしモード */
+    .blur-ja-mode .ja-text-content {
+      filter: blur(5px);
+      user-select: none;
+      transition: filter 0.22s ease;
+    }
+    .blur-ja-mode .bilingual-pair-row:hover .ja-text-content,
+    .blur-ja-mode .bilingual-pair-row.is-hovered .ja-text-content {
+      filter: blur(0px);
+    }
+    /* 英語精読モード */
+    .english-only-mode .ja-col-wrapper {
+      display: none;
+    }
+    .english-only-mode .en-col-wrapper {
+      grid-column: span 2 / span 2;
+    }
+    /* 重要学術単語ハイライト */
+    .vocab-term {
+      border-bottom: 2px dotted #6366f1;
+      background-color: rgba(238, 242, 255, 0.75);
+      color: #312e81;
+      font-weight: 600;
+      padding: 0 2px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .vocab-term:hover {
+      background-color: #4f46e5;
+      color: #ffffff;
+      border-bottom-color: #4f46e5;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- ==================== ヘッダー＆メインナビゲーション ==================== -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 上段：ブランドロゴ＆ステータス＆単語帳＆JSON追加 -->
+      <div class="h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h3l2-6 4 12 3-8 2 2h4" />
+            </svg>
+          </div>
+          <div class="truncate">
+            <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight truncate">
+              NeuroCardio &amp; Koopman Research Hub
+            </h1>
+            <p class="text-[11px] sm:text-xs text-slate-500 hidden sm:block truncate">
+              中枢-自律神経連関・非線形HRV・RC+Koopman線形制御・認知症早期診断 論文統合＆英語精読基盤
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="hidden xl:flex items-center gap-3 text-xs font-medium bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+            <span class="text-slate-600">収録: <strong id="statTotal" class="text-slate-900">0</strong>件</span>
+            <span class="text-slate-300">|</span>
+            <span class="text-emerald-700">既読: <strong id="statRead">0</strong></span>
+            <span class="text-slate-300">|</span>
+            <span class="text-amber-600">★重要: <strong id="statStar">0</strong></span>
+          </div>
+
+          <button
+            id="openWordbookBtn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 transition shadow-2xs cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>マイ単語帳 (<strong id="wordbookCountBadge">0</strong>)</span>
+          </button>
+
+          <button
+            id="openModalBtn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transition shadow-xs cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="hidden sm:inline">論文 / レビューJSON追加</span>
+            <span class="sm:hidden">JSON追加</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 下段：メインモード切替タブ -->
+      <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2.5 pt-0.5" aria-label="メインビュー切替">
+        <button
+          data-view="daily"
+          class="view-tab inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white transition shrink-0 cursor-pointer"
+        >
+          <span>1. デイリー論文フィード（解析手法・基礎）</span>
+        </button>
+        <button
+          data-view="clinical"
+          class="view-tab inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition shrink-0 cursor-pointer"
+        >
+          <span>2. 臨床最前線レビュー（複数論文統合）</span>
+          <span id="clinicalBadgeCount" class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-100 text-rose-700 font-bold">0</span>
+        </button>
+        <button
+          data-view="synthesis"
+          class="view-tab inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition shrink-0 cursor-pointer"
+        >
+          <span>3. アーカイブ横断・世界の現状＆課題まとめ</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== メインコンテンツ ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- =================================================================== -->
+    <!-- VIEW 1 & VIEW 2 共通レイアウト（左：アーカイブリスト / 右：詳細・統合レビュー） -->
+    <!-- =================================================================== -->
+    <div id="feedAndClinicalContainer">
+      <!-- フィルター＆検索バー -->
+      <section class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 shadow-xs">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div id="categoryTabs" class="flex flex-wrap items-center gap-1.5"></div>
+
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+            <div class="relative flex-1 sm:w-64">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+              </svg>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="キーワード・手法・疾患・IF検索..."
+                class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              />
+            </div>
+
+            <button
+              id="starOnlyBtn"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium border border-slate-200 bg-white text-slate-700 hover:bg-amber-50 transition shrink-0 cursor-pointer"
+            >
+              <span id="starOnlyIcon" class="text-slate-400">★</span>
+              <span>重要のみ</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2カラムレイアウト -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <aside class="lg:col-span-4 space-y-3 lg:sticky lg:top-32">
+          <div class="flex items-center justify-between px-1">
+            <h2 id="listHeading" class="text-xs font-bold uppercase tracking-wider text-slate-500">
+              アーカイブ一覧 (<span id="filteredCount">0</span>件)
+            </h2>
+            <span class="text-xs text-slate-400">新しい順</span>
+          </div>
+          <div id="paperList" class="space-y-3 max-h-[74vh] overflow-y-auto pr-1"></div>
+        </aside>
+
+        <article id="paperDetail" class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-8"></article>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 3: アーカイブ横断・世界の研究の現状＆抱えている課題まとめビュー -->
+    <!-- =================================================================== -->
+    <div id="synthesisContainer" class="hidden space-y-6">
+      <section class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4 mb-5">
+          <div>
+            <span class="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 mb-1">
+              Cross-Archive Research Landscape Synthesizer
+            </span>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">
+              検索・選択アーカイブ横断：世界の研究の現状と抱えている課題の統合分析
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              蓄積された論文・臨床レビューを横断的に束ね、領域全体の現在地・未解決ボトルネック・自身の研究アプローチによる突破口を構造化します。
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              id="selectAllSynthBtn"
+              class="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              表示中をすべて選択
+            </button>
+            <button
+              id="copySynthReportBtn"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition shadow-xs cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>統合レポートをクリップボードにコピー</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 space-y-3">
+            <div class="relative">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+              </svg>
+              <input
+                id="synthSearchInput"
+                type="text"
+                placeholder="テーマ絞り込み（例: 認知症, Koopman, HRV, 起立, 迷走神経）..."
+                class="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+              <span>統合対象を選択 (<strong id="synthSelectedCount" class="text-indigo-700">0</strong>件選択中)</span>
+              <button id="clearSynthBtn" class="text-slate-400 hover:text-rose-600 underline cursor-pointer">選択解除</button>
+            </div>
+
+            <div id="synthChecklist" class="space-y-2 max-h-[58vh] overflow-y-auto pr-1"></div>
+          </div>
+
+          <div id="synthOutputPanel" class="lg:col-span-7 space-y-4"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 4: 全文精読・対訳＆英語学習モード (Full-Text Bilingual Reader) -->
+    <!-- =================================================================== -->
+    <div id="readerContainer" class="hidden space-y-5">
+      <!-- リーダー上部スティッキーコントロールバー -->
+      <div class="sticky top-16 z-20 bg-white/95 backdrop-blur rounded-2xl border border-slate-200 p-3.5 sm:p-4 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <!-- 左：戻るボタン＆論文タイトル -->
+          <div class="flex items-center gap-3 min-w-0">
+            <button
+              id="exitReaderBtn"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-800 hover:bg-slate-200 transition shrink-0 cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>一覧・要約へ戻る</span>
+            </button>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-600 text-white">全文精読・対訳モード</span>
+                <span id="readerJournalMeta" class="text-xs font-semibold text-slate-500 truncate"></span>
+              </div>
+              <h2 id="readerTitleJa" class="text-sm sm:text-base font-extrabold text-slate-900 truncate mt-0.5"></h2>
+            </div>
+          </div>
+
+          <!-- 右：英語学習モード切替＆音声読み上げコントロール -->
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <!-- 表示モード切替 -->
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200" role="group">
+              <button data-rmode="normal" class="rmode-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-700 shadow-2xs cursor-pointer">
+                通常対訳
+              </button>
+              <button data-rmode="blur-ja" class="rmode-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">
+                日本語ぼかし
+              </button>
+              <button data-rmode="en-only" class="rmode-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">
+                英語精読のみ
+              </button>
+            </div>
+
+            <!-- 音声読み上げコントロール -->
+            <div class="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-xl">
+              <button
+                id="readSectionAudioBtn"
+                class="inline-flex items-center gap-1 text-xs font-bold text-indigo-800 hover:text-indigo-950 cursor-pointer"
+              >
+                <span id="audioBtnIcon">🔊</span>
+                <span id="audioBtnLabel">セクション連続再生</span>
+              </button>
+              <select
+                id="speechRateSelect"
+                aria-label="読み上げ速度"
+                class="text-xs font-mono font-bold bg-white border border-indigo-200 rounded-lg px-1.5 py-0.5 text-indigo-900 focus:outline-none cursor-pointer"
+              >
+                <option value="0.75">0.75x</option>
+                <option value="1.0" selected>1.0x</option>
+                <option value="1.2">1.2x</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- セクションジャンプナビゲーション -->
+        <div id="readerSectionNav" class="flex items-center gap-1.5 overflow-x-auto pt-3 mt-3 border-t border-slate-100"></div>
+      </div>
+
+      <!-- リーダー案内バナー -->
+      <div class="bg-gradient-to-r from-amber-50 via-indigo-50 to-teal-50 rounded-2xl border border-indigo-200/80 px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded-md bg-amber-400/30 text-amber-900 font-bold">使い方ヒント</span>
+          <span>左の<strong>日本語訳</strong>または右の<strong>英語原文</strong>にカーソルを置くと対応箇所が同時にハイライトされます。英語の<span class="vocab-term mx-1">点線下線語</span>をクリックすると辞書解説＆単語帳登録ができます。</span>
+        </div>
+      </div>
+
+      <!-- 5セクション全文対訳＆セクション末まとめ・概念図・英語表現集 -->
+      <div id="readerSectionsContainer" class="space-y-8"></div>
+    </div>
+
+  </main>
+
+  <!-- ==================== 学術英単語ポップアップ辞書カード ==================== -->
+  <div id="vocabPopover" class="fixed bottom-5 left-5 z-50 hidden max-w-md w-[calc(100vw-2.5rem)] bg-white rounded-2xl border-2 border-indigo-500 shadow-2xl p-5 transition-all">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h4 id="vocabWordTitle" class="text-lg font-extrabold text-indigo-950"></h4>
+          <span id="vocabWordIpa" class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded"></span>
+          <button id="vocabSpeakBtn" class="p-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold cursor-pointer" title="発音を聞く">🔊</button>
+        </div>
+        <p id="vocabWordMeaning" class="text-sm font-bold text-emerald-700 mt-1"></p>
+      </div>
+      <button id="closeVocabPopoverBtn" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs text-slate-700 leading-relaxed mb-3">
+      <span class="font-bold text-indigo-800 block mb-0.5">論文執筆・専門ニュアンス解説:</span>
+      <span id="vocabWordNuance"></span>
+    </div>
+    <div class="flex items-center justify-end gap-2">
+      <button
+        id="saveToWordbookBtn"
+        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs cursor-pointer"
+      >
+        <span>＋ 単語帳に保存</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== マイ単語帳（フラッシュカード復習）モーダル ==================== -->
+  <div id="wordbookModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full overflow-hidden max-h-[88vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between shrink-0 bg-amber-50/50">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <span>マイ学術英単語帳（My Research Wordbook）</span>
+            <span id="wbModalCount" class="text-xs px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold">0語</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">論文精読中に保存した専門用語・学術表現の復習＆フラッシュカードテスト</p>
+        </div>
+        <button id="closeWordbookBtn" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+            <button id="wbTabList" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs cursor-pointer">単語リスト一覧</button>
+            <button id="wbTabQuiz" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">フラッシュカード復習</button>
+          </div>
+          <button id="copyWordbookBtn" class="px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer">
+            単語帳をコピー
+          </button>
+        </div>
+
+        <div id="wordbookBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 論文 / レビューJSON追加モーダル ==================== -->
+  <div id="jsonModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-3xl w-full overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between shrink-0">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">新規論文 / 臨床レビューJSONデータの追加</h3>
+          <p class="text-xs text-slate-500 mt-0.5">全文5セクション対訳・セクション別図解・Impact Factor・数式（LaTeX）に対応</p>
+        </div>
+        <button id="closeModalBtn" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-3 overflow-y-auto">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-600">テンプレート切替:</span>
+          <button id="loadSingleTemplateBtn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 cursor-pointer">
+            1. 個別論文テンプレート（全文対訳＋数式＋図解）
+          </button>
+          <button id="loadReviewTemplateBtn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 cursor-pointer">
+            2. 臨床最前線レビューテンプレート（複数論文統合）
+          </button>
+        </div>
+
+        <textarea
+          id="jsonInputArea"
+          rows="13"
+          class="w-full font-mono text-xs bg-slate-50 border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        ></textarea>
+        <div id="jsonErrorMsg" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2"></div>
+      </div>
+
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+        <button id="cancelModalBtn" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+          キャンセル
+        </button>
+        <button id="submitJsonBtn" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs cursor-pointer">
+          リストに追加して表示
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== トースト通知 ==================== -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span id="toastText">通知メッセージ</span>
+    </div>
+  </div>
+
+  <!-- ==================== JavaScript アプリケーションロジック ==================== -->
+  <script>
+    // =========================================================================
+    // 1. 学術英語辞書データベース（生体医工学・神経科学・非線形制御・英語論文頻出語）
+    // =========================================================================
+    const ACADEMIC_GLOSSARY = {
+      "global linearization": {
+        ipa: "/ˈɡloʊbəl ˌlɪniərəˈzeɪʃən/",
+        meaning: "大域的線形化",
+        nuance: "局所的なテイラー展開（ヤコビアン線形化）と対比し、クープマン作用素などで状態空間全体の非線形ダイナミクスを無限次元（または高次元リフティング空間）で線形表現する際の重要用語。"
+      },
+      "vagal withdrawal": {
+        ipa: "/ˈveɪɡəl wɪðˈdrɔːəl/",
+        meaning: "迷走神経離脱（副交感神経活動の急速な抑制）",
+        nuance: "能動的起立直後（0〜5秒）や運動開始時に心臓迷走神経ブレーキが外れて心拍数が急上昇する生理現象を表す定番表現。"
+      },
+      "baroreflex sensitivity": {
+        ipa: "/ˌbæroʊˈriːflɛks ˌsɛnsɪˈtɪvɪti/",
+        meaning: "圧受容体反射感受性（BRS）",
+        nuance: "血圧変動に対して心拍間隔（RR間隔）がどれだけ敏感に補償応答するかを示す自律神経の復元力・恒常性指標。"
+      },
+      "transient overshoot": {
+        ipa: "/ˈtrænziənt ˈoʊvərʃuːt/",
+        meaning: "過渡的オーバーシュート（一過性の過剰応答）",
+        nuance: "起立負荷やステップ入力に対して、定常値へ落ち着く前に一時的に目標値を超えて跳ね上がる制御工学・生理学の共通表現。"
+      },
+      "elucidate": {
+        ipa: "/ɪˈluːsɪdeɪt/",
+        meaning: "〜を解明する、明らかにする",
+        nuance: "DiscussionやIntroductionで「複雑な生理学的機序や数理的関係を明らかにする」際に頻出するフォーマル動詞（clarifyより学術的）。"
+      },
+      "attenuate": {
+        ipa: "/əˈtɛnjueɪt/",
+        meaning: "〜を減弱させる、緩和する",
+        nuance: "「交感神経の過剰反応を抑える」「スペクトル漏れを低減する」など、生体信号・薬理効果・フィルタ特性のすべてに使える万能動詞。"
+      },
+      "outperform": {
+        ipa: "/ˌaʊtpərˈfɔːrm/",
+        meaning: "〜の性能を上回る、凌駕する",
+        nuance: "Resultsで提案手法が従来手法（conventional benchmarks）より高い予測精度やAUCを達成したことを述べる際の定石動詞。"
+      },
+      "non-stationarity": {
+        ipa: "/nɒn ˌsteɪʃəˈnærɪti/",
+        meaning: "非定常性",
+        nuance: "時間経過とともに平均・分散・周波数スペクトルが変化する性質。起立過渡期や認知負荷中の生体信号で従来のFFT/ARが破綻する主因として頻出。"
+      },
+      "exogenous covariates": {
+        ipa: "/ɛkˈsɒdʒɪnəs koʊˈvɛəriəts/",
+        meaning: "外因性共変量（外部入力変数）",
+        nuance: "点過程モデルやARXモデルにおいて、自己の過去履歴以外に外部からシステムへ入力される説明変数（例：脳波エントロピー mEEG）を指す。"
+      },
+      "interoceptive": {
+        ipa: "/ˌɪntəroʊˈsɛptɪv/",
+        meaning: "内受容感覚の",
+        nuance: "心拍・呼吸・胃腸などの内臓状態が求心性神経（迷走神経など）を介して脳へ伝えられる感覚処理（Bottom-up連関）を表す重要形容詞。"
+      },
+      "lateralization": {
+        ipa: "/ˌlætərəlaɪˈzeɪʃən/",
+        meaning: "側性化（大脳半球の機能的非対称性）",
+        nuance: "左半球（C3/P3）が副交感神経ブレーキ、右半球（C4/島皮質）が交感神経ドライブを優位に制御する大脳半球の左右差を指す。"
+      },
+      "prodromal": {
+        ipa: "/proʊˈdroʊməl/",
+        meaning: "前駆期の（発症前段階の）",
+        nuance: "認知症（ADやレビー小体型）やてんかん発作において、典型的な臨床症状が現れる前の早期段階を指す医学最重要語。"
+      },
+      "locus coeruleus": {
+        ipa: "/ˈloʊkəs sɪˈruːliəs/",
+        meaning: "青斑核（せいはんかく）",
+        nuance: "脳幹背側に位置するノルアドレナリン作動性神経核。アルツハイマー病で海馬より10年以上早くタウ病理が出現し、自律神経・覚醒制御の中枢を担う。"
+      },
+      "surrogate data testing": {
+        ipa: "/ˈsɜːrəɡət ˈdeɪtə ˈtɛstɪŋ/",
+        meaning: "サロゲートデータ検定",
+        nuance: "位相ランダム化（IAAFT等）により線形スペクトル特性のみを保存した人工データと比較し、観測時系列の真の非線形性を統計証明する手法。"
+      },
+      "closed-loop control": {
+        ipa: "/kloʊzd luːp kənˈtroʊl/",
+        meaning: "閉ループ制御（フィードバック制御）",
+        nuance: "生体からのリアルタイム計測値をフィードバックして刺激入力（taVNSや呼吸誘導など）を逐次最適化する制御方式。"
+      }
+    };
+
+    // =========================================================================
+    // 2. 初期データセット（全文5セクション対訳＋各セクション末図解＆英語表現付）
+    // =========================================================================
+    const INITIAL_ITEMS = [
+      // -----------------------------------------------------------------------
+      // [論文 1] RC + Koopman作用素（全文5セクション完全収録）
+      // -----------------------------------------------------------------------
+      {
+        id: "paper-2026-11-17",
+        entry_type: "daily_paper",
+        date: "2026-11-17",
+        isToday: true,
+        category: "RC + Koopman制御",
+        title_ja: "リザバーコンピューティングとクープマン作用素を用いた非線形心拍自律神経ダイナミクスの大域的線形化と過渡応答解析",
+        title_en: "Global Linearization and Transient Eigenmode Analysis of Nonlinear Cardiac Autonomic Dynamics Using Reservoir Computing and Koopman Operator",
+        journal: "IEEE Transactions on Biomedical Engineering",
+        impact_factor: 11.4,
+        doi: "10.1109/TBME.2026.3418920",
+        tags: ["Koopman作用素", "リザバーコンピューティング", "能動的起立試験", "固有値・極座標解析", "線形状態空間"],
+        summary: {
+          problem: "従来の心拍変動（HRV）周波数解析（LF/HF）は信号の定常性を前提としており、能動的起立試験直後（0〜30秒）のような非線形・非定常な自律神経の急変（迷走神経離脱と交感神経オーバーシュート）を正確に追跡できない。また、閉ループ生体制御（モデル予測制御：MPC）を実現するためには、非線形ダイナミクス $x_{k+1} = F(x_k, u_k)$ を大域的に線形表現する枠組みが不可欠であった。",
+          solution_and_method: "遅延埋め込みによる時間差情報の抽出、エコーステートネットワーク（ESN）による高次元非線形リフティング、そして逐次最小二乗法（RLS）によるクープマン状態遷移行列 $A$ のオンライン同定を組み合わせ、固有値 $\\mu_i = r_i e^{j\\theta_i}$ の極座標特性から内在固有振動数と減衰復元力を定量化した。",
+          diagram_caption: "図：遅延埋め込みRR間隔入力からESNリフティング空間を経て、クープマン状態遷移行列Aの極座標固有値を抽出する数理パイプライン",
+          diagram_svg: `<svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="212" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="20" y="28" width="180" height="164" rx="10" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/><text x="110" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#3730a3">1. 遅延埋め込み u_k</text><text x="110" y="80" text-anchor="middle" font-size="9.5" fill="#1e293b">[RR_k, ..., RR_{k-d}]ᵀ</text><text x="110" y="105" text-anchor="middle" font-size="9" fill="#4f46e5">迷走(&lt;1s)・交感(3-5s)</text><text x="110" y="122" text-anchor="middle" font-size="9" fill="#4f46e5">の時間差履歴を束ねる</text><rect x="220" y="28" width="185" height="164" rx="10" fill="#f0fdfa" stroke="#2dd4bf" stroke-width="1.5"/><text x="312" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#115e59">2. ESNリザバー r_k</text><text x="312" y="80" text-anchor="middle" font-size="9.5" fill="#134e4a">マルチタイムスケール</text><text x="312" y="100" text-anchor="middle" font-size="9.5" fill="#134e4a">観測関数辞書へ射影</text><text x="312" y="125" text-anchor="middle" font-size="9" fill="#0f766e">高次元リフティング</text><rect x="425" y="28" width="180" height="164" rx="10" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/><text x="515" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#92400e">3. クープマン行列 A</text><text x="515" y="80" text-anchor="middle" font-size="9.5" fill="#78350f">z_{k+1} ≈ A z_k + B u_k</text><text x="515" y="105" text-anchor="middle" font-size="9" fill="#b45309">1拍ごとのRLS更新</text><text x="515" y="125" text-anchor="middle" font-size="9" fill="#b45309">状態遷移を直接同定</text><rect x="625" y="28" width="175" height="164" rx="10" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/><text x="712" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#991b1b">4. 固有値極座標</text><text x="712" y="80" text-anchor="middle" font-size="9.5" fill="#7f1d1d">μ_i = r_i e^{jθ_i}</text><text x="712" y="105" text-anchor="middle" font-size="9" fill="#991b1b">θ_i: 内在固有振動数</text><text x="712" y="125" text-anchor="middle" font-size="9" fill="#991b1b">r_i: 減衰率・復元力</text></svg>`,
+          key_results: "健常者24名の能動的起立試験において、起立後0〜15秒の過渡期RR間隔予測誤差が従来線形ARモデル比で42%低減。起立直後の迷走神経離脱に伴う高周波極の動径急減と、圧受容体反射モードの単位円接近・減衰振動軌跡を定量化した。",
+          discussion_and_implications: "不完全な既存HRV指標を教師にせず状態遷移そのものを同定することで、固定周波数帯域の仮定に縛られない自律神経復元力評価と閉ループ線形MPCへの道を開いた。",
+          relevance_to_my_research: "能動的起立試験（計測5〜8分、初期Washout 30〜50拍＋RLSオンライン更新）の数理設計と完全一致。複素共役極と実数極の比率比較により過渡応答の定量的指標を確立できる。"
+        },
+        abstract_ja: "生体の心臓自律神経制御は本質的に非線形かつ非定常であり、体位変換などの急激な外乱に対する過渡応答を従来の線形周波数指標で捉えることには限界がある。本研究では、エコーステートネットワーク（ESN）をクープマン作用素の有限次元近似辞書として活用し、不均等な心拍間隔時系列を大域的線形状態空間へリフティングする手法を提案する。",
+        abstract_en: "Cardiac autonomic regulation is inherently nonlinear and non-stationary, limiting the validity of conventional stationary spectral indices during rapid physiological transitions such as active standing. Here, we employ an Echo State Network (ESN) as a data-driven dictionary of observables for the Koopman operator, lifting beat-to-beat RR interval dynamics into a globally linear state space.",
+        full_text_sections: [
+          {
+            id: "sec-intro",
+            title_en: "1. Introduction",
+            title_ja: "1. イントロダクション（研究背景と目的）",
+            paragraphs: [
+              {
+                en: "The human cardiovascular system maintains hemodynamic homeostasis through continuous, bidirectional interactions between the central autonomic network and cardiac pacemaker cells. When a healthy individual transitions from a supine to an upright posture during an active standing test, gravitational blood pooling in the lower extremities triggers an immediate cascade of autonomic adjustments.",
+                ja: "ヒトの心血管系は、中枢自律神経ネットワークと心臓ペースメーカー細胞との間の継続的かつ双方向的な相互作用を通じて血行動態の恒常性を維持している。健常者が能動的起立試験において仰臥位から立位へと姿勢を移行すると、重力による下肢への血液貯留が引き金となり、一連の急速な自律神経調整が即座に誘発される。"
+              },
+              {
+                en: "Specifically, the first 0 to 5 seconds following standing onset are characterized by abrupt vagal withdrawal, resulting in a rapid shortening of R-R intervals. Between 5 and 15 seconds, a compensatory sympathetic surge induces a transient overshoot in heart rate and vascular resistance, followed by baroreflex-mediated damped oscillations between 15 and 30 seconds before settling into a new upright steady state.",
+                ja: "具体的には、起立開始後0〜5秒は急激な迷走神経離脱（vagal withdrawal）によって特徴づけられ、R-R間隔が急速に短縮する。続いて5〜15秒の間には代償性の交感神経サージが心拍数と血管抵抗に一過性のオーバーシュートを引き起こし、その後15〜30秒の間に圧受容体反射を介した減衰振動を経て、新たな立位定常状態へと収束する。"
+              },
+              {
+                en: "Conventional heart rate variability (HRV) spectral indices, such as low-frequency (LF: 0.04–0.15 Hz) and high-frequency (HF: 0.15–0.40 Hz) power, rely fundamentally on the assumption of signal stationarity over sliding windows of 30 seconds to several minutes. Consequently, this inherent non-stationarity during rapid postural transitions severely distorts traditional spectral estimates, smoothing out critical transient biomarkers of autonomic resilience.",
+                ja: "低周波（LF: 0.04–0.15 Hz）および高周波（HF: 0.15–0.40 Hz）パワーといった従来の心拍変動（HRV）スペクトル指標は、30秒から数分のスライディングウィンドウ内における信号の定常性の仮定に根本的に依存している。その結果、急速な姿勢変換時におけるこの本質的な非定常性が従来のスペクトル推定値を著しく歪め、自律神経の復元力を示す重要な過渡的バイオマーカーを平滑化して消失させてしまう。"
+              },
+              {
+                en: "Furthermore, advancing from passive physiological monitoring to closed-loop control of autonomic states—via respiratory pacing or transcutaneous auricular vagus nerve stimulation (taVNS)—requires a mathematically tractable linear state-space representation. To overcome these limitations, we propose a data-driven framework combining Reservoir Computing (RC) and Koopman operator theory to achieve global linearization of nonlinear beat-to-beat cardiac dynamics without relying on distorted HRV labels.",
+                ja: "さらに、受動的な生理モニタリングから、呼吸ペーシングや経皮的耳介迷走神経刺激（taVNS）を介した自律神経状態の閉ループ制御へと発展させるためには、数学的に扱いやすい線形状態空間表現が不可欠である。これらの限界を克服するため、本研究ではリザバーコンピューティング（RC）とクープマン作用素理論を統合し、歪んだ既存HRV指標を教師ラベルとして用いることなく、非線形な拍動ダイナミクスの大域的線形化を実現するデータ駆動型フレームワークを提案する。"
+              }
+            ],
+            takeaways: [
+              "能動的起立後0〜30秒は「0–5s：迷走神経離脱」「5–15s：交感神経オーバーシュート」「15–30s：圧受容体反射による減衰振動」という3段階の非定常過渡応答を呈する。",
+              "30秒以上の窓幅を要する従来のLF/HFスペクトル解析は、定常性仮定の破綻により起立直後の重要な過渡応答を歪めてしまう。",
+              "本研究の目的は、RC＋クープマン作用素によって非線形心拍ダイナミクスを大域的線形空間へ写像し、固有値解析と将来の閉ループ制御の基盤を築くことにある。"
+            ],
+            diagram_caption: "イントロダクション図解：能動的起立試験0〜30秒の3相生理応答と、従来HRV窓解析の破綻メカニズム",
+            diagram_svg: `<svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="212" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><text x="410" y="26" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#0f172a">能動的起立試験（0〜30秒）の3相過渡応答 vs 従来HRV解析の限界</text><line x1="60" y1="165" x2="770" y2="165" stroke="#64748b" stroke-width="1.5"/><line x1="60" y1="45" x2="60" y2="165" stroke="#64748b" stroke-width="1.5"/><text x="35" y="105" text-anchor="middle" font-size="10" fill="#475569" transform="rotate(-90 35 105)">RR間隔 [ms]</text><rect x="160" y="45" width="110" height="120" fill="#fef2f2" opacity="0.8"/><rect x="270" y="45" width="160" height="120" fill="#fffbeb" opacity="0.8"/><rect x="430" y="45" width="200" height="120" fill="#f0fdfa" opacity="0.8"/><path d="M 65 70 L 160 70 C 190 70, 220 145, 270 150 C 310 153, 330 120, 380 128 C 430 135, 470 95, 520 112 C 560 122, 590 106, 630 110 L 760 110" fill="none" stroke="#4f46e5" stroke-width="3"/><line x1="160" y1="42" x2="160" y2="168" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/><text x="160" y="182" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#dc2626">起立開始 (0s)</text><text x="215" y="62" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#991b1b">Phase 1 (0-5s)</text><text x="215" y="76" text-anchor="middle" font-size="8.5" fill="#b91c1c">即時迷走神経離脱</text><text x="350" y="62" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#92400e">Phase 2 (5-15s)</text><text x="350" y="76" text-anchor="middle" font-size="8.5" fill="#b45309">交感神経オーバーシュート</text><text x="530" y="62" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#115e59">Phase 3 (15-30s)</text><text x="530" y="76" text-anchor="middle" font-size="8.5" fill="#0f766e">圧受容体反射・減衰振動</text><rect x="160" y="188" width="470" height="20" rx="5" fill="#fee2e2" stroke="#f87171"/><text x="395" y="201" text-anchor="middle" font-size="9" font-weight="bold" fill="#991b1b">× 従来LF/HF（30〜60秒固定窓）ではこの3相の急変がすべて平均化・破綻する</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "A is characterized by [Noun Phrase], resulting in [Effect].",
+                example: "The first 0 to 5 seconds following standing onset are characterized by abrupt vagal withdrawal, resulting in a rapid shortening of R-R intervals.",
+                note: "過渡フェーズの生理学的特徴と、それによって生じる直接的結果を因果関係で明快に記述する定番構文。"
+              },
+              {
+                pattern: "Conventional [Methods] rely fundamentally on the assumption of [Condition]. Consequently, [Limitation].",
+                example: "Conventional HRV spectral indices rely fundamentally on the assumption of signal stationarity. Consequently, non-stationarity severely distorts traditional estimates.",
+                note: "先行研究の手法が前提としている仮定（定常性など）を指摘し、なぜそれが破綻するのかを論理的に導くイントロの黄金パターン。"
+              }
+            ]
+          },
+          {
+            id: "sec-methods",
+            title_en: "2. Methods",
+            title_ja: "2. 方法（実験プロトコルとRC＋クープマン数理モデル）",
+            paragraphs: [
+              {
+                en: "Twenty-four healthy young adults participated in an active standing protocol lasting 6 minutes (360 seconds), consisting of a 3-minute supine baseline period followed by a rapid self-initiated transition to standing and a 3-minute upright maintenance phase. Beat-to-beat R-R intervals were extracted from high-resolution electrocardiogram (ECG) recordings sampled at 1000 Hz.",
+                ja: "健常若年成人24名が、6分間（360秒）の能動的起立プロトコルに参加した。プロトコルは3分間の安静仰臥位ベースライン期間、それに続く迅速な自発的起立動作、および3分間の立位維持フェーズで構成された。1000 Hzでサンプリングされた高分解能心電図（ECG）記録から、1拍ごとのR-R間隔を抽出した。"
+              },
+              {
+                en: "To capture the physiological latency difference between fast parasympathetic modulation (< 1 s) and slower sympathetic drive (3–5 s), we first constructed a time-delay embedded input vector $u_k = [RR_k, RR_{k-1}, \\dots, RR_{k-d}]^\\top \\in \\mathbb{R}^{d+1}$ with embedding dimension $d = 5$. This vector serves as the input to an Echo State Network (ESN) reservoir comprising $N_r = 100$ nonlinear leaky-integrator neurons:",
+                ja: "高速な副交感神経変調（1秒未満）と遅い交感神経ドライブ（3〜5秒）との間の生理学的伝達遅延差を捉えるため、まず埋め込み次元 $d = 5$ とする時間遅延埋め込み入力ベクトル $u_k = [RR_k, RR_{k-1}, \\dots, RR_{k-d}]^\\top \\in \\mathbb{R}^{d+1}$ を構築した。このベクトルは、$N_r = 100$ 個の非線形リーク積分ニューロンからなるエコーステートネットワーク（ESN）リザバーへの入力となる："
+              },
+              {
+                en: "$$r_k = (1 - a) r_{k-1} + a \\tanh\\left( W_{\\text{in}} \\begin{bmatrix} 1 \\\\ u_k \\end{bmatrix} + W_{\\text{res}} r_{k-1} \\right)$$ where $W_{\\text{in}}$ is the fixed random input weight matrix, $W_{\\text{res}}$ is the sparse recurrent reservoir matrix scaled to a spectral radius $\\rho = 0.92 < 1$ to guarantee the echo state property, and $a \\in (0, 1]$ denotes multi-timescale leak rates spanning fast and slow autonomic time constants.",
+                ja: "$$r_k = (1 - a) r_{k-1} + a \\tanh\\left( W_{\\text{in}} \\begin{bmatrix} 1 \\\\ u_k \\end{bmatrix} + W_{\\text{res}} r_{k-1} \\right)$$ ここで、$W_{\\text{in}}$ は固定ランダム入力重み行列、$W_{\\text{res}}$ はエコーステート性を保証するためにスペクトル半径 $\\rho = 0.92 < 1$ にスケーリングされた疎な再帰リザバー行列であり、$a \\in (0, 1]$ は高速および低速な自律神経時定数をカバーするマルチタイムスケールなリーク率を表す。"
+              },
+              {
+                en: "Rather than regressing onto biased stationary HRV indices as target labels, we formed the lifted Koopman observable state $z_k = [u_k^\\top, r_k^\\top]^\\top$ and directly identified the linear state-transition operator $A$ governing $z_{k+1} \\approx A z_k$. After discarding the initial 40 beats as reservoir washout, $A$ was updated beat-by-beat using Recursive Least Squares (RLS) with a forgetting factor $\\lambda_{\\text{RLS}} = 0.96$, followed by eigendecomposition $A v_i = \\mu_i v_i$ to extract polar coordinates $\\mu_i = r_i e^{j\\theta_i}$.",
+                ja: "バイアスを含んだ定常HRV指標を教師ラベルとして回帰するのではなく、リフティングされたクープマン観測状態 $z_k = [u_k^\\top, r_k^\\top]^\\top$ を構成し、$z_{k+1} \\approx A z_k$ を支配する線形状態遷移作用素 $A$ を直接同定した。リザバーの初期過渡（ウォッシュアウト）として最初の40拍を破棄した後、忘却係数 $\\lambda_{\\text{RLS}} = 0.96$ の逐次最小二乗法（RLS）を用いて $A$ を1拍ごとに更新し、固有値分解 $A v_i = \\mu_i v_i$ を行って極座標 $\\mu_i = r_i e^{j\\theta_i}$ を抽出した。"
+              }
+            ],
+            takeaways: [
+              "計測プロトコルは計6分（仰臥位3分＋起立動作＋立位3分）で、初期40拍をWashoutとして破棄する。",
+              "過去5拍の遅延埋め込みベクトル $u_k$ をマルチタイムスケールESNへ入力し、高次元リフティング状態 $z_k = [u_k^\\top, r_k^\\top]^\\top$ を構成する。",
+              "既存HRV指標を正解ラベルにせず、1ステップ先の状態 $z_{k+1}$ そのものをRLSで直接学習し、行列 $A$ の固有値 $\\mu_i = r_i e^{j\\theta_i}$ を拍単位で追跡する。"
+            ],
+            diagram_caption: "方法図解：遅延埋め込み入力・マルチタイムスケールESN・RLSオンライン更新によるクープマン固有値抽出アルゴリズム",
+            diagram_svg: `<svg viewBox="0 0 820 215" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="207" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="18" y="25" width="175" height="165" rx="10" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/><text x="105" y="46" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#3730a3">Step 1: 遅延埋め込み (d=5)</text><text x="105" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">u_k = [RR_k, ..., RR_{k-5}]ᵀ</text><text x="105" y="98" text-anchor="middle" font-size="9" fill="#4f46e5">迷走神経(&lt;1s)と交感神経</text><text x="105" y="114" text-anchor="middle" font-size="9" fill="#4f46e5">(3-5s)の時間差情報を保持</text><text x="105" y="150" text-anchor="middle" font-size="9" fill="#475569">初期40拍はWashout破棄</text><rect x="215" y="25" width="185" height="165" rx="10" fill="#f0fdfa" stroke="#2dd4bf" stroke-width="1.5"/><text x="307" y="46" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#115e59">Step 2: ESNリザバー (N=100)</text><text x="307" y="72" text-anchor="middle" font-size="9.5" fill="#134e4a">スペクトル半径 ρ = 0.92</text><text x="307" y="94" text-anchor="middle" font-size="9.5" fill="#134e4a">マルチリーク率 a ∈ (0,1]</text><text x="307" y="122" text-anchor="middle" font-size="9" fill="#0f766e">高次元非線形基底辞書 r_k</text><text x="307" y="148" text-anchor="middle" font-size="9" fill="#0f766e">リフティング: z_k = [u_kᵀ, r_kᵀ]ᵀ</text><rect x="422" y="25" width="185" height="165" rx="10" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/><text x="514" y="46" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#92400e">Step 3: RLSオンライン同定</text><text x="514" y="72" text-anchor="middle" font-size="9.5" fill="#78350f">z_{k+1} ≈ A z_k (忘却係数 0.96)</text><text x="514" y="98" text-anchor="middle" font-size="9" fill="#b45309">不完全なLF/HFラベルを使わず</text><text x="514" y="114" text-anchor="middle" font-size="9" fill="#b45309">状態遷移そのものを直接学習</text><text x="514" y="148" text-anchor="middle" font-size="9" fill="#78350f">1拍ごとに線形行列 A を更新</text><rect x="629" y="25" width="173" height="165" rx="10" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/><text x="715" y="46" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#991b1b">Step 4: 固有値極座標分解</text><text x="715" y="72" text-anchor="middle" font-size="9.5" fill="#7f1d1d">A v_i = μ_i v_i</text><text x="715" y="96" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#dc2626">μ_i = r_i e^{jθ_i}</text><text x="715" y="124" text-anchor="middle" font-size="9" fill="#991b1b">θ_i: データ駆動固有振動数</text><text x="715" y="146" text-anchor="middle" font-size="9" fill="#991b1b">τ_i = -Δt / ln(r_i): 復元時定数</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "To capture [Physiological Feature], we constructed [Mathematical Object] defined as [Equation].",
+                example: "To capture the physiological latency difference between fast parasympathetic modulation and slower sympathetic drive, we constructed a time-delay embedded input vector.",
+                note: "数式や入力ベクトルを導入する際、「なぜその構造が必要なのか（生理学的動機）」を冒頭のTo不定詞句で明示する書き方。"
+              },
+              {
+                pattern: "Rather than [Conventional Approach], we formed [Proposed Representation] and directly identified [Operator].",
+                example: "Rather than regressing onto biased stationary HRV indices as target labels, we formed the lifted Koopman observable state and directly identified the linear state-transition operator.",
+                note: "従来手法との設計思想の違い（教師ラベルを使わないこと等）を鮮明に対比させる表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-results",
+            title_en: "3. Results",
+            title_ja: "3. 結果（予測精度および複素平面上の根軌跡変化）",
+            paragraphs: [
+              {
+                en: "During the critical 0 to 15-second transient window immediately following active standing, the RC-Koopman model significantly outperformed both conventional linear autoregressive (AR) models and sliding-window FFT estimators, reducing one-step-ahead R-R interval prediction root-mean-square error (RMSE) by 42.3% ($14.2 \\pm 3.1\\text{ ms}$ vs. $24.6 \\pm 5.8\\text{ ms}$, $p < 0.001$).",
+                ja: "能動的起立直後の重要な0〜15秒の過渡ウィンドウにおいて、RC-クープマンモデルは従来の線形自己回帰（AR）モデルおよびスライディングウィンドウFFT推定器の双方を有意に凌駕し（outperformed）、1ステップ先のR-R間隔予測の二乗平均平方根誤差（RMSE）を42.3%低減した（$14.2 \\pm 3.1\\text{ ms}$ 対 $24.6 \\pm 5.8\\text{ ms}$, $p < 0.001$）。"
+              },
+              {
+                en: "Polar coordinate tracking of the dominant Koopman eigenvalues $\\mu_i = r_i e^{j\\theta_i}$ revealed distinct, phase-locked trajectories across the complex plane. During supine rest, a prominent complex-conjugate pole pair resided around $0.25\\text{ Hz}$ (respiratory sinus arrhythmia) with a high modulus $r_i = 0.88 \\pm 0.04$, reflecting strong vagal tone.",
+                ja: "主要なクープマン固有値 $\\mu_i = r_i e^{j\\theta_i}$ の極座標追跡により、複素平面上で明確かつフェーズに同期した軌跡が明らかになった。仰臥位安静中には、顕著な複素共役極ペアが $0.25\\text{ Hz}$ 付近（呼吸性洞性不整脈）に高い動径 $r_i = 0.88 \\pm 0.04$ を伴って位置しており、強い迷走神経緊張を反映していた。"
+              },
+              {
+                en: "Within 3 seconds of standing initiation, the modulus of this high-frequency mode plummeted to $r_i = 0.41 \\pm 0.07$ ($p < 0.001$), quantifying rapid vagal withdrawal. Simultaneously, a slower baroreflex eigenmode near $0.10\\text{ Hz}$ migrated outward toward the unit circle boundary ($r_i$ peaking at $0.97 \\pm 0.02$ around 10 seconds post-standing), corresponding to underdamped sympathetic-baroreflex oscillations before contracting back to $r_i = 0.82 \\pm 0.05$ in the upright steady state.",
+                ja: "起立開始から3秒以内に、この高周波モードの動径は $r_i = 0.41 \\pm 0.07$ へと急落し（$p < 0.001$）、急速な迷走神経離脱を定量化した。同時に、$0.10\\text{ Hz}$ 付近のより遅い圧受容体反射固有モードが単位円境界に向かって外側へ移動し（起立後約10秒で $r_i$ が $0.97 \\pm 0.02$ のピークに到達）、立位定常状態において $r_i = 0.82 \\pm 0.05$ へと再び収縮する前に、不足減衰の交感神経-圧受容体反射振動が生じる様子と一致した。"
+              }
+            ],
+            takeaways: [
+              "起立後0〜15秒の過渡期RR間隔予測誤差（RMSE）が従来線形ARモデル比で42.3%有意に低減（p < 0.001）。",
+              "起立3秒以内に高周波モード（0.25 Hz付近）の動径 r_i が 0.88 → 0.41 へ急落し、迷走神経離脱を即時捕捉。",
+              "起立10秒前後で0.10 Hz付近の圧受容体反射極の動径 r_i が単位円（0.97）へ接近し、その後減衰振動を経て立位定常値（0.82）へ収束する根軌跡が実証された。"
+            ],
+            diagram_caption: "結果図解：複素単位円上におけるクープマン固有値 μ_i = r_i e^{jθ_i} の起立前後根軌跡（Root Locus）シフト",
+            diagram_svg: `<svg viewBox="0 0 820 225" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="217" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><circle cx="210" cy="115" r="82" fill="#ffffff" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/><line x1="115" y1="115" x2="305" y2="115" stroke="#94a3b8" stroke-width="1"/><line x1="210" y1="22" x2="210" y2="208" stroke="#94a3b8" stroke-width="1"/><text x="298" y="108" font-size="9" fill="#64748b">Re</text><text x="216" y="32" font-size="9" fill="#64748b">Im</text><text x="210" y="216" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#334155">単位円 |μ| = 1（安定境界）</text><circle cx="245" cy="52" r="6" fill="#0d9488"/><circle cx="222" cy="86" r="6" fill="#99f6e4" stroke="#0d9488" stroke-width="1.5"/><path d="M 242 58 L 226 80" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="2,2"/><text x="325" y="55" font-size="9.5" font-weight="bold" fill="#0f766e">● HF極 (0.25 Hz): 迷走神経離脱</text><text x="335" y="70" font-size="9" fill="#334155">仰臥位 r=0.88 → 起立3s後 r=0.41 へ急収縮</text><circle cx="268" cy="82" r="5" fill="#f59e0b"/><circle cx="286" cy="74" r="6.5" fill="#dc2626"/><path d="M 268 82 L 281 76" stroke="#dc2626" stroke-width="1.8"/><text x="325" y="110" font-size="9.5" font-weight="bold" fill="#b91c1c">● 圧受容体極 (0.10 Hz): 過渡オーバーシュート</text><text x="335" y="125" font-size="9" fill="#334155">起立10sで単位円境界(r=0.97)へ接近（不足減衰振動）</text><text x="335" y="140" font-size="9" fill="#334155">その後 r=0.82 へ収束し立位定常状態を維持</text><rect x="325" y="158" width="465" height="42" rx="8" fill="#eef2ff" stroke="#818cf8"/><text x="557" y="176" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#312e81">1ステップ先予測誤差（起立0–15s）: 従来AR 24.6 ms → 本手法 14.2 ms (-42.3%)</text><text x="557" y="191" text-anchor="middle" font-size="9" fill="#4338ca">複素共役極と実数極のバランスが自律神経の「復元力」を直接数値化</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "During [Phase], the proposed model significantly outperformed [Benchmarks], reducing [Metric] by X% (p < 0.001).",
+                example: "During the critical 0 to 15-second transient window, the RC-Koopman model significantly outperformed both conventional AR models and FFT estimators, reducing RMSE by 42.3%.",
+                note: "Results冒頭で最もインパクトのある定量成果を簡潔に宣言する基本テンプレート。"
+              },
+              {
+                pattern: "Polar coordinate tracking of [Eigenvalues] revealed distinct, phase-locked trajectories across [Domain].",
+                example: "Polar coordinate tracking of the dominant Koopman eigenvalues revealed distinct, phase-locked trajectories across the complex plane.",
+                note: "数学的指標（固有値）の挙動が生理学的フェーズと厳密に同期していることを示す表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-discussion",
+            title_en: "4. Discussion",
+            title_ja: "4. 考察（生理学的メカニズムと既存手法との比較）",
+            paragraphs: [
+              {
+                en: "The primary contribution of this study is demonstrating that Koopman spectral analysis on an ESN lifting space disentangles rapid vagal withdrawal from slower baroreflex-mediated sympathetic compensation without imposing arbitrary frequency boundaries. In conventional AR residue decomposition or sliding-window FFT, spectral leakage from very-low-frequency (VLF) trends and abrupt jumps across the 0.15 Hz boundary often obscure transient physiological dynamics.",
+                ja: "本研究の主要な貢献は、ESNリフティング空間上のクープマン・スペクトル解析を用いることで、恣意的な周波数境界を課すことなく、急速な迷走神経離脱と遅い圧受容体反射を介した交感神経代償とを分離できると実証した点にある。従来のAR留数分解やスライディングウィンドウFFTでは、超低周波（VLF）トレンドからのスペクトル漏れや0.15 Hz境界をまたぐ不連続なジャンプが、過渡的な生理ダイナミクスをしばしば不明瞭にしていた。"
+              },
+              {
+                en: "Physiologically, the contraction of the 0.25 Hz eigenvalue modulus within 3 seconds reflects the fast kinetics of acetylcholine unbinding from cardiac muscarinic M2 receptors and closure of GIRK potassium channels. Conversely, the transient migration of the 0.10 Hz mode toward the unit circle ($|\\mu| \\to 1$) captures the delayed $\\beta_1$-adrenergic cAMP/PKA signaling cascade interacting with arterial baroreceptor feedback loops.",
+                ja: "生理学的には、3秒以内の0.25 Hz固有値動径の収縮は、心臓ムスカリン性M2受容体からのアセチルコリン解離およびGIRKカリウムチャネル閉鎖という高速なキネティクスを反映している。対照的に、0.10 Hzモードの単位円（$|\\mu| \\to 1$）方向への一過性移動は、動脈圧受容体フィードバックループと相互作用する遅延性の $\\beta_1$ アドレナリン受容体 cAMP/PKA シグナル伝達カスケードを捉えている。"
+              },
+              {
+                en: "From a clinical perspective, the radial distance $1 - r_i$ from the unit circle provides a direct, quantitative measure of dynamic resilience (restoration force). In patients with prodromal neurodegenerative disorders such as early Alzheimer's disease or orthostatic intolerance, degeneration of the locus coeruleus and central autonomic network may manifest as prolonged proximity of Koopman eigenvalues to the unit circle or a shift from underdamped complex-conjugate poles to overdamped real poles.",
+                ja: "臨床的観点からは、単位円からの動径距離 $1 - r_i$ が動的復元力（restoration force）の直接的かつ定量的な尺度を提供する。早期アルツハイマー病などの前駆期神経変性疾患や起立不耐症の患者においては、青斑核や中枢自律神経ネットワークの変性が、クープマン固有値の単位円近傍への長時間滞留、あるいは不足減衰の複素共役極から過減衰の実数極へのシフトとして現れる可能性がある。"
+              }
+            ],
+            takeaways: [
+              "高周波極の急収縮は「M2受容体・GIRKチャネル閉鎖（ミリ秒〜数秒応答）」、0.10 Hz極の単位円接近は「β1受容体・cAMP/PKAカスケード＋圧受容体反射」の生理機構と対応する。",
+              "単位円からの距離 1 - r_i や「複素共役極 vs 実数極」の比率は、自律神経のレジリエンス（復元力）を測る新たな臨床指標となる。",
+              "認知症前駆期（青斑核変性）や起立性低血圧の超早期診断バイオマーカーへの応用が有望である。"
+            ],
+            diagram_caption: "考察図解：固有値極座標の挙動と心臓自律神経受容体キネティクス（M2/GIRK vs β1/cAMP）の生理学的対応",
+            diagram_svg: `<svg viewBox="0 0 820 205" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="197" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="20" y="24" width="375" height="158" rx="10" fill="#f0fdfa" stroke="#14b8a6" stroke-width="1.5"/><text x="207" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="#115e59">高速経路：迷走神経・副交感キネティクス</text><text x="207" y="70" text-anchor="middle" font-size="9.5" fill="#1e293b">・受容体機序: M2受容体 / GIRKチャネル直接開閉</text><text x="207" y="90" text-anchor="middle" font-size="9.5" fill="#1e293b">・時定数: 1秒未満の超高速応答</text><text x="207" y="114" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#0f766e">→ クープマン表現: 高周波極 r_i の即時収縮</text><text x="207" y="138" text-anchor="middle" font-size="9" fill="#334155">前頭-皮質下抑制回路・青斑核機能の健全性を反映</text><rect x="425" y="24" width="375" height="158" rx="10" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.5"/><text x="612" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="#9f1239">遅延経路：交感神経・圧受容体フィードバック</text><text x="612" y="70" text-anchor="middle" font-size="9.5" fill="#1e293b">・受容体機序: β1受容体 / cAMP-PKAカスケード</text><text x="612" y="90" text-anchor="middle" font-size="9.5" fill="#1e293b">・時定数: 3〜5秒の遅延＋動脈圧受容体反射ループ</text><text x="612" y="114" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#be123c">→ クープマン表現: 0.1Hz極の単位円接近 (1 - r_i)</text><text x="612" y="138" text-anchor="middle" font-size="9" fill="#334155">単位円への過度な接近・過減衰化は復元力低下を示す</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "The primary contribution of this study is demonstrating that [Method] disentangles [Factor A] from [Factor B].",
+                example: "The primary contribution of this study is demonstrating that Koopman spectral analysis disentangles rapid vagal withdrawal from slower sympathetic compensation.",
+                note: "Discussionの第1文で本研究の学術的貢献（何がどう分離・解明できたか）を力強く要約する表現。"
+              },
+              {
+                pattern: "From a clinical perspective, [Metric] provides a direct, quantitative measure of [Physiological Concept].",
+                example: "From a clinical perspective, the radial distance from the unit circle provides a direct, quantitative measure of dynamic resilience.",
+                note: "数理パラメータ（動径距離など）が臨床現場でどのような医学的意味を持つかへ橋渡しする重要表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-conclusion",
+            title_en: "5. Conclusion",
+            title_ja: "5. 結論（総括と閉ループ制御への展望）",
+            paragraphs: [
+              {
+                en: "We have established a data-driven RC-Koopman framework capable of capturing second-by-second nonlinear cardiac autonomic transitions during active standing without relying on stationary HRV assumptions. By directly identifying linear state-transition dynamics in a reservoir-lifted space, our approach quantifies both intrinsic oscillatory frequencies and autonomic restoration forces via polar eigenvalue analysis.",
+                ja: "我々は、定常HRVの仮定に依存することなく、能動的起立中の秒単位の非線形心臓自律神経遷移を捉えることができるデータ駆動型RC-クープマン・フレームワークを確立した。リザバーによってリフティングされた空間内で線形状態遷移ダイナミクスを直接同定することにより、本手法は極座標固有値解析を介して内在固有振動数と自律神経復元力の双方を定量化する。"
+              },
+              {
+                en: "Future work will integrate exogenous control inputs $B u_k$—such as guided respiration, transcutaneous auricular vagus nerve stimulation (taVNS), and functional nutritional interventions—into this linearized Koopman state space to realize real-time Model Predictive Control (MPC) of human brain-heart states.",
+                ja: "今後の研究では、誘導呼吸、経皮的耳介迷走神経刺激（taVNS）、および機能性栄養介入などの外因性制御入力 $B u_k$ をこの線形化されたクープマン状態空間へ統合し、ヒトの脳-心臓状態のリアルタイム・モデル予測制御（MPC）を実現する予定である。"
+              }
+            ],
+            takeaways: [
+              "定常HRV指標を使わずに、RC＋クープマン作用素のみで起立過渡期の非線形自律神経ダイナミクスを大域線形化・定量化することに成功した。",
+              "次のステップは制御入力行列 B を組み込み、taVNSや呼吸誘導による生体システムの閉ループモデル予測制御（KMPC）へ展開することである。"
+            ],
+            diagram_caption: "結論図解：起立過渡解析（Stage 1）からクープマン・モデル予測制御による脳-心臓閉ループ制御（Stage 2）へのロードマップ",
+            diagram_svg: `<svg viewBox="0 0 820 190" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="182" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="30" width="330" height="130" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/><text x="190" y="54" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">達成済（Stage 1）：非線形システムの線形同定</text><text x="190" y="80" text-anchor="middle" font-size="9.5" fill="#1e293b">・ESN + Koopmanによる大域線形化 (z_{k+1} = A z_k)</text><text x="190" y="102" text-anchor="middle" font-size="9.5" fill="#1e293b">・起立0–30s過渡期の極座標復元力評価を確立</text><text x="190" y="124" text-anchor="middle" font-size="9.5" fill="#4338ca">・認知症・自律神経失調の早期診断指標へ</text><path d="M 365 95 L 435 95" stroke="#4f46e5" stroke-width="2.5"/><polygon points="435,90 447,95 435,100" fill="#4f46e5"/><rect x="455" y="30" width="340" height="130" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/><text x="625" y="54" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">次段階（Stage 2）：閉ループ線形MPC制御</text><text x="625" y="80" text-anchor="middle" font-size="9.5" fill="#1e293b">・制御入力行列 B の導入: z_{k+1} = A z_k + B u_k</text><text x="625" y="102" text-anchor="middle" font-size="9.5" fill="#1e293b">・taVNS / 呼吸誘導 / 機能性介入の最適制御</text><text x="625" y="124" text-anchor="middle" font-size="9.5" fill="#047857">・ヒト脳-心臓状態を目標アトラクタへ誘導</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "We have established a data-driven [Framework] capable of capturing [Phenomenon] without relying on [Limitation].",
+                example: "We have established a data-driven RC-Koopman framework capable of capturing second-by-second nonlinear cardiac autonomic transitions without relying on stationary HRV assumptions.",
+                note: "Conclusionの冒頭で達成事項を現在完了形（We have established...）で格調高く締めくくる定型文。"
+              },
+              {
+                pattern: "Future work will integrate [Control Inputs] into [Model] to realize real-time [Application].",
+                example: "Future work will integrate exogenous control inputs into this linearized Koopman state space to realize real-time Model Predictive Control.",
+                note: "次の研究フェーズ（閉ループ制御など）への発展性を明確に示す結びの表現。"
+              }
+            ]
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // [論文 2] 点過程モデル（脳波エントロピー -> RR, 全文5セクション完全収録）
+      // -----------------------------------------------------------------------
+      {
+        id: "paper-2026-11-16",
+        entry_type: "daily_paper",
+        date: "2026-11-16",
+        isToday: false,
+        category: "点過程・脳心臓連関",
+        title_ja: "非均質点過程モデルによる局所脳波エントロピーから心拍間隔への秒単位トップダウン制御の同定",
+        title_en: "Second-by-Second Identification of Top-Down Brain-to-Heart Control from Local EEG Entropy via Inhomogeneous Point-Process Modeling",
+        journal: "Journal of Neural Engineering",
+        impact_factor: 9.8,
+        doi: "10.1088/1741-2552/ad89c4",
+        tags: ["点過程モデル", "脳波エントロピー(mEEG)", "中枢自律神経ネットワーク", "大脳半球側性化", "迷走神経ブレーキ"],
+        summary: {
+          problem: "従来の脳-心臓連関研究では30秒〜数分の時間窓を要するHRV指標と脳波を相関させていたため、認知負荷や機能性成分摂取時の「1〜5秒単位の高速なトップダウン自律神経制御」が見逃されていた。",
+          solution_and_method: "心拍R波発生を逆ガウス点過程として定式化し、過去1〜5秒の局所脳波サンプルエントロピー $mEEG$ を外因性共変量として組み込み、即時迷走神経ブレーキ（正の $\\alpha_j$, $\\Delta t = 1\\text{ s}$）と遅延性交感神経促進（負の $\\alpha_j$, $\\Delta t = 3\\sim 5\\text{ s}$）を分離同定した。",
+          diagram_caption: "図：局所脳波エントロピー（mEEG）の1〜5秒遅延入力による逆ガウス点過程RR間隔変調モデル",
+          diagram_svg: `<svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="192" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="20" y="26" width="210" height="148" rx="10" fill="#f0fdfa" stroke="#14b8a6" stroke-width="1.5"/><text x="125" y="48" text-anchor="middle" font-size="11" font-weight="bold" fill="#115e59">局所脳波エントロピー mEEG</text><text x="125" y="75" text-anchor="middle" font-size="9.5" fill="#1e293b">ラグ Δt = 1〜5 秒 (1秒分解能)</text><text x="125" y="98" text-anchor="middle" font-size="9.5" fill="#0f766e">左半球(C3/P3) vs 右半球(C4)</text><rect x="275" y="20" width="265" height="72" rx="10" fill="#ecfdf5" stroke="#10b981"/><text x="407" y="42" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">即時迷走神経ブレーキ (Δt = 1s, α &gt; 0)</text><text x="407" y="62" text-anchor="middle" font-size="9" fill="#047857">M2受容体・GIRK開口 → RR間隔延長</text><rect x="275" y="108" width="265" height="72" rx="10" fill="#fff1f2" stroke="#f43f5e"/><text x="407" y="130" text-anchor="middle" font-size="10" font-weight="bold" fill="#9f1239">遅延交感神経ドライブ (Δt = 3-5s, α &lt; 0)</text><text x="407" y="150" text-anchor="middle" font-size="9" fill="#be123c">β1受容体・cAMP/PKA → RR間隔短縮</text><rect x="580" y="26" width="220" height="148" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/><text x="690" y="48" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">逆ガウス点過程モデル</text><text x="690" y="76" text-anchor="middle" font-size="9.5" fill="#1e293b">θ_n = μ + Σβ_i RR_{n-i}</text><text x="690" y="96" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#4f46e5">+ Σα_j mEEG(t_n - Δt_j)</text><text x="690" y="125" text-anchor="middle" font-size="9" fill="#3730a3">等間隔補間なしで拍単位同定</text></svg>`,
+          key_results: "GABA摂取・リラックス条件では左半球（C3/P3）の $\\Delta t = 1\\text{ s}$ で正の $\\alpha$ が増強し、認知負荷継続4〜6分後には左右側性化と符号の反転（自律神経ブレーキ破綻）が捉えられた。",
+          discussion_and_implications: "心拍誘発電位（HEP：Bottom-up）と相補的に「脳→心臓（Top-down）」の因果伝達を拍単位で同定可能であり、うつ病やNCG-TMS最適化に直結する。",
+          relevance_to_my_research: "東海ME学会発表の基盤モデル（GABA摂取時のmEEG→RR点過程モデル）と直接対応。課題継続後の符号反転機序の裏付けとなる。"
+        },
+        abstract_ja: "中枢自律神経ネットワークから心臓へのトップダウン制御は数秒オーダーで動的に変化する。本研究では逆ガウス点過程モデルに1〜5秒前の局所脳波サンプルエントロピーを外因性共変量として統合し、即時迷走神経ブレーキと遅延交感神経ドライブを分離同定した。",
+        abstract_en: "Top-down modulation from the central autonomic network to the heart operates on a timescale of seconds. By integrating lagged local EEG sample entropy (1–5 s) as exogenous covariates into an inverse Gaussian point-process model, we decoupled rapid vagal braking from delayed sympathetic drive.",
+        full_text_sections: [
+          {
+            id: "sec-intro",
+            title_en: "1. Introduction",
+            title_ja: "1. イントロダクション（秒単位の脳-心臓トップダウン連関）",
+            paragraphs: [
+              {
+                en: "Bidirectional communication along the brain-heart axis plays a pivotal role in emotional regulation, cognitive resilience, and gut-brain sensory integration. While heartbeat-evoked potentials (HEPs) effectively capture bottom-up interoceptive signaling from the heart to the cortex, quantifying rapid top-down control from the central autonomic network (CAN) to the sinoatrial node remains a major methodological challenge.",
+                ja: "脳-心臓軸に沿った双方向コミュニケーションは、情動制御、認知的レジリエンス、および脳腸感覚統合において極めて重要な役割を果たしている。心拍誘発電位（HEP）が心臓から大脳皮質へのボトムアップな内受容感覚（interoceptive）シグナル伝達を効果的に捉える一方で、中枢自律神経ネットワーク（CAN）から洞房結節への高速なトップダウン制御を定量化することは、依然として大きな方法論的課題である。"
+              },
+              {
+                en: "Furthermore, functional nutritional compounds such as orally ingested gamma-aminobutyric acid (GABA) do not cross the blood-brain barrier in substantial quantities, suggesting that their rapid anxiolytic and parasympathetic effects are mediated via gut-brain vagal afferents projecting to the nucleus tractus solitarius (NTS) and cortical autonomic hubs within seconds. Conventional HRV windowing obscures these sub-5-second dynamics.",
+                ja: "さらに、経口摂取されたガンマアミノ酪酸（GABA）などの機能性栄養成分は血液脳関門をほとんど通過しないため、その迅速な抗不安作用および副交感神経亢進作用は、数秒以内に孤束核（NTS）および皮質自律神経中枢へ投射する脳腸相関の迷走神経求心路を介して媒介されていると考えられる。従来のHRV時間窓解析では、こうした5秒未満のダイナミクスが覆い隠されてしまう。"
+              }
+            ],
+            takeaways: [
+              "HEPが「心臓→脳（Bottom-up）」を測るのに対し、本研究は「脳→心臓（Top-down）」の秒単位制御を同定する。",
+              "血液脳関門を通過しない経口GABA等の作用機序（迷走神経求心路を介した数秒応答）の解明には、時間窓を使わない点過程モデリングが必要である。"
+            ],
+            diagram_caption: "イントロダクション図解：ボトムアップ（HEP）とトップダウン（本点過程モデル）の双方向脳-心臓連関",
+            diagram_svg: `<svg viewBox="0 0 820 185" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="177" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="40" y="32" width="220" height="120" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/><text x="150" y="60" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">大脳皮質・中枢自律神経網</text><text x="150" y="84" text-anchor="middle" font-size="9.5" fill="#3730a3">左半球(C3/P3) vs 右半球(C4)</text><text x="150" y="106" text-anchor="middle" font-size="9" fill="#4338ca">局所脳波エントロピー (mEEG)</text><rect x="560" y="32" width="220" height="120" rx="12" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.5"/><text x="670" y="60" text-anchor="middle" font-size="11" font-weight="bold" fill="#9f1239">心臓洞房結節（RR間隔）</text><text x="670" y="84" text-anchor="middle" font-size="9.5" fill="#be123c">M2受容体 / β1受容体</text><text x="670" y="106" text-anchor="middle" font-size="9" fill="#881337">非均質点過程イベント発生</text><path d="M 265 65 L 552 65" stroke="#0d9488" stroke-width="2.5"/><polygon points="552,60 564,65 552,70" fill="#0d9488"/><text x="410" y="55" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#0f766e">Top-down制御（本モデル：Δt = 1〜5秒）</text><path d="M 555 122 L 268 122" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/><polygon points="268,117 256,122 268,127" fill="#94a3b8"/><text x="410" y="140" text-anchor="middle" font-size="9" fill="#64748b">Bottom-up内受容感覚（HEP / 迷走神経求心路）</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "While [Method A] effectively captures [Bottom-up], quantifying [Top-down] remains a major methodological challenge.",
+                example: "While heartbeat-evoked potentials (HEPs) effectively capture bottom-up interoceptive signaling, quantifying rapid top-down control remains a major methodological challenge.",
+                note: "既存指標（HEP）の役割を認めつつ、本研究が埋めるべきギャップ（Top-down評価）を対比させる高度な表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-methods",
+            title_en: "2. Methods",
+            title_ja: "2. 方法（逆ガウス点過程モデルと外因性mEEG入力）",
+            paragraphs: [
+              {
+                en: "We modeled the stochastic occurrence of R-wave peaks $t_n$ using an inhomogeneous inverse Gaussian probability density function parameterized by instantaneous mean R-R interval $\\theta_n$ and shape parameter $\\lambda$. To incorporate cortical complexity without uniform resampling, local EEG Sample Entropy ($mEEG$) was computed in 1-second epochs and entered as lagged exogenous covariates:",
+                ja: "瞬時平均R-R間隔 $\\theta_n$ および形状パラメータ $\\lambda$ によってパラメータ化された非均質逆ガウス確率密度関数を用いて、R波ピーク $t_n$ の確率的発生をモデル化した。等間隔リサンプリングを行わずに皮質の複雑性を組み込むため、1秒エポックで局所脳波サンプルエントロピー（$mEEG$）を算出し、遅延外因性共変量（exogenous covariates）として入力した："
+              },
+              {
+                en: "$$\\theta_n = \\mu + \\sum_{i=1}^q \\beta_i \\cdot RR_{n-i} + \\sum_{j=1}^{\\text{lag}=5} \\alpha_j \\cdot mEEG(t_n - \\Delta t_j)$$ Here, positive coefficients $\\alpha_j > 0$ at $\\Delta t = 1\\text{ s}$ index rapid vagal braking (R-R prolongation), whereas negative coefficients $\\alpha_j < 0$ at $\\Delta t = 3\\sim 5\\text{ s}$ quantify delayed sympathetic acceleration.",
+                ja: "$$\\theta_n = \\mu + \\sum_{i=1}^q \\beta_i \\cdot RR_{n-i} + \\sum_{j=1}^{\\text{lag}=5} \\alpha_j \\cdot mEEG(t_n - \\Delta t_j)$$ ここで、$\\Delta t = 1\\text{ s}$ における正の係数 $\\alpha_j > 0$ は即時的な迷走神経ブレーキ（RR間隔延長）を指標化し、$\\Delta t = 3\\sim 5\\text{ s}$ における負の係数 $\\alpha_j < 0$ は遅延性の交感神経促進を定量化する。"
+              }
+            ],
+            takeaways: [
+              "等間隔補間を行わない逆ガウス点過程の期待値 θ_n に、過去1〜5秒前の局所脳波サンプルエントロピー mEEG を組み込む。",
+              "係数 α_j の「符号（正 vs 負）」と「遅延時間（1s vs 3–5s）」によって迷走神経と交感神経の寄与を分離する。"
+            ],
+            diagram_caption: "方法図解：1秒分解能mEEGのラグ入力（Δt=1〜5s）と点過程係数 α_j の符号分離",
+            diagram_svg: `<svg viewBox="0 0 820 175" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="167" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="30" width="230" height="115" rx="10" fill="#eef2ff" stroke="#818cf8"/><text x="140" y="54" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#312e81">入力：mEEG(t_n - Δt_j)</text><text x="140" y="78" text-anchor="middle" font-size="9.5" fill="#1e293b">Sample Entropy (m=2, r=0.2SD)</text><text x="140" y="98" text-anchor="middle" font-size="9.5" fill="#4338ca">Δt = 1, 2, 3, 4, 5 秒の5ラグ</text><rect x="295" y="30" width="230" height="115" rx="10" fill="#f0fdfa" stroke="#14b8a6"/><text x="410" y="54" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#115e59">パラメータ同定：最尤推定</text><text x="410" y="78" text-anchor="middle" font-size="9.5" fill="#1e293b">α_1 &gt; 0 : 即時迷走神経ブレーキ</text><text x="410" y="98" text-anchor="middle" font-size="9.5" fill="#be123c">α_{3..5} &lt; 0 : 遅延交感ドライブ</text><rect x="565" y="30" width="230" height="115" rx="10" fill="#fffbeb" stroke="#fbbf24"/><text x="680" y="54" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#92400e">出力：拍単位の因果結合強度</text><text x="680" y="78" text-anchor="middle" font-size="9.5" fill="#78350f">大脳半球側性化（C3 vs C4）</text><text x="680" y="98" text-anchor="middle" font-size="9.5" fill="#78350f">課題中の動的符号反転を検出</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Positive coefficients at [Lag 1] index [Mechanism A], whereas negative coefficients at [Lag 2] quantify [Mechanism B].",
+                example: "Positive coefficients at Δt = 1 s index rapid vagal braking, whereas negative coefficients at Δt = 3–5 s quantify delayed sympathetic acceleration.",
+                note: "数理モデルのパラメータの符号と生理学的解釈を対比させて明快に定義する構文。"
+              }
+            ]
+          },
+          {
+            id: "sec-results",
+            title_en: "3. Results",
+            title_ja: "3. 結果（大脳半球側性化と課題継続に伴う符号反転）",
+            paragraphs: [
+              {
+                en: "During the initial 0 to 2 minutes of mental arithmetic, placebo administration elicited predominantly negative $\\alpha$ values over right central regions (C4) at $\\Delta t = 1\\sim 3\\text{ s}$, indicating sympathetic acceleration. In contrast, oral GABA intake significantly enhanced positive $\\alpha$ values over left fronto-parietal electrodes (C3, P3) at $\\Delta t = 1\\text{ s}$ ($p < 0.01$), consistent with hemispheric lateralization of autonomic control.",
+                ja: "暗算課題の開始後0〜2分において、プラセボ摂取群では右中心部領域（C4）の $\\Delta t = 1\\sim 3\\text{ s}$ で負の $\\alpha$ 値が優位となり、交感神経性促進を示した。対照的に、経口GABA摂取群では左前頭-頭頂電極（C3, P3）の $\\Delta t = 1\\text{ s}$ において正の $\\alpha$ 値が有意に増強し（$p < 0.01$）、自律神経制御の大脳半球側性化（lateralization）と一致した。"
+              },
+              {
+                en: "Remarkably, after 4 to 6 minutes of sustained cognitive load, a spatial and polarity reversal emerged: left-hemispheric $\\alpha$ shifted from positive to negative, capturing the dynamic transition from initial stress adaptation to cognitive resource depletion and vagal brake failure.",
+                ja: "注目すべきことに、認知負荷を4〜6分間継続した後には空間的および極性の反転が出現した。すなわち、左半球の $\\alpha$ が正から負へと移行し、初期のストレス適応から認知リソースの疲弊および迷走神経ブレーキの破綻へと至る動的プロセスが捉えられた。"
+              }
+            ],
+            takeaways: [
+              "課題初期（0–2分）：Placeboは右半球(C4)で負のα（交感優位）、GABAは左半球(C3/P3)で正のα（即時迷走神経ブレーキ）を示した。",
+              "課題後半（4–6分）：認知疲労に伴い左半球のαが正から負へ反転し、迷走神経ブレーキの破綻が拍単位で検出された。"
+            ],
+            diagram_caption: "結果図解：課題初期（0–2分）の左右側性化と、課題継続（4–6分）後の符号反転ダイナミクス",
+            diagram_svg: `<svg viewBox="0 0 820 175" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="167" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="26" width="370" height="122" rx="10" fill="#ecfdf5" stroke="#10b981"/><text x="210" y="48" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#065f46">初期フェーズ（0〜2分）：大脳半球側性化</text><text x="210" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">・GABA摂取群：左半球(C3/P3) Δt=1s で α &gt; 0（迷走ブレーキ）</text><text x="210" y="94" text-anchor="middle" font-size="9.5" fill="#1e293b">・Placebo群：右半球(C4) Δt=1-3s で α &lt; 0（交感促進）</text><text x="210" y="118" text-anchor="middle" font-size="9" fill="#047857">脳腸相関を介した迷走神経求心路の即時緩衝作用</text><rect x="425" y="26" width="370" height="122" rx="10" fill="#fff1f2" stroke="#f43f5e"/><text x="610" y="48" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#9f1239">疲労フェーズ（4〜6分）：極性・空間反転</text><text x="610" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">・左半球(C3)の α が正(+)から負(-)へ反転</text><text x="610" y="94" text-anchor="middle" font-size="9.5" fill="#1e293b">・前頭-皮質下抑制ブレーキの破綻と交感優位化</text><text x="610" y="118" text-anchor="middle" font-size="9" fill="#be123c">時間窓平均法では相殺されて見えない動的遷移を捕捉</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Remarkably, after [Duration] of sustained [Condition], a spatial and polarity reversal emerged.",
+                example: "Remarkably, after 4 to 6 minutes of sustained cognitive load, a spatial and polarity reversal emerged.",
+                note: "時系列解析で最も重要な動的変化（符号の反転など）を強調して導入する際の表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-discussion",
+            title_en: "4. Discussion",
+            title_ja: "4. 考察（臨床応用：精神疾患・てんかん・脳腸相関）",
+            paragraphs: [
+              {
+                en: "The observed polarity reversal during prolonged cognitive stress highlights why time-resolved point-process modeling is essential: averaging across a 6-minute task would cancel out the early positive vagal gain and late negative sympathetic shift. Clinically, loss of the Δt = 1 s positive vagal brake serves as a promising biomarker for prefrontal-subcortical disinhibition in major depressive disorder and PTSD, as well as a real-time target engagement metric for Neuro-Cardiac-Guided TMS (NCG-TMS).",
+                ja: "長時間の認知ストレス中に観測された極性反転は、時間分解能の高い点過程モデリングが不可欠である理由を浮き彫りにしている。6分間の課題全体を平均化してしまうと、初期の正の迷走神経ゲインと後期の負の交感神経シフトが互いに相殺されてしまうからである。臨床的には、Δt = 1 s の正の迷走神経ブレーキの脱落は、うつ病やPTSDにおける前頭-皮質下脱抑制の有望なバイオマーカーとなるとともに、神経心臓誘導TMS（NCG-TMS）におけるリアルタイムの標的エンゲージメント指標として機能する。"
+              }
+            ],
+            takeaways: [
+              "6分間を平均化すると初期の正のαと後期の負のαが相殺されるため、秒単位の時間分解能が不可欠。",
+              "うつ病・PTSDの前頭-皮質下回路評価、NCG-TMSの拍単位最適化、てんかんSUDEP予兆検知への臨床展開が可能。"
+            ],
+            diagram_caption: "考察図解：点過程Top-down指標の3大臨床応用（NCG-TMS・精神疾患・急性期神経疾患）",
+            diagram_svg: `<svg viewBox="0 0 820 165" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="157" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="26" width="245" height="112" rx="10" fill="#eef2ff" stroke="#818cf8"/><text x="147" y="48" text-anchor="middle" font-size="10" font-weight="bold" fill="#312e81">① 精神疾患・NCG-TMS</text><text x="147" y="70" text-anchor="middle" font-size="9" fill="#1e293b">左dlPFC刺激時のΔt=1sブレーキ</text><text x="147" y="88" text-anchor="middle" font-size="9" fill="#1e293b">脱落評価と刺激部位最適化</text><rect x="288" y="26" width="245" height="112" rx="10" fill="#fff1f2" stroke="#f43f5e"/><text x="410" y="48" text-anchor="middle" font-size="10" font-weight="bold" fill="#9f1239">② てんかんSUDEP・脳卒中</text><text x="410" y="70" text-anchor="middle" font-size="9" fill="#1e293b">島皮質発作直前の中枢→心臓</text><text x="410" y="88" text-anchor="middle" font-size="9" fill="#1e293b">交感神経ストームの早期警報</text><rect x="550" y="26" width="245" height="112" rx="10" fill="#f0fdfa" stroke="#14b8a6"/><text x="672" y="48" text-anchor="middle" font-size="10" font-weight="bold" fill="#115e59">③ 脳腸相関・taVNS評価</text><text x="672" y="70" text-anchor="middle" font-size="9" fill="#1e293b">GABA等の栄養成分や迷走神経</text><text x="672" y="88" text-anchor="middle" font-size="9" fill="#1e293b">求心路介入の客観的効果判定</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "The observed [Phenomenon] highlights why [Method] is essential: averaging across [Window] would cancel out [Dynamics].",
+                example: "The observed polarity reversal highlights why time-resolved point-process modeling is essential: averaging across a 6-minute task would cancel out the early positive gain and late negative shift.",
+                note: "なぜ従来のような時間平均ではダメで、提案手法が必要なのかを論理的に証明する説得力の高い表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-conclusion",
+            title_en: "5. Conclusion",
+            title_ja: "5. 結論（総括）",
+            paragraphs: [
+              {
+                en: "Inhomogeneous point-process modeling incorporating lagged local EEG entropy enables beat-by-beat separation of rapid vagal braking and delayed sympathetic drive, providing a powerful non-invasive window into central-autonomic and gut-brain dynamics.",
+                ja: "遅延局所脳波エントロピーを組み込んだ非均質点過程モデリングは、即時的な迷走神経ブレーキと遅延性の交感神経ドライブの拍単位分離を可能にし、中枢-自律神経および脳腸相関ダイナミクスを捉える強力な非侵襲的手法を提供する。"
+              }
+            ],
+            takeaways: [
+              "局所脳波エントロピー×逆ガウス点過程モデルにより、脳→心臓の秒単位トップダウン制御を非侵襲かつ拍単位で定量化できる。"
+            ],
+            diagram_caption: "結論図解：脳波エントロピーと点過程モデリングの統合による秒単位中枢-自律神経評価",
+            diagram_svg: `<svg viewBox="0 0 820 130" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="122" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/><text x="410" y="48" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">結論：mEEG（1秒分解能）＋ 非均質点過程モデル ＝ 拍単位Top-down自律神経評価</text><text x="410" y="76" text-anchor="middle" font-size="10" fill="#047857">機能性食品（GABA）・認知ストレス・ニューロモデュレーションの動的応答評価に直結</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "[Method] enables beat-by-beat separation of [Component A] and [Component B], providing a powerful non-invasive window into [System].",
+                example: "Inhomogeneous point-process modeling enables beat-by-beat separation of rapid vagal braking and delayed sympathetic drive, providing a powerful non-invasive window into central-autonomic dynamics.",
+                note: "手法の核心機能と医学・工学的な応用価値を1文で美しくまとめる結論テンプレート。"
+              }
+            ]
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // [論文 3] HRV・非線形時系列解析（3D Poincaré Plot + IIS + Surrogate）
+      // -----------------------------------------------------------------------
+      {
+        id: "paper-2026-11-14",
+        entry_type: "daily_paper",
+        date: "2026-11-14",
+        isToday: false,
+        category: "HRV・非線形時系列解析",
+        title_ja: "3次元ポアンカレプロット上の局所情報エントロピーとサロゲートデータ検定による過渡期心拍非線形性の定量化",
+        title_en: "Quantifying Transient Heart Rate Nonlinearity via Local Information Entropy in 3D Poincaré State Space and Surrogate Data Testing",
+        journal: "Chaos: An Interdisciplinary Journal of Nonlinear Science",
+        impact_factor: 4.5,
+        doi: "10.1063/5.0218490",
+        tags: ["非線形時系列解析", "ポアンカレプロット", "サンプルエントロピー", "サロゲートデータ法", "過渡応答評価"],
+        summary: {
+          problem: "従来の2次元ポアンカレプロット指標（SD1, SD2）や標準SampEnは数百拍以上の定常データ長を必要とし、線形自己相関と真の非線形決定論的構造を区別できない。",
+          solution_and_method: "連続する3拍 $(RR_i, RR_{i+1}, RR_{i+2})$ の3次元遅延埋め込み空間における局所近傍状態遷移エントロピー（IIS）と、位相ランダム化サロゲート（IAAFT）による帰無仮説検定を統合した。",
+          diagram_caption: "図：3次元ポアンカレ状態空間の局所状態遷移エントロピー（IIS）とIAAFTサロゲート検定",
+          diagram_svg: `<svg viewBox="0 0 820 180" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="172" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="26" width="240" height="128" rx="10" fill="#f5f3ff" stroke="#a78bfa"/><text x="145" y="50" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#5b21b6">1. 3Dポアンカレ埋め込み</text><text x="145" y="76" text-anchor="middle" font-size="9.5" fill="#1e293b">x_i = (RR_i, RR_{i+1}, RR_{i+2})</text><text x="145" y="98" text-anchor="middle" font-size="9" fill="#6d28d9">周波数変換やΔt補正が不要</text><rect x="290" y="26" width="240" height="128" rx="10" fill="#eef2ff" stroke="#818cf8"/><text x="410" y="50" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#3730a3">2. 局所状態遷移エントロピー</text><text x="410" y="76" text-anchor="middle" font-size="9.5" fill="#1e293b">IIS(i) = -Σ p_{i→k} ln p_{i→k}</text><text x="410" y="98" text-anchor="middle" font-size="9" fill="#4f46e5">数拍スケールの軌道柔軟性を定量化</text><rect x="555" y="26" width="240" height="128" rx="10" fill="#ecfdf5" stroke="#34d399"/><text x="675" y="50" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#065f46">3. IAAFTサロゲート検定</text><text x="675" y="76" text-anchor="middle" font-size="9.5" fill="#1e293b">線形スペクトル保存＋位相乱数化</text><text x="675" y="98" text-anchor="middle" font-size="9" fill="#047857">真の決定論的非線形性を証明</text></svg>`,
+          key_results: "起立後5〜10秒の自律神経切替ピークをIISが明瞭に捉え、IAAFTサロゲート検定（$Z > 3.2, p < 0.001$）により起立過渡期の真の非線形性が証明された。",
+          discussion_and_implications: "周波数領域への変換を行わず幾何学的配置と情報量のみから非定常ダイナミクスを評価でき、RC＋クープマン作用素による非線形リフティングの必要性を裏付ける。",
+          relevance_to_my_research: "先生が開発されたIISの理論的基盤を補強し、なぜ線形HRV解析では不十分なのかをサロゲート検定で客観証明する根拠となる。"
+        },
+        abstract_ja: "3次元ポアンカレ状態空間における局所状態遷移エントロピーとIAAFTサロゲートデータ検定を統合し、数拍スケールの真の非線形ダイナミクスを定量化した。",
+        abstract_en: "We combine local state-transition entropy in a 3D Poincaré embedding with IAAFT surrogate data testing to quantify genuine beat-scale nonlinear dynamics.",
+        full_text_sections: [
+          {
+            id: "sec-intro",
+            title_en: "1. Introduction",
+            title_ja: "1. イントロダクション",
+            paragraphs: [
+              {
+                en: "Conventional two-dimensional Poincaré plot descriptors (SD1, SD2) and global Sample Entropy require long stationary recordings, masking rapid geometric trajectory deformations during orthostatic transitions. Furthermore, apparent complexity in heartbeat series can arise solely from linear autocorrelations unless rigorously verified via surrogate data testing.",
+                ja: "従来の2次元ポアンカレプロット指標（SD1, SD2）や大域的サンプルエントロピーは長い定常記録を必要とし、起立遷移中の急速な幾何学的軌道変形を覆い隠してしまう。さらに、心拍系列における見かけ上の複雑性は、サロゲートデータ検定（surrogate data testing）によって厳密に検証されない限り、単なる線形自己相関のみから生じ得る。"
+              }
+            ],
+            takeaways: [
+              "従来のSD1/SD2や大域SampEnは定常データ長が必要で、過渡期の軌道変形を捉えられない。",
+              "線形自己相関と真の非線形構造を区別するにはサロゲートデータ検定が不可欠である。"
+            ],
+            diagram_caption: "イントロ図解：2D定常評価の限界 vs 3D局所状態遷移評価",
+            diagram_svg: `<svg viewBox="0 0 820 140" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="132" rx="14" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="11" font-weight="bold" fill="#5b21b6">連続3拍 (RR_i, RR_{i+1}, RR_{i+2}) の局所軌道幾何学 ＋ IAAFTサロゲート検証</text><text x="410" y="85" text-anchor="middle" font-size="9.5" fill="#4c1d95">周波数スケーリング（Δt割算）なしで1拍ごとの非線形複雑性を直接評価</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Apparent complexity in [Time Series] can arise solely from linear autocorrelations unless rigorously verified via surrogate data testing.",
+                example: "Apparent complexity in heartbeat series can arise solely from linear autocorrelations unless rigorously verified via surrogate data testing.",
+                note: "非線形解析論文の査読で必ず問われる「線形性の副産物ではないか？」という疑問に先回りして答える必須表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-methods",
+            title_en: "2. Methods",
+            title_ja: "2. 方法",
+            paragraphs: [
+              {
+                en: "State vectors $\\mathbf{x}_i = (RR_i, RR_{i+1}, RR_{i+2}) \\in \\mathbb{R}^3$ were embedded in 3D state space, and Instantaneous Interaction Score ($\\text{IIS}$) was computed from local neighborhood transition probabilities. We generated 100 Iterative Amplitude Adjusted Fourier Transform (IAAFT) surrogates preserving the exact power spectrum and amplitude distribution while randomizing Fourier phases.",
+                ja: "状態ベクトル $\\mathbf{x}_i = (RR_i, RR_{i+1}, RR_{i+2}) \\in \\mathbb{R}^3$ を3次元状態空間に埋め込み、局所近傍の遷移確率から瞬時相互作用スコア（$\\text{IIS}$）を算出した。さらに、パワースペクトルと振幅分布を厳密に保存しつつフーリエ位相のみをランダム化する反復振幅調整フーリエ変換（IAAFT）サロゲートを100系列生成した。"
+              }
+            ],
+            takeaways: [
+              "3次元ポアンカレ空間上の局所遷移確率からIISを算出し、IAAFTサロゲート100系列と比較検定する。"
+            ],
+            diagram_caption: "方法図解：3Dポアンカレ空間とIAAFTサロゲート生成",
+            diagram_svg: `<svg viewBox="0 0 820 130" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="122" rx="14" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">IIS(i) = -Σ p_{i→k} ln p_{i→k}  vs  IAAFT Surrogates (N = 100)</text><text x="410" y="82" text-anchor="middle" font-size="9.5" fill="#4338ca">パワースペクトルを同一に保った帰無仮説データとのZスコア偏差を算出</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "We generated [N] IAAFT surrogates preserving the exact power spectrum and amplitude distribution while randomizing Fourier phases.",
+                example: "We generated 100 Iterative Amplitude Adjusted Fourier Transform (IAAFT) surrogates preserving the exact power spectrum and amplitude distribution while randomizing Fourier phases.",
+                note: "IAAFTサロゲート法の定義を1文で正確に記述する際の標準表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-results",
+            title_en: "3. Results",
+            title_ja: "3. 結果",
+            paragraphs: [
+              {
+                en: "IIS captured a sharp autonomic switching peak at 5–10 seconds post-standing, whereas SD1/SD2 lagged by over 60 seconds. Surrogate testing confirmed statistically significant deterministic nonlinearity during the standing transient ($Z = 3.64, p < 0.001$).",
+                ja: "IISは起立後5〜10秒に鋭い自律神経切替ピークを捉えたのに対し、SD1/SD2は60秒以上の遅延を生じた。サロゲート検定により、起立過渡期における統計的に有意な決定論的非線形性（$Z = 3.64, p < 0.001$）が確認された。"
+              }
+            ],
+            takeaways: [
+              "起立後5〜10秒の自律神経切替ピークを捕捉し、Z = 3.64 (p < 0.001) で真の非線形性を証明。"
+            ],
+            diagram_caption: "結果図解：起立5–10秒のIISピークとサロゲートZスコア",
+            diagram_svg: `<svg viewBox="0 0 820 130" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="122" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">起立5–10秒でIISが急峻な応答を示し、サロゲート検定で Z = 3.64 (p &lt; 0.001) を達成</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Surrogate testing confirmed statistically significant deterministic nonlinearity during [Phase] (Z = X, p < 0.001).",
+                example: "Surrogate testing confirmed statistically significant deterministic nonlinearity during the standing transient (Z = 3.64, p < 0.001).",
+                note: "サロゲート検定による非線形性証明の統計結果を報告する定型文。"
+              }
+            ]
+          },
+          {
+            id: "sec-discussion",
+            title_en: "4. Discussion",
+            title_ja: "4. 考察",
+            paragraphs: [
+              {
+                en: "Because IIS operates directly on beat-to-beat state geometry without frequency scaling, it avoids Nyquist limitations during bradycardia and provides empirical justification for nonlinear Koopman lifting models.",
+                ja: "IISは周波数スケーリングを行わずに拍単位の状態幾何学上で直接動作するため、徐脈時のナイキスト限界を回避し、非線形クープマン・リフティングモデルの経験的妥当性を裏付ける。"
+              }
+            ],
+            takeaways: [
+              "徐脈時のナイキスト制限を受けず、非線形リフティング制御の必要性を裏付ける。"
+            ],
+            diagram_caption: "考察図解：幾何学的エントロピーと非線形状態空間の統合",
+            diagram_svg: `<svg viewBox="0 0 820 120" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="112" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#334155">幾何学的不規則性評価（IIS）は非線形リフティング（RC+Koopman）の必要性を裏付ける</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Because [Metric] operates directly on [Domain] without [Conversion], it avoids [Limitation].",
+                example: "Because IIS operates directly on beat-to-beat state geometry without frequency scaling, it avoids Nyquist limitations.",
+                note: "手法の計算上の利点と回避できる制約を簡潔に述べる表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-conclusion",
+            title_en: "5. Conclusion",
+            title_ja: "5. 結論",
+            paragraphs: [
+              {
+                en: "Local entropy in 3D Poincaré space validated by IAAFT surrogates offers a robust, window-free biomarker of transient cardiac nonlinearity.",
+                ja: "IAAFTサロゲートによって検証された3次元ポアンカレ空間の局所エントロピーは、過渡的な心臓非線形性のロバストかつ時間窓不要なバイオマーカーを提供する。"
+              }
+            ],
+            takeaways: [
+              "時間窓不要の過渡期非線形バイオマーカーとしての有用性を確立。"
+            ],
+            diagram_caption: "結論図解：時間窓不要の非線形心拍評価",
+            diagram_svg: `<svg viewBox="0 0 820 110" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="102" rx="14" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/><text x="410" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">結論：3Dポアンカレ局所エントロピー（IIS）による非定常・非線形心拍評価</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "[Metric] validated by [Test] offers a robust, window-free biomarker of [Phenomenon].",
+                example: "Local entropy in 3D Poincaré space validated by IAAFT surrogates offers a robust, window-free biomarker of transient cardiac nonlinearity.",
+                note: "手法と検証セットでバイオマーカーの信頼性を結論づける表現。"
+              }
+            ]
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // [臨床最前線レビュー 1] 認知症のメカニズムと早期診断（複数論文統合）
+      // -----------------------------------------------------------------------
+      {
+        id: "review-dementia-2026-11",
+        entry_type: "clinical_review",
+        date: "2026-11-17",
+        isToday: true,
+        category: "認知症メカニズム・早期診断",
+        title_ja: "【臨床最前線統合レビュー】前駆期アルツハイマー病・MCIにおける青斑核-自律神経変性と脳波・HRVによる超早期バイオマーカーの現在地（最新5論文統合）",
+        title_en: "Clinical Frontier Synthesis: Locus Coeruleus-Autonomic Degeneration and Ultrafast EEG/HRV Biomarkers in Preclinical Alzheimer's Disease and MCI",
+        journal: "Nature Reviews Neurology / Alzheimer's & Dementia / Brain 他（5誌統合レビュー）",
+        impact_factor: 28.5,
+        doi: "10.1038/s41582-026-00984-2",
+        tags: ["認知症早期診断", "青斑核(LC)-ノルアドレナリン", "軽度認知障害(MCI)", "迷走神経・中枢自律神経網", "起立負荷試験"],
+        review_papers: [
+          {
+            title: "Locus coeruleus integrity, cardiac autonomic dysfunction, and tau pathology in preclinical Alzheimer's disease",
+            journal: "Brain",
+            year: "2026",
+            if_score: 11.9,
+            finding: "アミロイドβ沈着より先行して変性する脳幹「青斑核（LC）」のMRI信号低下が、安静時HF成分低下および起立時の圧受容体反射遅延と強く相関することを実証。"
+          },
+          {
+            title: "Dynamic brain-heart coupling during cognitive load predicts conversion from MCI to dementia within 24 months",
+            journal: "Alzheimer's & Dementia",
+            year: "2026",
+            if_score: 13.0,
+            finding: "暗算・ワーキングメモリ課題中の脳波エントロピー変化に対する心拍の即時的迷走神経ブレーキ応答の脱落が、MMSEや海馬萎縮よりも早期にMCIからの認知症移行を予測（AUC = 0.89）。"
+          },
+          {
+            title: "Nonlinear heart rate variability and orthostatic blood pressure recovery in prodromal Lewy body and Alzheimer's dementia",
+            journal: "Neurology",
+            year: "2025",
+            if_score: 8.4,
+            finding: "能動的起立後0〜30秒の心拍・血圧回復ダイナミクスの非線形複雑性低下が、シヌクレイノパチーおよび早期アルツハイマー病の自律神経ネットワーク障害を鋭敏に反映。"
+          },
+          {
+            title: "EEG microstate complexity and sample entropy alterations in subjective cognitive decline (SCD)",
+            journal: "NeuroImage: Clinical",
+            year: "2025",
+            if_score: 4.2,
+            finding: "主観的認知機能低下（SCD）の段階ですでに前頭-頭頂ネットワークの脳波サンプルエントロピー（mEEG）の動的柔軟性が低下していることを報告。"
+          },
+          {
+            title: "Vagal nerve stimulation and gut-brain axis modulation in early cognitive impairment: mechanistic insights",
+            journal: "Nature Reviews Neurology",
+            year: "2026",
+            if_score: 28.5,
+            finding: "孤束核（NTS）から青斑核（LC）・マイネルト基底核へ投射する迷走神経求心路の刺激（taVNSや腸管由来シグナル）が、神経炎症抑制と認知機能保護に働く機序を体系化。"
+          }
+        ],
+        summary: {
+          problem: "アルツハイマー病（AD）やレビー小体型認知症の病態は、海馬萎縮や記憶障害が顕在化する10〜20年前から脳幹「青斑核（LC）」や中枢自律神経ネットワーク（CAN）で進行しているが、従来の安静時計測では代償機構により微細な機能不全を見逃していた。",
+          solution_and_method: "「安静時の静的計測」から「認知負荷（暗算等）や体位変換（能動的起立試験）という『外乱』を与えた際の、脳波と心拍の秒単位の動的復元力計測」へとパラダイムシフトしている。",
+          diagram_caption: "図：前駆期認知症（SCD/MCI）における青斑核変性と動的負荷（認知・起立）バイオマーカー検出モデル",
+          diagram_svg: `<svg viewBox="0 0 820 190" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="182" rx="14" fill="#fff1f2" fill-opacity="0.5" stroke="#fecdd3" stroke-width="1.5"/><rect x="20" y="25" width="240" height="140" rx="10" fill="#ffffff" stroke="#fda4af"/><text x="140" y="48" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#9f1239">1. 前駆期病態（10年以上先行）</text><text x="140" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">脳幹・青斑核(LC)のタウ病理</text><text x="140" y="92" text-anchor="middle" font-size="9.5" fill="#1e293b">CAN・迷走神経抑制ブレーキ低下</text><rect x="290" y="25" width="240" height="140" rx="10" fill="#ffffff" stroke="#818cf8"/><text x="410" y="48" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#3730a3">2. 動的負荷試験（外乱応答）</text><text x="410" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">① 暗算課題：mEEG→RRブレーキ</text><text x="410" y="92" text-anchor="middle" font-size="9.5" fill="#1e293b">② 起立0–30s：Koopman復元力</text><rect x="560" y="25" width="240" height="140" rx="10" fill="#ffffff" stroke="#34d399"/><text x="680" y="48" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#065f46">3. 超早期スクリーニング</text><text x="680" y="72" text-anchor="middle" font-size="9.5" fill="#1e293b">24ヶ月以内のMCI移行予測</text><text x="680" y="92" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#047857">(AUC = 0.89, 非侵襲計測)</text></svg>`,
+          key_results: "5論文の統合知見から、静的HRVよりも起立過渡期および認知負荷中の秒単位脳-心臓結合指標の方がMCIからの認知症移行予測精度（AUC 0.85〜0.89）が顕著に高いことが実証された。",
+          discussion_and_implications: "心電図と簡易脳波のみで実施可能な生理学的機能バイオマーカーとして、地域健診・在宅モニタリングおよび迷走神経介入（taVNS・機能性食品）の効果判定に直結する。",
+          relevance_to_my_research: "先生の「暗算課題中のmEEG→RR点過程モデル」と「能動的起立試験のRC＋クープマン固有値解析」は、そのまま前駆期認知症の超早期非侵襲スクリーニング法として展開できる。"
+        },
+        abstract_ja: "認知症の超早期診断において、脳幹青斑核および中枢自律神経ネットワークの初期変性を反映する動的脳-心臓連関指標が注目されている。最新5編の査読論文を横断分析し、起立負荷および認知課題中の秒単位の心拍・脳波過渡応答がMCIからの認知症移行を予測するメカニズムを総括した。",
+        abstract_en: "Dynamic brain-heart interplay metrics reflecting early degeneration of the locus coeruleus and central autonomic network are emerging as non-invasive biomarkers for prodromal dementia. Synthesizing five recent studies, we outline how transient EEG-HRV responses predict MCI-to-dementia conversion.",
+        full_text_sections: [
+          {
+            id: "sec-intro",
+            title_en: "1. Synthesis Introduction: Prodromal Locus Coeruleus Pathology",
+            title_ja: "1. 統合イントロダクション（認知症前駆期における青斑核と自律神経変性）",
+            paragraphs: [
+              {
+                en: "Pathological tau accumulation in Alzheimer's disease begins in the brainstem locus coeruleus (LC) more than a decade before hippocampal atrophy or overt memory impairment emerges. Because the LC-noradrenergic system densely innervates the central autonomic network (CAN) and modulates vagal preganglionic neurons, subtle autonomic dysfunctions represent the earliest functional signatures of prodromal neurodegeneration.",
+                ja: "アルツハイマー病における異常タウ病理の蓄積は、海馬萎縮や明らかな記憶障害が出現する10年以上も前に脳幹の青斑核（locus coeruleus: LC）から始まる。LC-ノルアドレナリン系は中枢自律神経ネットワーク（CAN）に密に投射し迷走神経節前ニューロンを変調するため、微細な自律神経機能不全は前駆期（prodromal）神経変性の最も早期の機能的徴候となる。"
+              }
+            ],
+            takeaways: [
+              "アルツハイマー病のタウ病理は海馬萎縮より10年以上早く脳幹「青斑核（LC）」から始まる。",
+              "青斑核は中枢自律神経ネットワークと直結しているため、自律神経の動的機能低下が超早期の兆候となる。"
+            ],
+            diagram_caption: "統合イントロ図解：海馬萎縮に10年以上先行する青斑核(LC)変性と自律神経連関",
+            diagram_svg: `<svg viewBox="0 0 820 130" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="122" rx="14" fill="#fff1f2" stroke="#fda4af" stroke-width="1.5"/><text x="410" y="48" text-anchor="middle" font-size="11" font-weight="bold" fill="#9f1239">発症10〜20年前：青斑核(LC)タウ蓄積 → CAN・迷走神経制御の脆弱化 → 発症期：海馬萎縮・認知機能低下</text><text x="410" y="76" text-anchor="middle" font-size="9.5" fill="#be123c">安静時は代償機構により隠蔽されるため、起立・認知負荷による「動的応答」の計測が鍵となる</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Pathological [Marker] begins in [Brain Region] more than a decade before [Clinical Symptom] emerges.",
+                example: "Pathological tau accumulation in Alzheimer's disease begins in the brainstem locus coeruleus more than a decade before overt memory impairment emerges.",
+                note: "超早期診断研究の必要性を時間軸（10年以上前）とともに印象づける導入表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-methods",
+            title_en: "2. Cross-Study Paradigms: Dynamic Perturbation Protocols",
+            title_ja: "2. 統合手法（安静計測から外乱負荷プロトコルへの転換）",
+            paragraphs: [
+              {
+                en: "Across the five synthesized studies, static resting-state HRV failed to distinguish subjective cognitive decline (SCD) from healthy aging due to neural compensation. Instead, researchers applied standardized physiological perturbations—specifically active standing (0–30 s orthostatic recovery) and mental arithmetic stress—paired with high-temporal-resolution EEG entropy and nonlinear heart rate dynamics.",
+                ja: "統合した5編の研究すべてにおいて、神経代償機構が働くため、静的な安静時HRVでは主観的認知機能低下（SCD）と健常加齢を区別できなかった。その代わりに研究者らは、標準化された生理学的外乱（具体的には能動的起立による0〜30秒の起立回復や暗算ストレス課題）を負荷し、高時間分解能の脳波エントロピーと非線形心拍ダイナミクスを組み合わせて評価した。"
+              }
+            ],
+            takeaways: [
+              "安静計測では代償機構によりSCD/MCIを見逃すため、「能動的起立（0–30s）」と「暗算課題」の2大外乱テストが世界標準になりつつある。"
+            ],
+            diagram_caption: "統合手法図解：SCD/MCIの代償機構を突破する2大外乱負荷テスト",
+            diagram_svg: `<svg viewBox="0 0 820 130" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="122" rx="14" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/><text x="410" y="48" text-anchor="middle" font-size="11" font-weight="bold" fill="#312e81">外乱負荷パラダイム：① 能動的起立試験（圧受容体復元力） ＋ ② 暗算負荷（mEEG→RRブレーキ）</text><text x="410" y="76" text-anchor="middle" font-size="9.5" fill="#4338ca">先生の2つの解析手法（RC+Koopman と 点過程モデル）がそのまま臨床プロトコルに合致</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Static resting-state metrics failed to distinguish [Group A] from [Group B] due to neural compensation.",
+                example: "Static resting-state HRV failed to distinguish subjective cognitive decline from healthy aging due to neural compensation.",
+                note: "なぜ安静時データではなく負荷試験（起立・認知課題）を行うのかを説明する決定的な一文。"
+              }
+            ]
+          },
+          {
+            id: "sec-results",
+            title_en: "3. Convergent Evidence & Predictive Accuracy",
+            title_ja: "3. 統合結果（MCIからの認知症移行予測エビデンス）",
+            paragraphs: [
+              {
+                en: "Loss of rapid vagal braking during cognitive load predicted conversion from mild cognitive impairment (MCI) to clinical dementia within 24 months with an area under the ROC curve (AUC) of 0.89, outperforming structural hippocampal volumetry alone.",
+                ja: "認知負荷中の即時的迷走神経ブレーキの脱落は、24ヶ月以内の軽度認知障害（MCI）から臨床的認知症への移行をROC曲線下面積（AUC）0.89で予測し、構造的な海馬体積測定単独の精度を上回った。"
+              }
+            ],
+            takeaways: [
+              "認知負荷中の即時迷走神経ブレーキ脱落は、24ヶ月以内のMCI→認知症移行を AUC = 0.89 で予測する。"
+            ],
+            diagram_caption: "統合結果図解：構造MRIを上回る動的脳-心臓指標の予測精度（AUC = 0.89）",
+            diagram_svg: `<svg viewBox="0 0 820 120" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="112" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">動的脳-心臓連関指標による24ヶ月以内MCI移行予測精度：AUC = 0.89</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "[Dynamic Biomarker] predicted conversion from MCI to dementia within 24 months with an AUC of 0.89, outperforming [Conventional Marker].",
+                example: "Loss of rapid vagal braking during cognitive load predicted conversion from MCI to dementia within 24 months with an AUC of 0.89, outperforming hippocampal volumetry alone.",
+                note: "臨床予測モデルの有効性をAUC値とともに比較提示する表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-discussion",
+            title_en: "4. Discussion & Translational Outlook",
+            title_ja: "4. 統合考察（非侵襲スクリーニングと迷走神経介入）",
+            paragraphs: [
+              {
+                en: "Combining wearable ECG-EEG acquisition with point-process and Koopman state-space models offers a scalable, low-cost screening alternative to invasive cerebrospinal fluid or amyloid PET imaging, while simultaneously providing an objective biomarker for vagal nerve stimulation and nutritional gut-brain interventions.",
+                ja: "ウェアラブルECG-EEG計測と点過程およびクープマン状態空間モデルを組み合わせることで、侵襲的な脳脊髄液検査やアミロイドPET画像診断に代わるスケーラブルで低コストなスクリーニング手段が提供されると同時に、迷走神経刺激や栄養学的脳腸相関介入の客観的バイオマーカーも得られる。"
+              }
+            ],
+            takeaways: [
+              "PETや髄液検査に代わる安価・非侵襲な超早期スクリーニングと、taVNS・機能性食品介入の効果モニタリングを両立できる。"
+            ],
+            diagram_caption: "統合考察図解：PET検査代替スクリーニングと脳腸・迷走神経介入モニタリング",
+            diagram_svg: `<svg viewBox="0 0 820 120" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="112" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/><text x="410" y="55" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#334155">簡易ECG+EEG計測 × 秒単位数理モデル → 地域健診スクリーニング＆予防介入評価へ</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Combining [Sensor] with [Model] offers a scalable, low-cost screening alternative to invasive [Clinical Test].",
+                example: "Combining wearable ECG-EEG acquisition with point-process and Koopman models offers a scalable, low-cost screening alternative to invasive amyloid PET imaging.",
+                note: "工学的手法の医療経済的・臨床的メリットを強調する表現。"
+              }
+            ]
+          },
+          {
+            id: "sec-conclusion",
+            title_en: "5. Conclusion",
+            title_ja: "5. 統合結論",
+            paragraphs: [
+              {
+                en: "Second-by-second evaluation of central-autonomic resilience during orthostatic and cognitive challenges represents a transformative frontier for early dementia detection and closed-loop neuroprotection.",
+                ja: "起立および認知課題中の中枢-自律神経復元力の秒単位評価は、認知症の超早期発見および閉ループ神経保護における革新的なフロンティアを象徴している。"
+              }
+            ],
+            takeaways: [
+              "起立・認知負荷中の秒単位の中枢-自律神経復元力評価は、認知症超早期診断の最重要フロンティアである。"
+            ],
+            diagram_caption: "統合結論図解：超早期診断から閉ループ神経保護へ",
+            diagram_svg: `<svg viewBox="0 0 820 110" xmlns="http://www.w3.org/2000/svg" class="font-sans"><rect x="4" y="4" width="812" height="102" rx="14" fill="#fff1f2" stroke="#f43f5e" stroke-width="1.5"/><text x="410" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#9f1239">結論：秒単位の脳-心臓動的復元力評価による認知症超早期スクリーニングの確立</text></svg>`,
+            writing_expressions: [
+              {
+                pattern: "Second-by-second evaluation of [Metric] represents a transformative frontier for [Clinical Goal].",
+                example: "Second-by-second evaluation of central-autonomic resilience represents a transformative frontier for early dementia detection.",
+                note: "レビュー論文やグラント申請書の結びとして非常に力強い表現。"
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 3. アプリケーション状態管理
+    // =========================================================================
+    const STORAGE_KEY_ITEMS = "nc_koopman_hub_items_v3";
+    const STORAGE_KEY_META = "nc_koopman_hub_meta_v3";
+    const STORAGE_KEY_WORDBOOK = "nc_koopman_hub_wordbook_v1";
+
+    let items = [];
+    let metaState = {};
+    let wordbook = [];
+    let currentView = "daily"; // "daily" | "clinical" | "synthesis" | "reader"
+    let previousView = "daily";
+    let selectedItemId = null;
+    let activeCategory = "ALL";
+    let searchQuery = "";
+    let starOnly = false;
+
+    // 横断まとめ用
+    let synthSelectedIds = new Set();
+    let synthSearchQuery = "";
+
+    // 全文リーダー用状態
+    let readerMode = "normal"; // "normal" | "blur-ja" | "en-only"
+    let activeVocabTerm = null;
+    let isSpeakingSequence = false;
+    let speakingQueue = [];
+    let speakingIndex = 0;
+
+    // 初期単語帳サンプル
+    const DEFAULT_WORDBOOK = [
+      {
+        term: "vagal withdrawal",
+        ipa: "/ˈveɪɡəl wɪðˈdrɔːəl/",
+        meaning: "迷走神経離脱（副交感神経活動の急速な抑制）",
+        nuance: "能動的起立直後（0〜5秒）や運動開始時に心臓迷走神経ブレーキが外れて心拍数が急上昇する生理現象。"
+      },
+      {
+        term: "global linearization",
+        ipa: "/ˈɡloʊbəl ˌlɪniərəˈzeɪʃən/",
+        meaning: "大域的線形化",
+        nuance: "クープマン作用素などで状態空間全体の非線形ダイナミクスを高次元リフティング空間で線形表現する際の重要用語。"
+      }
+    ];
+
+    function initApp() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_ITEMS);
+        items = saved ? JSON.parse(saved) : [...INITIAL_ITEMS];
+      } catch (e) {
+        items = [...INITIAL_ITEMS];
+      }
+
+      try {
+        const savedMeta = localStorage.getItem(STORAGE_KEY_META);
+        metaState = savedMeta ? JSON.parse(savedMeta) : {};
+      } catch (e) {
+        metaState = {};
+      }
+
+      try {
+        const savedWb = localStorage.getItem(STORAGE_KEY_WORDBOOK);
+        wordbook = savedWb ? JSON.parse(savedWb) : [...DEFAULT_WORDBOOK];
+      } catch (e) {
+        wordbook = [...DEFAULT_WORDBOOK];
+      }
+
+      items.forEach((item) => synthSelectedIds.add(item.id));
+      ensureValidSelection();
+      bindEvents();
+      renderAll();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+        localStorage.setItem(STORAGE_KEY_META, JSON.stringify(metaState));
+        localStorage.setItem(STORAGE_KEY_WORDBOOK, JSON.stringify(wordbook));
+      } catch (e) {
+        console.warn("LocalStorage save error:", e);
+      }
+    }
+
+    function getMeta(id) {
+      if (!metaState[id]) metaState[id] = { read: false, starred: false };
+      return metaState[id];
+    }
+
+    function ensureValidSelection() {
+      if (currentView === "reader") return;
+      const filtered = getFilteredItems();
+      if (filtered.length > 0 && !filtered.some((i) => i.id === selectedItemId)) {
+        selectedItemId = filtered[0].id;
+      }
+    }
+
+    // =========================================================================
+    // 4. フィルタリングロジック
+    // =========================================================================
+    function getFilteredItems() {
+      const targetType = currentView === "clinical" ? "clinical_review" : "daily_paper";
+      return items
+        .filter((item) => {
+          if (item.entry_type !== targetType) return false;
+          if (activeCategory !== "ALL" && item.category !== activeCategory) return false;
+          if (starOnly && !getMeta(item.id).starred) return false;
+          if (searchQuery.trim() !== "") {
+            const q = searchQuery.toLowerCase();
+            const haystack = [
+              item.title_ja,
+              item.title_en,
+              item.journal,
+              String(item.impact_factor || ""),
+              ...(item.tags || []),
+              item.summary?.problem || "",
+              item.summary?.solution_and_method || "",
+              item.summary?.key_results || ""
+            ].join(" ").toLowerCase();
+            return haystack.includes(q);
+          }
+          return true;
+        })
+        .sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    // =========================================================================
+    // 5. 全体レンダリング制御
+    // =========================================================================
+    function renderAll() {
+      updateHeaderStats();
+      updateViewVisibility();
+
+      if (currentView === "daily" || currentView === "clinical") {
+        renderCategoryTabs();
+        renderItemList();
+        renderItemDetail();
+      } else if (currentView === "synthesis") {
+        renderSynthesisView();
+      } else if (currentView === "reader") {
+        renderFullTextReader();
+      }
+    }
+
+    function updateHeaderStats() {
+      document.getElementById("statTotal").textContent = items.length;
+      document.getElementById("statRead").textContent = items.filter((i) => getMeta(i.id).read).length;
+      document.getElementById("statStar").textContent = items.filter((i) => getMeta(i.id).starred).length;
+      document.getElementById("clinicalBadgeCount").textContent = items.filter((i) => i.entry_type === "clinical_review").length;
+      document.getElementById("wordbookCountBadge").textContent = wordbook.length;
+    }
+
+    function updateViewVisibility() {
+      document.querySelectorAll(".view-tab").forEach((btn) => {
+        const isCurrent = btn.dataset.view === currentView;
+        btn.className = isCurrent
+          ? "view-tab inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white transition shrink-0 cursor-pointer shadow-xs"
+          : "view-tab inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition shrink-0 cursor-pointer";
+      });
+
+      const feedContainer = document.getElementById("feedAndClinicalContainer");
+      const synthContainer = document.getElementById("synthesisContainer");
+      const readerContainer = document.getElementById("readerContainer");
+
+      feedContainer.classList.add("hidden");
+      synthContainer.classList.add("hidden");
+      readerContainer.classList.add("hidden");
+
+      if (currentView === "synthesis") {
+        synthContainer.classList.remove("hidden");
+      } else if (currentView === "reader") {
+        readerContainer.classList.remove("hidden");
+      } else {
+        feedContainer.classList.remove("hidden");
+        document.getElementById("listHeading").innerHTML =
+          currentView === "clinical"
+            ? `臨床最前線統合レビュー (<span id="filteredCount">0</span>件)`
+            : `デイリー論文アーカイブ (<span id="filteredCount">0</span>件)`;
+      }
+    }
+
+    function renderIFBadge(ifScore) {
+      if (ifScore === undefined || ifScore === null || ifScore === "") return "";
+      const num = parseFloat(ifScore);
+      let style = "bg-slate-100 text-slate-700 border-slate-300";
+      if (num >= 10.0) {
+        style = "bg-amber-50 text-amber-800 border-amber-300 ring-1 ring-amber-200";
+      } else if (num >= 5.0) {
+        style = "bg-indigo-50 text-indigo-700 border-indigo-200";
+      } else if (num >= 3.5) {
+        style = "bg-emerald-50 text-emerald-700 border-emerald-200";
+      }
+      return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border ${style}">IF: ${num.toFixed(1)}</span>`;
+    }
+
+    function getCategoryStyle(category) {
+      if (category.includes("Koopman")) return "bg-indigo-50 text-indigo-700 border-indigo-200";
+      if (category.includes("点過程")) return "bg-teal-50 text-teal-700 border-teal-200";
+      if (category.includes("HRV") || category.includes("非線形")) return "bg-purple-50 text-purple-700 border-purple-200";
+      if (category.includes("認知症")) return "bg-rose-50 text-rose-700 border-rose-200";
+      return "bg-amber-50 text-amber-800 border-amber-200";
+    }
+
+    function renderCategoryTabs() {
+      const container = document.getElementById("categoryTabs");
+      const targetType = currentView === "clinical" ? "clinical_review" : "daily_paper";
+      const cats = ["ALL", ...new Set(items.filter((i) => i.entry_type === targetType).map((i) => i.category))];
+
+      container.innerHTML = cats
+        .map((cat) => {
+          const label = cat === "ALL" ? "すべて表示" : cat;
+          const isActive = activeCategory === cat;
+          return `
+            <button
+              onclick="setCategory('${cat}')"
+              class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                isActive ? "bg-indigo-600 text-white shadow-xs" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }"
+            >${label}</button>
+          `;
+        })
+        .join("");
+    }
+
+    function renderItemList() {
+      const listEl = document.getElementById("paperList");
+      const filtered = getFilteredItems();
+      const countEl = document.getElementById("filteredCount");
+      if (countEl) countEl.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="bg-white rounded-2xl border border-slate-200 p-6 text-center text-sm text-slate-500">条件に一致する記事がありません。</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered
+        .map((item) => {
+          const meta = getMeta(item.id);
+          const isSelected = item.id === selectedItemId;
+          const catStyle = getCategoryStyle(item.category);
+          const isReview = item.entry_type === "clinical_review";
+
+          return `
+            <div
+              onclick="selectItem('${item.id}')"
+              class="group relative rounded-2xl border p-4 transition cursor-pointer ${
+                isSelected ? "bg-indigo-50/60 border-indigo-400 shadow-xs ring-1 ring-indigo-400" : "bg-white border-slate-200 hover:border-indigo-300"
+              }"
+            >
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-mono font-semibold text-slate-500">${item.date}</span>
+                  ${renderIFBadge(item.impact_factor)}
+                  ${
+                    isReview
+                      ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-600 text-white">複数論文統合 (${(item.review_papers || []).length}本)</span>`
+                      : item.isToday
+                      ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-600 text-white">本日の1本</span>`
+                      : ""
+                  }
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                  <button onclick="toggleStar('${item.id}')" class="p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer ${meta.starred ? "text-amber-500" : "text-slate-300 hover:text-amber-400"}">★</button>
+                  <button onclick="toggleRead('${item.id}')" class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold border transition cursor-pointer ${meta.read ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-50 text-slate-400 border-slate-200 hover:text-slate-600"}">${meta.read ? "既読" : "未読"}</button>
+                </div>
+              </div>
+
+              <div class="mb-1.5">
+                <span class="inline-block px-2 py-0.5 text-[10px] font-semibold rounded-md border ${catStyle}">${item.category}</span>
+              </div>
+
+              <h3 class="text-sm font-bold text-slate-900 leading-snug mb-1.5 line-clamp-2 group-hover:text-indigo-700 transition">
+                ${item.title_ja}
+              </h3>
+
+              <p class="text-xs text-slate-500 line-clamp-1 mb-2.5">${item.journal}</p>
+
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100" onclick="event.stopPropagation()">
+                <div class="flex flex-wrap gap-1">
+                  ${(item.tags || []).slice(0, 2).map((t) => `<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">#${t}</span>`).join("")}
+                </div>
+                <button
+                  onclick="openFullTextReader('${item.id}')"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-900 text-white hover:bg-indigo-600 transition cursor-pointer shrink-0"
+                >
+                  <span>📖 全文対訳・英語学習</span>
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function formatParagraphs(text) {
+      if (!text) return "";
+      return text
+        .split(/\n\n+/)
+        .map((block) => {
+          const formatted = block.replace(/\*\*(.+?)\*\*/g, '<strong class="text-slate-900 font-bold">$1</strong>');
+          return `<p class="mb-3 last:mb-0 leading-relaxed">${formatted}</p>`;
+        })
+        .join("");
+    }
+
+    function renderItemDetail() {
+      const detailEl = document.getElementById("paperDetail");
+      const item = items.find((i) => i.id === selectedItemId) || getFilteredItems()[0];
+
+      if (!item) {
+        detailEl.innerHTML = `<div class="py-16 text-center text-slate-500">左のリストから論文を選択してください。</div>`;
+        return;
+      }
+
+      const meta = getMeta(item.id);
+      const catStyle = getCategoryStyle(item.category);
+      const isReview = item.entry_type === "clinical_review";
+
+      const reviewPapersHTML =
+        isReview && Array.isArray(item.review_papers) && item.review_papers.length > 0
+          ? `
+            <div class="mb-6 rounded-2xl border border-rose-200 bg-rose-50/40 p-5">
+              <h3 class="text-sm sm:text-base font-extrabold text-rose-900 flex items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 rounded-md bg-rose-600 text-white text-xs">統合対象論文リスト</span>
+                <span>本レビューで横断分析した主要査読論文（${item.review_papers.length}本）</span>
+              </h3>
+              <div class="space-y-2.5">
+                ${item.review_papers
+                  .map(
+                    (rp, idx) => `
+                    <div class="bg-white rounded-xl border border-rose-100 p-3.5 shadow-2xs">
+                      <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                        <span class="text-xs font-bold text-slate-800">[論文 ${idx + 1}] ${rp.journal} (${rp.year})</span>
+                        ${renderIFBadge(rp.if_score)}
+                      </div>
+                      <p class="text-xs text-slate-500 italic mb-1.5">${rp.title}</p>
+                      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed"><strong class="text-rose-800">核心的知見:</strong> ${rp.finding}</p>
+                    </div>
+                  `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `
+          : "";
+
+      const diagramHTML =
+        item.summary?.diagram_svg || item.summary?.diagram_url
+          ? `
+            <div class="mt-4 pt-4 border-t border-indigo-200/70">
+              <div class="diagram-container bg-white rounded-xl border border-slate-200 p-3 shadow-2xs overflow-x-auto">
+                ${
+                  item.summary.diagram_svg
+                    ? item.summary.diagram_svg
+                    : `<img src="${item.summary.diagram_url}" alt="手法概念図" class="max-w-full h-auto mx-auto rounded-lg" onerror="this.src='https://placehold.co/800x240/f1f5f9/475569?text=Conceptual+Diagram'" />`
+                }
+              </div>
+              ${item.summary.diagram_caption ? `<p class="text-xs text-slate-600 mt-2 text-center font-medium">${item.summary.diagram_caption}</p>` : ""}
+            </div>
+          `
+          : "";
+
+      detailEl.innerHTML = `
+        <div class="border-b border-slate-200 pb-6 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">${item.date}</span>
+              ${renderIFBadge(item.impact_factor)}
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg border ${catStyle}">${item.category}</span>
+              <span class="text-xs font-semibold text-slate-600">${item.journal}</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="toggleStar('${item.id}')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold border transition cursor-pointer ${meta.starred ? "bg-amber-50 border-amber-300 text-amber-700" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}">${meta.starred ? "★ 重要登録済" : "☆ 重要マーク"}</button>
+              <button onclick="toggleRead('${item.id}')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold border transition cursor-pointer ${meta.read ? "bg-emerald-50 border-emerald-300 text-emerald-700" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}">${meta.read ? "✓ 既読" : "既読にする"}</button>
+            </div>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug mb-2">${item.title_ja}</h2>
+          <p class="text-xs sm:text-sm text-slate-500 italic mb-4">${item.title_en}</p>
+
+          <!-- 全文精読・対訳＆英語学習モード起動バナー -->
+          <div class="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase">Full-Text Bilingual &amp; Study</span>
+                <span class="text-xs text-indigo-200 font-semibold">全5セクション省略なし＋セクション別図解＋英語学習</span>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-200 mt-1">
+                左に日本語訳・右に英語原文を並べてカーソル連動ハイライト＆音声読み上げ・単語帳登録で精読します。
+              </p>
+            </div>
+            <button
+              onclick="openFullTextReader('${item.id}')"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-indigo-500 hover:bg-indigo-400 text-white transition shadow-md shrink-0 cursor-pointer"
+            >
+              <span>📖 全文を精読する（対訳・図解・英語学習）</span>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap gap-1.5">
+              ${(item.tags || []).map((t) => `<span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">#${t}</span>`).join("")}
+            </div>
+            ${
+              item.doi
+                ? `<a href="https://doi.org/${item.doi}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">
+                    <span>DOI: ${item.doi}</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0-7L10 14M5 7v12h12" /></svg>
+                  </a>`
+                : ""
+            }
+          </div>
+        </div>
+
+        ${reviewPapersHTML}
+
+        <div class="space-y-5 mb-6">
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <div class="flex items-center gap-2 text-rose-700 font-bold text-sm sm:text-base mb-2.5">
+              <span class="w-6 h-6 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-extrabold">1</span>
+              <h3>${isReview ? "臨床・研究領域が抱える構造的課題" : "扱っている問題点（Problem Statement）"}</h3>
+            </div>
+            <div class="text-sm text-slate-700">${formatParagraphs(item.summary.problem)}</div>
+          </div>
+
+          <div class="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 sm:p-5">
+            <div class="flex items-center gap-2 text-indigo-900 font-bold text-sm sm:text-base mb-2.5">
+              <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-extrabold">2</span>
+              <h3>${isReview ? "世界の最前線における解決アプローチと統合手法" : "解決策と具体的手法（数式モデル・アルゴリズム詳細）"}</h3>
+            </div>
+            <div class="text-sm text-slate-800">${formatParagraphs(item.summary.solution_and_method)}</div>
+            ${diagramHTML}
+          </div>
+
+          <div class="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 sm:p-5">
+            <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm sm:text-base mb-2.5">
+              <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-extrabold">3</span>
+              <h3>${isReview ? "複数研究から導かれるコンセンサス・主要エビデンス" : "主要な結果（Key Results）"}</h3>
+            </div>
+            <div class="text-sm text-slate-800">${formatParagraphs(item.summary.key_results)}</div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm sm:text-base mb-2.5">
+              <span class="w-6 h-6 rounded-lg bg-slate-800 text-white flex items-center justify-center text-xs font-extrabold">4</span>
+              <h3>重要な考察・限界と今後の展望（Discussion &amp; Future Directions）</h3>
+            </div>
+            <div class="text-sm text-slate-700">${formatParagraphs(item.summary.discussion_and_implications)}</div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border-2 border-teal-500/35 bg-gradient-to-br from-teal-50 to-indigo-50/60 p-5 mb-6">
+          <div class="flex items-center gap-2 text-teal-950 font-extrabold text-sm sm:text-base mb-2">
+            <svg class="w-5 h-5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <h3>自分の研究（点過程モデル・IIS・RC+Koopman線形制御）への接続・応用ヒント</h3>
+          </div>
+          <div class="text-sm text-slate-800 font-medium">${formatParagraphs(item.summary.relevance_to_my_research)}</div>
+        </div>
+      `;
+
+      renderMathInTarget(detailEl);
+    }
+
+    // =========================================================================
+    // 6. VIEW 4: 全文精読・対訳＆英語学習モード (Full-Text Bilingual Reader)
+    // =========================================================================
+    window.openFullTextReader = function (id) {
+      stopAllSpeech();
+      selectedItemId = id;
+      if (currentView !== "reader") {
+        previousView = currentView;
+      }
+      currentView = "reader";
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // 数式($...$, $$...$$)を保護しつつ、英語テキスト内の重要学術語彙にクリック可能なスパンを付与
+    function annotateEnglishWithVocab(rawEnText) {
+      if (!rawEnText) return "";
+      // 数式ブロックを分割して保護
+      const segments = rawEnText.split(/(\$\$[\s\S]*?\$\$|\$[^\$]*?\$)/g);
+      const terms = Object.keys(ACADEMIC_GLOSSARY).sort((a, b) => b.length - a.length);
+      const escapedTerms = terms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      const vocabRegex = new RegExp(`\\b(${escapedTerms.join("|")})\\b`, "gi");
+
+      return segments
+        .map((seg) => {
+          if (seg.startsWith("$")) return seg; // 数式はそのまま保持
+          return seg.replace(vocabRegex, (matched) => {
+            const key = matched.toLowerCase();
+            return `<span class="vocab-term" onclick="openVocabPopover('${key.replace(/'/g, "\\'")}', event)">${matched}</span>`;
+          });
+        })
+        .join("");
+    }
+
+    // 既存論文に full_text_sections がない場合のフォールバック生成
+    function getFullTextSections(item) {
+      if (Array.isArray(item.full_text_sections) && item.full_text_sections.length > 0) {
+        return item.full_text_sections;
+      }
+      return [
+        {
+          id: "sec-intro",
+          title_en: "1. Introduction",
+          title_ja: "1. イントロダクション",
+          paragraphs: [{ en: item.abstract_en || item.title_en, ja: item.abstract_ja || item.title_ja }],
+          takeaways: [item.summary.problem],
+          diagram_caption: "イントロダクション概念図",
+          diagram_svg: item.summary.diagram_svg || ""
+        },
+        {
+          id: "sec-methods",
+          title_en: "2. Methods",
+          title_ja: "2. 方法",
+          paragraphs: [{ en: item.summary.solution_and_method, ja: item.summary.solution_and_method }],
+          takeaways: [item.summary.solution_and_method],
+          diagram_caption: item.summary.diagram_caption || "手法概念図",
+          diagram_svg: item.summary.diagram_svg || ""
+        },
+        {
+          id: "sec-results",
+          title_en: "3. Results",
+          title_ja: "3. 結果",
+          paragraphs: [{ en: item.summary.key_results, ja: item.summary.key_results }],
+          takeaways: [item.summary.key_results],
+          diagram_caption: "",
+          diagram_svg: ""
+        },
+        {
+          id: "sec-discussion",
+          title_en: "4. Discussion",
+          title_ja: "4. 考察",
+          paragraphs: [{ en: item.summary.discussion_and_implications, ja: item.summary.discussion_and_implications }],
+          takeaways: [item.summary.discussion_and_implications],
+          diagram_caption: "",
+          diagram_svg: ""
+        },
+        {
+          id: "sec-conclusion",
+          title_en: "5. Conclusion",
+          title_ja: "5. 結論",
+          paragraphs: [{ en: item.summary.relevance_to_my_research, ja: item.summary.relevance_to_my_research }],
+          takeaways: [item.summary.relevance_to_my_research],
+          diagram_caption: "",
+          diagram_svg: ""
+        }
+      ];
+    }
+
+    function renderFullTextReader() {
+      const item = items.find((i) => i.id === selectedItemId) || items[0];
+      if (!item) return;
+
+      document.getElementById("readerJournalMeta").textContent = `${item.journal} (IF: ${item.impact_factor ?? "N/A"}) • ${item.date}`;
+      document.getElementById("readerTitleJa").textContent = item.title_ja;
+
+      const sections = getFullTextSections(item);
+
+      // セクションジャンプボタン
+      const navEl = document.getElementById("readerSectionNav");
+      navEl.innerHTML = sections
+        .map(
+          (sec) => `
+          <a
+            href="#${sec.id}"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-indigo-600 hover:text-white transition shrink-0"
+          >${sec.title_en}</a>
+        `
+        )
+        .join("");
+
+      const containerEl = document.getElementById("readerSectionsContainer");
+      containerEl.className = `space-y-8 ${
+        readerMode === "blur-ja" ? "blur-ja-mode" : readerMode === "en-only" ? "english-only-mode" : ""
+      }`;
+
+      containerEl.innerHTML = sections
+        .map((sec, sIdx) => {
+          const pairsHTML = sec.paragraphs
+            .map((pair, pIdx) => {
+              const rowId = `pair-${sIdx}-${pIdx}`;
+              const annotatedEn = annotateEnglishWithVocab(pair.en);
+              return `
+                <div
+                  id="${rowId}"
+                  data-en-raw="${encodeURIComponent(pair.en)}"
+                  onmouseenter="highlightPair('${rowId}', true)"
+                  onmouseleave="highlightPair('${rowId}', false)"
+                  class="bilingual-pair-row grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4"
+                >
+                  <!-- 左カラム：日本語訳 -->
+                  <div class="ja-col-wrapper">
+                    <div class="ja-cell h-full rounded-xl border border-slate-200 bg-white p-4 sm:p-5 text-sm sm:text-[15px] text-slate-800 leading-relaxed shadow-2xs">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-mono font-bold text-slate-400">JP #${sIdx + 1}.${pIdx + 1}</span>
+                      </div>
+                      <div class="ja-text-content">${pair.ja}</div>
+                    </div>
+                  </div>
+
+                  <!-- 右カラム：英語原文 -->
+                  <div class="en-col-wrapper">
+                    <div class="en-cell h-full rounded-xl border border-slate-200 bg-white p-4 sm:p-5 text-sm sm:text-[15px] text-slate-900 leading-relaxed shadow-2xs font-sans">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-mono font-bold text-indigo-500">EN #${sIdx + 1}.${pIdx + 1}</span>
+                        <button
+                          onclick="speakSingleRow('${rowId}')"
+                          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition cursor-pointer"
+                          title="この段落の英語音声を再生"
+                        >
+                          <span>🔊 音声再生</span>
+                        </button>
+                      </div>
+                      <div class="en-text-content">${annotatedEn}</div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+
+          // セクション末の要点まとめ＋専用概念図＋論文英語表現集
+          const diagramBlock =
+            sec.diagram_svg || sec.diagram_url
+              ? `
+                <div class="mt-4">
+                  <div class="diagram-container bg-white rounded-xl border border-slate-200 p-3 shadow-2xs overflow-x-auto">
+                    ${
+                      sec.diagram_svg
+                        ? sec.diagram_svg
+                        : `<img src="${sec.diagram_url}" alt="${sec.title_en} 図解" class="max-w-full h-auto mx-auto rounded-lg" onerror="this.src='https://placehold.co/800x220/f1f5f9/475569?text=Section+Diagram'" />`
+                    }
+                  </div>
+                  ${sec.diagram_caption ? `<p class="text-xs text-slate-600 mt-2 text-center font-semibold">${sec.diagram_caption}</p>` : ""}
+                </div>
+              `
+              : "";
+
+          const expressionsBlock =
+            Array.isArray(sec.writing_expressions) && sec.writing_expressions.length > 0
+              ? `
+                <div class="mt-4 pt-4 border-t border-indigo-200/70">
+                  <h4 class="text-xs font-extrabold uppercase tracking-wider text-indigo-900 mb-2.5 flex items-center gap-1.5">
+                    <span>✍️ このセクションから学ぶ英語論文ライティング表現</span>
+                  </h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    ${sec.writing_expressions
+                      .map(
+                        (exp) => `
+                        <div class="bg-white rounded-xl border border-indigo-100 p-3.5 text-xs">
+                          <div class="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded mb-1.5">${exp.pattern}</div>
+                          <p class="text-slate-800 italic mb-1.5">"${exp.example}"</p>
+                          <p class="text-slate-600 leading-relaxed">${exp.note}</p>
+                        </div>
+                      `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+              : "";
+
+          return `
+            <section id="${sec.id}" class="scroll-mt-36 rounded-2xl border border-slate-200 bg-slate-100/60 p-4 sm:p-6 space-y-4">
+              <!-- セクション見出し -->
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                <div>
+                  <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">${sec.title_en}</h3>
+                  <p class="text-xs sm:text-sm font-bold text-indigo-700">${sec.title_ja}</p>
+                </div>
+                <div class="hidden lg:grid grid-cols-2 gap-8 text-xs font-bold text-slate-500 pr-4">
+                  <span>左：日本語訳（カーソル連動）</span>
+                  <span>右：Original English</span>
+                </div>
+              </div>
+
+              <!-- 対訳ペア行一覧 -->
+              <div class="space-y-3.5">
+                ${pairsHTML}
+              </div>
+
+              <!-- セクション末：重要な要点まとめ＋専用概念図＋ライティング表現 -->
+              <div class="mt-5 rounded-2xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-50/90 via-white to-teal-50/70 p-5 shadow-xs">
+                <div class="flex items-center gap-2 text-indigo-950 font-extrabold text-sm sm:text-base mb-3">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white text-xs">セクション要点まとめ</span>
+                  <span>${sec.title_ja} の重要ポイント</span>
+                </div>
+                <ul class="space-y-2 text-xs sm:text-sm text-slate-800">
+                  ${(sec.takeaways || [])
+                    .map(
+                      (pt) => `
+                      <li class="flex items-start gap-2">
+                        <span class="text-indigo-600 font-extrabold mt-0.5">✓</span>
+                        <span class="leading-relaxed font-medium">${pt}</span>
+                      </li>
+                    `
+                    )
+                    .join("")}
+                </ul>
+                ${diagramBlock}
+                ${expressionsBlock}
+              </div>
+            </section>
+          `;
+        })
+        .join("");
+
+      renderMathInTarget(containerEl);
+    }
+
+    // 双方向ホバーハイライト関数
+    window.highlightPair = function (rowId, isEnter) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      if (isEnter) {
+        row.classList.add("is-hovered");
+      } else {
+        row.classList.remove("is-hovered");
+      }
+    };
+
+    // =========================================================================
+    // 7. 英語音声読み上げ機能（Web Speech API）
+    // =========================================================================
+    function cleanTextForSpeech(rawEncoded) {
+      const decoded = decodeURIComponent(rawEncoded);
+      return decoded
+        .replace(/\$\$[\s\S]*?\$\$/g, " equation ")
+        .replace(/\$[^\$]*?\$/g, " ")
+        .replace(/\\[a-zA-Z]+/g, " ")
+        .replace(/[{}^_]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function stopAllSpeech() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeakingSequence = false;
+      document.querySelectorAll(".bilingual-pair-row.is-speaking").forEach((el) => el.classList.remove("is-speaking"));
+      const iconEl = document.getElementById("audioBtnIcon");
+      const labelEl = document.getElementById("audioBtnLabel");
+      if (iconEl) iconEl.textContent = "🔊";
+      if (labelEl) labelEl.textContent = "セクション連続再生";
+    }
+
+    window.speakSingleRow = function (rowId) {
+      if (!("speechSynthesis" in window)) {
+        showToast("お使いのブラウザは音声合成に対応していません");
+        return;
+      }
+      stopAllSpeech();
+      const row = document.getElementById(rowId);
+      if (!row) return;
+
+      const text = cleanTextForSpeech(row.dataset.enRaw);
+      const rate = parseFloat(document.getElementById("speechRateSelect").value) || 1.0;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      row.classList.add("is-speaking");
+      utter.onend = () => row.classList.remove("is-speaking");
+      utter.onerror = () => row.classList.remove("is-speaking");
+
+      window.speechSynthesis.speak(utter);
+    };
+
+    function playNextInQueue() {
+      if (!isSpeakingSequence || speakingIndex >= speakingQueue.length) {
+        stopAllSpeech();
+        return;
+      }
+      const row = speakingQueue[speakingIndex];
+      document.querySelectorAll(".bilingual-pair-row.is-speaking").forEach((el) => el.classList.remove("is-speaking"));
+      row.classList.add("is-speaking");
+      row.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      const text = cleanTextForSpeech(row.dataset.enRaw);
+      const rate = parseFloat(document.getElementById("speechRateSelect").value) || 1.0;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = rate;
+
+      utter.onend = () => {
+        speakingIndex++;
+        playNextInQueue();
+      };
+      utter.onerror = () => {
+        stopAllSpeech();
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    // =========================================================================
+    // 8. 学術英単語辞書ポップアップ＆マイ単語帳（フラッシュカード復習）
+    // =========================================================================
+    window.openVocabPopover = function (termKey, event) {
+      if (event) event.stopPropagation();
+      const entry = ACADEMIC_GLOSSARY[termKey];
+      if (!entry) return;
+
+      activeVocabTerm = { term: termKey, ...entry };
+      document.getElementById("vocabWordTitle").textContent = termKey;
+      document.getElementById("vocabWordIpa").textContent = entry.ipa;
+      document.getElementById("vocabWordMeaning").textContent = entry.meaning;
+      document.getElementById("vocabWordNuance").textContent = entry.nuance;
+
+      const alreadySaved = wordbook.some((w) => w.term.toLowerCase() === termKey.toLowerCase());
+      const saveBtn = document.getElementById("saveToWordbookBtn");
+      saveBtn.innerHTML = alreadySaved ? "<span>✓ 単語帳に登録済</span>" : "<span>＋ 単語帳に保存</span>";
+
+      document.getElementById("vocabPopover").classList.remove("hidden");
+    };
+
+    let wbTabMode = "list"; // "list" | "quiz"
+    let quizIndex = 0;
+    let quizRevealed = false;
+
+    function renderWordbookModal() {
+      document.getElementById("wbModalCount").textContent = `${wordbook.length}語`;
+      const bodyEl = document.getElementById("wordbookBody");
+      const listTabBtn = document.getElementById("wbTabList");
+      const quizTabBtn = document.getElementById("wbTabQuiz");
+
+      listTabBtn.className =
+        wbTabMode === "list"
+          ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs cursor-pointer"
+          : "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer";
+      quizTabBtn.className =
+        wbTabMode === "quiz"
+          ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs cursor-pointer"
+          : "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer";
+
+      if (wordbook.length === 0) {
+        bodyEl.innerHTML = `<div class="py-12 text-center text-sm text-slate-500">まだ単語が登録されていません。全文精読モードで英語の下線単語をクリックして追加してください。</div>`;
+        return;
+      }
+
+      if (wbTabMode === "list") {
+        bodyEl.innerHTML = `
+          <div class="space-y-2.5">
+            ${wordbook
+              .map(
+                (w, idx) => `
+                <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 flex items-start justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-base font-extrabold text-indigo-950">${w.term}</span>
+                      <span class="text-xs font-mono text-slate-500">${w.ipa || ""}</span>
+                      <button onclick="speakWord('${w.term.replace(/'/g, "\\'")}')" class="text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold cursor-pointer">🔊</button>
+                    </div>
+                    <p class="text-sm font-bold text-emerald-700 mt-1">${w.meaning}</p>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">${w.nuance || ""}</p>
+                  </div>
+                  <button onclick="removeWord(${idx})" class="text-xs text-slate-400 hover:text-rose-600 px-2 py-1 cursor-pointer">削除</button>
+                </div>
+              `
+              )
+              .join("")}
+          </div>
+        `;
+      } else {
+        if (quizIndex >= wordbook.length) quizIndex = 0;
+        const card = wordbook[quizIndex];
+        bodyEl.innerHTML = `
+          <div class="rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-6 text-center space-y-4">
+            <div class="text-xs font-bold text-slate-400">フラッシュカード ${quizIndex + 1} / ${wordbook.length}</div>
+            <div>
+              <h4 class="text-2xl font-extrabold text-slate-900">${card.term}</h4>
+              <p class="text-xs font-mono text-slate-500 mt-1">${card.ipa || ""}</p>
+              <button onclick="speakWord('${card.term.replace(/'/g, "\\'")}')" class="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold cursor-pointer">🔊 発音確認</button>
+            </div>
+
+            ${
+              quizRevealed
+                ? `
+                  <div class="rounded-xl bg-white border border-emerald-200 p-4 text-left space-y-1.5">
+                    <p class="text-base font-extrabold text-emerald-700">${card.meaning}</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">${card.nuance || ""}</p>
+                  </div>
+                `
+                : `
+                  <button onclick="revealQuizCard()" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
+                    日本語訳と学術ニュアンスを表示する
+                  </button>
+                `
+            }
+
+            <div class="flex items-center justify-center gap-3 pt-2">
+              <button onclick="nextQuizCard(-1)" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer">← 前の単語</button>
+              <button onclick="nextQuizCard(1)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer">次の単語 →</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    window.speakWord = function (word) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(word);
+      u.lang = "en-US";
+      u.rate = 0.9;
+      window.speechSynthesis.speak(u);
+    };
+
+    window.removeWord = function (idx) {
+      wordbook.splice(idx, 1);
+      saveState();
+      updateHeaderStats();
+      renderWordbookModal();
+    };
+
+    window.revealQuizCard = function () {
+      quizRevealed = true;
+      renderWordbookModal();
+    };
+
+    window.nextQuizCard = function (delta) {
+      quizIndex = (quizIndex + delta + wordbook.length) % wordbook.length;
+      quizRevealed = false;
+      renderWordbookModal();
+    };
+
+    // =========================================================================
+    // 9. VIEW 3: アーカイブ横断「世界の研究の現状と抱えている課題」統合エンジン
+    // =========================================================================
+    function getSynthFilteredItems() {
+      if (!synthSearchQuery.trim()) return items;
+      const q = synthSearchQuery.toLowerCase();
+      return items.filter((item) => {
+        const text = [item.title_ja, item.title_en, item.category, ...(item.tags || []), item.summary?.problem || "", item.summary?.solution_and_method || ""].join(" ").toLowerCase();
+        return text.includes(q);
+      });
+    }
+
+    function renderSynthesisView() {
+      const checklistEl = document.getElementById("synthChecklist");
+      const outputEl = document.getElementById("synthOutputPanel");
+      const visibleItems = getSynthFilteredItems();
+      const selectedItems = items.filter((i) => synthSelectedIds.has(i.id));
+
+      document.getElementById("synthSelectedCount").textContent = selectedItems.length;
+
+      checklistEl.innerHTML = visibleItems
+        .map((item) => {
+          const checked = synthSelectedIds.has(item.id);
+          return `
+            <label class="flex items-start gap-3 p-3 rounded-xl border transition cursor-pointer ${checked ? "bg-indigo-50/60 border-indigo-300" : "bg-slate-50 border-slate-200 hover:bg-white"}">
+              <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleSynthItem('${item.id}')" class="mt-1 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap mb-1">
+                  <span class="text-[11px] font-mono text-slate-500">${item.date}</span>
+                  ${renderIFBadge(item.impact_factor)}
+                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600">${item.category}</span>
+                </div>
+                <p class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">${item.title_ja}</p>
+              </div>
+            </label>
+          `;
+        })
+        .join("");
+
+      if (selectedItems.length === 0) {
+        outputEl.innerHTML = `<div class="rounded-2xl border border-dashed border-slate-300 p-12 text-center text-sm text-slate-500">左のチェックリストから統合したい論文・レビューを1件以上選択してください。</div>`;
+        return;
+      }
+
+      const validIFs = selectedItems.map((i) => parseFloat(i.impact_factor)).filter((n) => !isNaN(n));
+      const avgIF = validIFs.length > 0 ? (validIFs.reduce((a, b) => a + b, 0) / validIFs.length).toFixed(1) : "N/A";
+
+      outputEl.innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-xl bg-slate-900 text-white p-3.5">
+            <div class="text-[11px] text-slate-400 font-medium">統合分析対象</div>
+            <div class="text-xl font-extrabold mt-0.5">${selectedItems.length} <span class="text-xs font-normal text-slate-300">文献・レビュー</span></div>
+          </div>
+          <div class="rounded-xl bg-indigo-50 border border-indigo-200 p-3.5">
+            <div class="text-[11px] text-indigo-700 font-bold">対象誌 平均 Impact Factor</div>
+            <div class="text-xl font-extrabold text-indigo-950 mt-0.5 font-mono">${avgIF}</div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-indigo-200 bg-indigo-50/35 p-5">
+          <h3 class="text-sm sm:text-base font-extrabold text-indigo-950 mb-3 flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-indigo-600 text-white text-xs">現状・トレンド</span>
+            <span>世界の研究の現在地（選択された${selectedItems.length}件からの統合知見）</span>
+          </h3>
+          <ul class="space-y-2.5 text-xs sm:text-sm text-slate-800">
+            ${selectedItems
+              .map(
+                (i) => `
+                <li class="bg-white rounded-xl p-3 border border-indigo-100">
+                  <div class="flex items-center justify-between gap-2 mb-1">
+                    <span class="font-bold text-indigo-900 text-xs">[${i.category}] ${i.journal}</span>
+                    ${renderIFBadge(i.impact_factor)}
+                  </div>
+                  <p class="leading-relaxed">${i.summary.key_results}</p>
+                </li>
+              `
+              )
+              .join("")}
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-rose-200 bg-rose-50/35 p-5">
+          <h3 class="text-sm sm:text-base font-extrabold text-rose-950 mb-3 flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-rose-600 text-white text-xs">未解決課題</span>
+            <span>世界的に抱えている技術的・臨床的ボトルネック</span>
+          </h3>
+          <ul class="space-y-2.5 text-xs sm:text-sm text-slate-800">
+            ${selectedItems
+              .map(
+                (i) => `
+                <li class="bg-white rounded-xl p-3 border border-rose-100">
+                  <span class="block font-bold text-rose-800 text-xs mb-1">${i.title_ja} より抽出:</span>
+                  <p class="leading-relaxed">${i.summary.problem}</p>
+                </li>
+              `
+              )
+              .join("")}
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border-2 border-teal-500/30 bg-gradient-to-br from-teal-50 to-white p-5">
+          <h3 class="text-sm sm:text-base font-extrabold text-teal-950 mb-3 flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-teal-600 text-white text-xs">本研究の優位性</span>
+            <span>あなたの研究フレームワークによる統合的突破口</span>
+          </h3>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-800">
+            ${selectedItems
+              .map(
+                (i) => `
+                <div class="p-3 rounded-xl bg-white/90 border border-teal-100">
+                  <span class="font-bold text-teal-800 text-xs block mb-0.5">対「${i.category}」への接続:</span>
+                  <p class="leading-relaxed">${i.summary.relevance_to_my_research}</p>
+                </div>
+              `
+              )
+              .join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMathInTarget(el) {
+      if (typeof renderMathInElement === "function" && el) {
+        try {
+          renderMathInElement(el, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false
+          });
+        } catch (e) {
+          console.warn("KaTeX render warning:", e);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 10. ユーザー操作ハンドラ＆イベント登録
+    // =========================================================================
+    window.selectItem = function (id) {
+      selectedItemId = id;
+      renderItemList();
+      renderItemDetail();
+      if (window.innerWidth < 1024) {
+        document.getElementById("paperDetail").scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    window.setCategory = function (cat) {
+      activeCategory = cat;
+      ensureValidSelection();
+      renderAll();
+    };
+
+    window.toggleStar = function (id) {
+      const meta = getMeta(id);
+      meta.starred = !meta.starred;
+      saveState();
+      renderAll();
+      showToast(meta.starred ? "★ 重要マークを付けました" : "重要マークを解除しました");
+    };
+
+    window.toggleRead = function (id) {
+      const meta = getMeta(id);
+      meta.read = !meta.read;
+      saveState();
+      renderAll();
+      showToast(meta.read ? "既読として記録しました" : "未読に戻しました");
+    };
+
+    window.toggleSynthItem = function (id) {
+      if (synthSelectedIds.has(id)) synthSelectedIds.delete(id);
+      else synthSelectedIds.add(id);
+      renderSynthesisView();
+    };
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastText").textContent = msg;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      setTimeout(() => toast.classList.add("translate-y-20", "opacity-0"), 2500);
+    }
+
+    function bindEvents() {
+      // 上部メインタブ
+      document.querySelectorAll(".view-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          stopAllSpeech();
+          currentView = btn.dataset.view;
+          activeCategory = "ALL";
+          ensureValidSelection();
+          renderAll();
+        });
+      });
+
+      // リーダーから戻る
+      document.getElementById("exitReaderBtn").addEventListener("click", () => {
+        stopAllSpeech();
+        document.getElementById("vocabPopover").classList.add("hidden");
+        currentView = previousView || "daily";
+        renderAll();
+      });
+
+      // リーダー表示モード切替（通常対訳 / 日本語ぼかし / 英語精読のみ）
+      document.querySelectorAll(".rmode-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          readerMode = btn.dataset.rmode;
+          document.querySelectorAll(".rmode-btn").forEach((b) => {
+            const active = b.dataset.rmode === readerMode;
+            b.className = active
+              ? "rmode-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-700 shadow-2xs cursor-pointer"
+              : "rmode-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer";
+          });
+          const containerEl = document.getElementById("readerSectionsContainer");
+          containerEl.className = `space-y-8 ${
+            readerMode === "blur-ja" ? "blur-ja-mode" : readerMode === "en-only" ? "english-only-mode" : ""
+          }`;
+        });
+      });
+
+      // セクション連続音声読み上げトグル
+      document.getElementById("readSectionAudioBtn").addEventListener("click", () => {
+        if (isSpeakingSequence) {
+          stopAllSpeech();
+          return;
+        }
+        const rows = Array.from(document.querySelectorAll("#readerSectionsContainer .bilingual-pair-row"));
+        if (rows.length === 0) return;
+        isSpeakingSequence = true;
+        speakingQueue = rows;
+        speakingIndex = 0;
+        document.getElementById("audioBtnIcon").textContent = "⏹";
+        document.getElementById("audioBtnLabel").textContent = "読み上げ停止";
+        playNextInQueue();
+      });
+
+      // 辞書ポップアップ操作
+      document.getElementById("closeVocabPopoverBtn").addEventListener("click", () => {
+        document.getElementById("vocabPopover").classList.add("hidden");
+      });
+      document.getElementById("vocabSpeakBtn").addEventListener("click", () => {
+        if (activeVocabTerm) speakWord(activeVocabTerm.term);
+      });
+      document.getElementById("saveToWordbookBtn").addEventListener("click", () => {
+        if (!activeVocabTerm) return;
+        const exists = wordbook.some((w) => w.term.toLowerCase() === activeVocabTerm.term.toLowerCase());
+        if (!exists) {
+          wordbook.unshift(activeVocabTerm);
+          saveState();
+          updateHeaderStats();
+          document.getElementById("saveToWordbookBtn").innerHTML = "<span>✓ 単語帳に登録済</span>";
+          showToast(`「${activeVocabTerm.term}」をマイ単語帳に保存しました`);
+        } else {
+          showToast("すでにマイ単語帳に登録されています");
+        }
+      });
+
+      // マイ単語帳モーダル操作
+      const wbModal = document.getElementById("wordbookModal");
+      document.getElementById("openWordbookBtn").addEventListener("click", () => {
+        wbTabMode = "list";
+        renderWordbookModal();
+        wbModal.classList.remove("hidden");
+      });
+      document.getElementById("closeWordbookBtn").addEventListener("click", () => wbModal.classList.add("hidden"));
+      document.getElementById("wbTabList").addEventListener("click", () => {
+        wbTabMode = "list";
+        renderWordbookModal();
+      });
+      document.getElementById("wbTabQuiz").addEventListener("click", () => {
+        wbTabMode = "quiz";
+        quizIndex = 0;
+        quizRevealed = false;
+        renderWordbookModal();
+      });
+      document.getElementById("copyWordbookBtn").addEventListener("click", () => {
+        const text = wordbook.map((w) => `${w.term} ${w.ipa}: ${w.meaning} (${w.nuance})`).join("\n");
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("単語帳リストをクリップボードにコピーしました");
+      });
+
+      // 検索＆重要フィルタ
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        ensureValidSelection();
+        renderItemList();
+        renderItemDetail();
+      });
+
+      document.getElementById("starOnlyBtn").addEventListener("click", () => {
+        starOnly = !starOnly;
+        const btn = document.getElementById("starOnlyBtn");
+        const icon = document.getElementById("starOnlyIcon");
+        btn.classList.toggle("bg-amber-50", starOnly);
+        btn.classList.toggle("border-amber-300", starOnly);
+        btn.classList.toggle("text-amber-800", starOnly);
+        icon.classList.toggle("text-amber-500", starOnly);
+        icon.classList.toggle("text-slate-400", !starOnly);
+        ensureValidSelection();
+        renderItemList();
+        renderItemDetail();
+      });
+
+      // 横断まとめビュー操作
+      document.getElementById("synthSearchInput").addEventListener("input", (e) => {
+        synthSearchQuery = e.target.value;
+        renderSynthesisView();
+      });
+      document.getElementById("selectAllSynthBtn").addEventListener("click", () => {
+        getSynthFilteredItems().forEach((i) => synthSelectedIds.add(i.id));
+        renderSynthesisView();
+      });
+      document.getElementById("clearSynthBtn").addEventListener("click", () => {
+        synthSelectedIds.clear();
+        renderSynthesisView();
+      });
+      document.getElementById("copySynthReportBtn").addEventListener("click", () => {
+        const selectedItems = items.filter((i) => synthSelectedIds.has(i.id));
+        if (selectedItems.length === 0) {
+          showToast("コピーする文献を選択してください");
+          return;
+        }
+        const reportText = [
+          `# 世界の研究の現状と抱えている課題 統合レポート（対象: ${selectedItems.length}件）`,
+          "",
+          "## 1. 世界の研究の現在地・主要結果",
+          ...selectedItems.map((i) => `- 【${i.journal} (IF: ${i.impact_factor})】${i.title_ja}\n  結果: ${i.summary.key_results}`),
+          "",
+          "## 2. 領域全体が抱えている未解決の課題",
+          ...selectedItems.map((i) => `- ${i.title_ja}: ${i.summary.problem}`),
+          "",
+          "## 3. 本研究アプローチによる突破口",
+          ...selectedItems.map((i) => `- ${i.summary.relevance_to_my_research}`)
+        ].join("\n");
+
+        const tempArea = document.createElement("textarea");
+        tempArea.value = reportText;
+        document.body.appendChild(tempArea);
+        tempArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempArea);
+        showToast("統合レポートをクリップボードにコピーしました");
+      });
+
+      // JSON追加モーダル
+      const modal = document.getElementById("jsonModal");
+      const jsonArea = document.getElementById("jsonInputArea");
+      const errBox = document.getElementById("jsonErrorMsg");
+
+      const SINGLE_TEMPLATE = {
+        entry_type: "daily_paper",
+        date: "2026-11-18",
+        category: "RC + Koopman制御",
+        title_ja: "クープマンモデル予測制御（KMPC）による経皮的耳介迷走神経刺激の閉ループ心拍制御",
+        title_en: "Closed-Loop Heart Rate Regulation via Koopman Model Predictive Control of Transcutaneous Auricular Vagus Nerve Stimulation",
+        journal: "IEEE Transactions on Neural Systems and Rehabilitation Engineering",
+        impact_factor: 5.2,
+        doi: "10.1109/TNSRE.2026.998877",
+        tags: ["KMPC", "taVNS", "閉ループ制御", "クープマン作用素"],
+        summary: {
+          problem: "taVNSの刺激パラメータは固定値で与えられており、個体差や瞬時の自律神経状態に適応できなかった。",
+          solution_and_method: "遅延座標とリザバー状態 $r_k$ から構成されるリフティング空間上で線形予測モデル $z_{k+1} = A z_k + B u_k$ を同定し、線形MPCにより最適刺激入力 $u_k$ を1拍ごとに算出した。",
+          key_results: "固定刺激と比較して目標RR間隔への整定時間が38%短縮し、過剰徐脈が抑制された。",
+          discussion_and_implications: "非線形生体応答をクープマン線形空間へ写像することで凸最適化によるリアルタイム制御が可能となった。",
+          relevance_to_my_research: "第二段階の閉ループ制御設計における制御入力行列 B の同定と最適入力算出に直接応用できる。"
+        },
+        abstract_ja: "本研究では、非線形な自律神経刺激応答をクープマン作用素により大域線形化し、モデル予測制御を適用した。",
+        abstract_en: "We present a Koopman Model Predictive Control framework for closed-loop vagus nerve stimulation.",
+        full_text_sections: [
+          {
+            id: "sec-intro",
+            title_en: "1. Introduction",
+            title_ja: "1. イントロダクション",
+            paragraphs: [
+              {
+                en: "Closed-loop control of autonomic nervous activity via transcutaneous auricular vagus nerve stimulation (taVNS) requires an accurate predictive model of nonlinear cardiac dynamics.",
+                ja: "経皮的耳介迷走神経刺激（taVNS）を介した自律神経活動の閉ループ制御には、非線形な心臓ダイナミクスの正確な予測モデルが不可欠である。"
+              }
+            ],
+            takeaways: ["固定パラメータのtaVNSでは個体差や過渡状態に適応できないため、閉ループ制御が求められる。"],
+            diagram_caption: "閉ループtaVNS制御の概念図",
+            diagram_url: "https://placehold.co/800x200/eef2ff/3730a3?text=Closed-Loop+Koopman+MPC"
+          }
+        ]
+      };
+
+      const REVIEW_TEMPLATE = {
+        entry_type: "clinical_review",
+        date: "2026-11-18",
+        category: "認知症メカニズム・早期診断",
+        title_ja: "【臨床最前線統合レビュー】睡眠時自律神経ダイナミクスと脳波徐波結合によるアルツハイマー病前駆期の超早期検出（3論文統合）",
+        title_en: "Clinical Frontier Synthesis: Nocturnal Autonomic Dynamics and EEG Slow-Wave Coupling in Prodromal Alzheimer's Disease",
+        journal: "Sleep Medicine Reviews / Brain 他（3誌統合）",
+        impact_factor: 11.2,
+        doi: "10.1016/j.smrv.2026.101988",
+        tags: ["認知症早期診断", "睡眠脳波", "自律神経連関"],
+        review_papers: [
+          {
+            title: "Autonomic-cortical coupling during NREM sleep predicts amyloid burden",
+            journal: "Brain",
+            year: "2026",
+            if_score: 11.9,
+            finding: "ノンレム睡眠中の脳波徐波と心拍迷走神経バーストの同期低下が脳内アミロイド蓄積と相関。"
+          }
+        ],
+        summary: {
+          problem: "日中の短い安静計測だけでは早期認知症の微細な中枢自律神経障害を見逃すケースがある。",
+          solution_and_method: "睡眠中の脳波徐波と心拍変動の結合度を点過程・非線形エントロピー解析により連続評価した。",
+          key_results: "認知機能低下の顕在化前に脳-心臓同期性の低下が検出された。",
+          discussion_and_implications: "ウェアラブル脳波・心電計による在宅超早期スクリーニングへの展開が期待される。",
+          relevance_to_my_research: "覚醒時の起立・認知負荷試験に加え、安静回復過程の評価指標として転用可能。"
+        },
+        abstract_ja: "睡眠および安静時の脳波-心拍結合指標を用いた認知症超早期診断の最新動向を3論文から統合レビューした。",
+        abstract_en: "A synthesis of three recent studies on sleep and resting brain-heart coupling biomarkers in prodromal dementia."
+      };
+
+      document.getElementById("openModalBtn").addEventListener("click", () => {
+        errBox.classList.add("hidden");
+        jsonArea.value = JSON.stringify(SINGLE_TEMPLATE, null, 2);
+        modal.classList.remove("hidden");
+      });
+      document.getElementById("loadSingleTemplateBtn").addEventListener("click", () => {
+        errBox.classList.add("hidden");
+        jsonArea.value = JSON.stringify(SINGLE_TEMPLATE, null, 2);
+      });
+      document.getElementById("loadReviewTemplateBtn").addEventListener("click", () => {
+        errBox.classList.add("hidden");
+        jsonArea.value = JSON.stringify(REVIEW_TEMPLATE, null, 2);
+      });
+
+      const closeModal = () => modal.classList.add("hidden");
+      document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+      document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
+
+      document.getElementById("submitJsonBtn").addEventListener("click", () => {
+        try {
+          const parsed = JSON.parse(jsonArea.value);
+          if (!parsed.title_ja || !parsed.summary) {
+            throw new Error("必須フィールド（title_ja, summary）が不足しています。");
+          }
+          const newItem = {
+            id: "item-" + Date.now(),
+            entry_type: parsed.entry_type || "daily_paper",
+            date: parsed.date || new Date().toISOString().slice(0, 10),
+            isToday: true,
+            category: parsed.category || "RC + Koopman制御",
+            title_ja: parsed.title_ja,
+            title_en: parsed.title_en || "",
+            journal: parsed.journal || "Peer-Reviewed Journal",
+            impact_factor: parsed.impact_factor ?? null,
+            doi: parsed.doi || "",
+            tags: parsed.tags || [],
+            review_papers: parsed.review_papers || [],
+            summary: {
+              problem: parsed.summary.problem || "",
+              solution_and_method: parsed.summary.solution_and_method || "",
+              diagram_caption: parsed.summary.diagram_caption || "",
+              diagram_svg: parsed.summary.diagram_svg || "",
+              diagram_url: parsed.summary.diagram_url || "",
+              key_results: parsed.summary.key_results || "",
+              discussion_and_implications: parsed.summary.discussion_and_implications || "",
+              relevance_to_my_research: parsed.summary.relevance_to_my_research || ""
+            },
+            abstract_ja: parsed.abstract_ja || "",
+            abstract_en: parsed.abstract_en || "",
+            full_text_sections: parsed.full_text_sections || []
+          };
+
+          items.forEach((i) => {
+            if (i.entry_type === newItem.entry_type) i.isToday = false;
+          });
+          items.unshift(newItem);
+          synthSelectedIds.add(newItem.id);
+          currentView = newItem.entry_type === "clinical_review" ? "clinical" : "daily";
+          activeCategory = "ALL";
+          selectedItemId = newItem.id;
+          saveState();
+          renderAll();
+          closeModal();
+          showToast("新しい論文 / レビューを追加しました");
+        } catch (err) {
+          errBox.textContent = "JSONパースエラー: " + err.message;
+          errBox.classList.remove("hidden");
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      async function loadRemoteManifest() {
+        try {
+          const res = await fetch('./data/manifest.json?t=' + Date.now());
+          if (!res.ok) return;
+          const manifest = await res.json();
+
+          if (Array.isArray(manifest.papers)) {
+            for (const item of manifest.papers) {
+              if (state.papers.some(p => p.id === item.id)) continue;
+              const pRes = await fetch('./' + item.path);
+              if (pRes.ok) {
+                const pData = await pRes.json();
+                state.papers.unshift(pData);
+              }
+            }
+          }
+          if (Array.isArray(manifest.reviews)) {
+            for (const item of manifest.reviews) {
+              if (state.reviews.some(r => r.id === item.id)) continue;
+              const rRes = await fetch('./' + item.path);
+              if (rRes.ok) {
+                const rData = await rRes.json();
+                state.reviews.unshift(rData);
+              }
+            }
+          }
+        } catch (e) {
+          console.log('Running in standalone local mode.');
+        }
+      }
+
+      loadRemoteManifest().then(() => initApp());
+      setTimeout(() => renderMathInTarget(document.body), 350);
+    });
+  </script>
+</body>
+</html>
