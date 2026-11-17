@@ -2730,43 +2730,62 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       // =========================================================================
-      // 全文精読ビュー用のセクション取得関数を最新JSON構造に完全対応させる
+      // 全文精読ビュー制御（PDF解読済みの論文のみ本文・詳細ポイントをフル表示）
       // =========================================================================
       window.getFullTextSections = function(item) {
-        if (!item) return [];
+        if (!item || !item.pdfDecoded) return [];
         const rawSections = (item.full_text && Array.isArray(item.full_text.sections) && item.full_text.sections.length > 0)
           ? item.full_text.sections
-          : (Array.isArray(item.sections) && item.sections.length > 0 ? item.sections : []);
+          : (Array.isArray(item.sections) ? item.sections : []);
 
-        if (rawSections.length > 0) {
-          return rawSections.map((sec, idx) => ({
-            id: sec.id || `sec-${idx + 1}`,
-            title_en: sec.title_en || `Section ${idx + 1}`,
-            title_ja: sec.title_ja || `セクション ${idx + 1}`,
-            paragraphs: Array.isArray(sec.paragraphs) ? sec.paragraphs : [],
-            takeaways: Array.isArray(sec.takeaways) && sec.takeaways.length > 0
-              ? sec.takeaways
-              : [sec.title_ja || '原文と対訳を左右で対比しながら精読できます。'],
-            diagram_svg: sec.diagram_svg || sec.section_svg || '',
-            diagram_caption: sec.diagram_caption || '',
-            writing_expressions: Array.isArray(sec.writing_expressions) ? sec.writing_expressions : []
-          }));
+        return rawSections.map((sec, idx) => ({
+          id: sec.id || `sec-${idx + 1}`,
+          title_en: sec.title_en || `Section ${idx + 1}`,
+          title_ja: sec.title_ja || `セクション ${idx + 1}`,
+          paragraphs: Array.isArray(sec.paragraphs) ? sec.paragraphs : [],
+          takeaways: Array.isArray(sec.takeaways) ? sec.takeaways : [],
+          // セクション内のダミーSVG枠は非表示にして重要ポイントを広く見せる
+          diagram_svg: '',
+          diagram_url: '',
+          diagram_caption: '',
+          writing_expressions: Array.isArray(sec.writing_expressions) ? sec.writing_expressions : []
+        }));
+      };
+
+      // 未解読論文で精読ビューを開いた場合は、Abstractを流用せずPDFアップロード案内を表示する
+      const _origRenderFullTextReader = typeof renderFullTextReader === 'function' ? renderFullTextReader : null;
+      window.renderFullTextReader = function() {
+        const item = items.find((i) => i.id === selectedItemId) || items[0];
+        if (!item) return;
+
+        if (!item.pdfDecoded) {
+          document.getElementById("readerJournalMeta").textContent = `${item.journal} (IF: ${item.impact_factor ?? "N/A"}) • ${item.date}`;
+          document.getElementById("readerTitleJa").textContent = item.title_ja;
+          document.getElementById("readerSectionNav").innerHTML = '';
+          const containerEl = document.getElementById("readerSectionsContainer");
+          containerEl.className = "space-y-6";
+          containerEl.innerHTML = `
+            <div class="rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/60 p-8 sm:p-12 text-center max-w-2xl mx-auto my-6">
+              <div class="text-4xl mb-3">📄</div>
+              <h3 class="text-lg font-extrabold text-slate-900 mb-2">この論文のPDF全文はまだ読み込まれていません</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                ハルシネーション（推測による本文創作）を防ぐため、PDFをアップロードするまで全文対訳は表示されません。<br>
+                一次ソースのリンクから論文PDFをダウンロードし、下のボタンからドロップしてください。
+              </p>
+              <button
+                onclick="document.getElementById('pdf-decoder-modal').classList.remove('hidden')"
+                class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-bold px-6 py-3 rounded-xl shadow-md transition cursor-pointer"
+              >
+                <span>📥 ダウンロードしたPDFをアップロードして全文解読</span>
+              </button>
+            </div>
+          `;
+          return;
         }
 
-        // 万が一 sections が空でもアブストラクト原文から精読画面を構築する
-        return [{
-          id: 'intro',
-          title_en: 'Abstract (Verified Original Text)',
-          title_ja: 'アブストラクト原文（全セクション解読は右下の「PDF全文解読」から実行できます）',
-          paragraphs: [{
-            en: item.abstractEn || item.title_en || '',
-            ja: item.abstractJa || item.problem || ''
-          }],
-          takeaways: [item.problem || '一次ソースの原文アブストラクトです。'],
-          diagram_svg: item.diagramSvg || '',
-          diagram_caption: item.diagramCaption || '',
-          writing_expressions: []
-        }];
+        if (_origRenderFullTextReader) {
+          _origRenderFullTextReader();
+        }
       };
 
       async function loadRemoteManifest() {
@@ -2812,6 +2831,7 @@
               ...raw,
               entry_type: type === 'review' ? 'clinical_review' : 'daily_paper',
               type: type,
+              pdfDecoded: Boolean(raw.pdfDecoded),
               impact_factor: raw.impact_factor || raw.impactFactor || 3.5,
               impactFactor: raw.impact_factor || raw.impactFactor || 3.5,
               problem: s.problem || raw.problem || '',
@@ -2824,8 +2844,8 @@
               relevance: sourceHeader + (s.relevance_to_my_research || raw.relevance || ''),
               abstractEn: abstractEn,
               abstractJa: abstractJa,
-              full_text: { sections: sections },
-              sections: sections
+              full_text: { sections: [] },
+              sections: []
             };
           }
 
@@ -2881,7 +2901,7 @@
       }
 
       // =========================================================================
-      // PDFアップロード＆全文AI解読モーダル（全5セクション・要点・表現集まで対応）
+      // PDFアップロード＆全文AI解読モーダル（全パラグラフ網羅抽出＋重要ポイント拡充）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -2910,7 +2930,7 @@
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の実テキストを抽出し、<strong>全5セクションの英文原文＋日本語対訳・セクション要点・英語論文表現集</strong>を生成して「全文を精読する」画面へ反映します。
+              出版社サイトやPMCからダウンロードした論文PDFをドロップすると、PDF内の本文を抽出し、<strong>全5セクションのすべての主要パラグラフ（英文原文＋日本語対訳）・詳細な重要ポイント・英語論文表現集</strong>を生成します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -2963,17 +2983,23 @@
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
           let fullText = '';
-          const maxPages = Math.min(pdf.numPages, 20);
+          const maxPages = Math.min(pdf.numPages, 35);
           for (let i = 1; i <= maxPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
             const pageText = content.items.map(item => item.str).join(' ');
+            // References以降は除外して本文を最大限保持
+            if (i > 2 && /\bReferences\b/i.test(pageText)) {
+              const beforeRef = pageText.split(/\bReferences\b/i)[0];
+              fullText += `\n--- Page ${i} ---\n${beforeRef}`;
+              break;
+            }
             fullText += `\n--- Page ${i} ---\n${pageText}`;
           }
           return fullText;
         }
 
-        async function fetchWithTimeout(url, options, timeoutMs = 35000) {
+        async function fetchWithTimeout(url, options, timeoutMs = 60000) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           try {
@@ -3014,11 +3040,6 @@
           }
         }
 
-        function buildSectionSvg(title) {
-          const safe = String(title || 'Section').replace(/[<>&"]/g, '');
-          return `<svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="80" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text x="300" y="45" text-anchor="middle" fill="#1e3a8a" font-size="13" font-weight="bold">${safe}</text></svg>`;
-        }
-
         async function handlePdfFile(file) {
           const apiKey = keyInput.value.trim();
           if (!apiKey) {
@@ -3028,7 +3049,7 @@
           localStorage.setItem('USER_GEMINI_API_KEY', apiKey);
 
           statusBox.classList.remove('hidden');
-          statusBox.textContent = '1/2 PDFから英文テキストを抽出しています...';
+          statusBox.textContent = '1/2 PDFから全ページの本文テキストを抽出しています...';
 
           try {
             const rawPdfText = await extractTextFromPdf(file);
@@ -3040,11 +3061,13 @@
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
 以下は査読済み論文PDFから抽出した実際の本文テキストです。
 
-【厳守ルール（捏造禁止・高速出力）】
-- sections の各パラグラフの "en" には、下記PDFテキストに実際に記載されている重要な英文パラグラフ（各セクション1〜2段落）を忠実に抽出してください（創作禁止）。
-- "ja" にはその忠実な学術日本語訳を入れてください。
-- sections は id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成し、各セクションに "takeaways"（日本語の要点2個）と "writing_expressions"（その英文から学べる英語論文表現1個）を含めてください。
-- 以下のJSON形式のみを出力してください。
+【厳守ルール（捏造禁止・全パラグラフ網羅抽出）】
+1. sections は必ず id が "intro", "methods", "results", "discussion", "conclusion" の5つで構成してください。
+2. **重要：各セクションの "paragraphs" は1段落だけに省略せず、そのセクションに含まれるすべての主要パラグラフ（各セクション3〜8段落程度、論文全体の流れが完全に追える分量）を原文の順序通りに抽出し、一字一句改変せず "en" に入れてください（存在しない英文の創作厳禁）。**
+3. "ja" にはそれぞれの "en" パラグラフの忠実で読みやすい学術日本語訳を入れてください。
+4. 各セクションの "takeaways"（重要ポイント）は、画像表示を廃止した代わりに情報量を充実させるため、**必ず4〜6個の具体的かつ詳細な日本語ポイント（数値・手法・生理学的メカニズムを含む）**を記述してください。
+5. "writing_expressions" には、そのセクションの英文から学べる有用な学術英語表現を2〜3個抽出してください。
+6. 以下のJSON形式のみを出力してください（SVGコードは不要です）。
 
 {
   "title_en": "英語タイトル",
@@ -3063,12 +3086,19 @@
       "id": "intro",
       "title_en": "1. Introduction",
       "title_ja": "1. 序論",
-      "takeaways": ["要点1", "要点2"],
+      "takeaways": [
+        "詳細な重要ポイント1（背景・既存手法の限界など）",
+        "詳細な重要ポイント2（生理学的・工学的メカニズム）",
+        "詳細な重要ポイント3（本研究の仮説とアプローチ）",
+        "詳細な重要ポイント4（本研究の新規性と位置づけ）"
+      ],
       "writing_expressions": [
         { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
       ],
       "paragraphs": [
-        { "en": "PDF内の実際の英文段落", "ja": "その日本語訳" }
+        { "en": "PDF内の実際の英文段落1", "ja": "その日本語訳1" },
+        { "en": "PDF内の実際の英文段落2", "ja": "その日本語訳2" },
+        { "en": "PDF内の実際の英文段落3", "ja": "その日本語訳3" }
       ]
     }
   ],
@@ -3078,7 +3108,7 @@
 }
 
 【PDF抽出テキスト】
-${rawPdfText.slice(0, 18000)}
+${rawPdfText.slice(0, 45000)}
 `;
 
             const candidateModels = await getAvailableGeminiModels(apiKey);
@@ -3086,7 +3116,7 @@ ${rawPdfText.slice(0, 18000)}
             let lastErrMsg = '';
 
             for (const modelName of candidateModels) {
-              statusBox.textContent = `2/2 Gemini (${modelName}) で全5セクションの対訳を生成中（最大35秒）...`;
+              statusBox.textContent = `2/2 Gemini (${modelName}) で全セクションの全パラグラフ対訳・重要ポイントを生成中（約25〜45秒）...`;
               try {
                 const apiRes = await fetchWithTimeout(
                   `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -3097,11 +3127,12 @@ ${rawPdfText.slice(0, 18000)}
                       contents: [{ parts: [{ text: prompt }] }],
                       generationConfig: {
                         responseMimeType: 'application/json',
-                        temperature: 0.1
+                        temperature: 0.1,
+                        maxOutputTokens: 32768
                       }
                     })
                   },
-                  35000
+                  60000
                 );
 
                 if (apiRes.ok) {
@@ -3119,7 +3150,7 @@ ${rawPdfText.slice(0, 18000)}
                 }
               } catch (fetchErr) {
                 if (fetchErr.name === 'AbortError') {
-                  lastErrMsg = `${modelName} が35秒以内に応答しませんでした。`;
+                  lastErrMsg = `${modelName} がタイムアウトしました。`;
                   statusBox.textContent = `⚠️ ${modelName} がタイムアウトしたため別モデルへ切り替えます...`;
                   continue;
                 }
@@ -3146,8 +3177,8 @@ ${rawPdfText.slice(0, 18000)}
 
             const normalizedSections = (parsed.sections || []).map(sec => ({
               ...sec,
-              diagram_svg: sec.diagram_svg || sec.section_svg || buildSectionSvg(sec.title_en || sec.title_ja),
-              section_svg: sec.section_svg || buildSectionSvg(sec.title_en || sec.title_ja)
+              diagram_svg: '',
+              section_svg: ''
             }));
 
             const mode = document.getElementById('pdf-target-mode').value;
@@ -3164,8 +3195,8 @@ ${rawPdfText.slice(0, 18000)}
                 results: parsed.key_results || items[targetIdx].results,
                 discussion: parsed.discussion_and_implications || items[targetIdx].discussion,
                 relevance: '【PDF全文解読済み】\n' + (parsed.relevance_to_my_research || items[targetIdx].relevance),
-                full_text: { sections: normalizedSections.length > 0 ? normalizedSections : items[targetIdx].sections },
-                sections: normalizedSections.length > 0 ? normalizedSections : items[targetIdx].sections
+                full_text: { sections: normalizedSections },
+                sections: normalizedSections
               };
             } else {
               const newId = 'pdf-' + Date.now();
@@ -3188,12 +3219,12 @@ ${rawPdfText.slice(0, 18000)}
                 method: parsed.solution_and_method || '',
                 formula: parsed.formula_block || '',
                 diagramCaption: 'PDF Full-Text Decoded',
-                diagramSvg: buildSectionSvg(parsed.title_en || file.name),
+                diagramSvg: '',
                 results: parsed.key_results || '',
                 discussion: parsed.discussion_and_implications || '',
                 relevance: parsed.relevance_to_my_research || '',
-                abstractEn: normalizedSections?.[0]?.paragraphs?.[0]?.en || '',
-                abstractJa: normalizedSections?.[0]?.paragraphs?.[0]?.ja || '',
+                abstractEn: '',
+                abstractJa: '',
                 full_text: { sections: normalizedSections },
                 sections: normalizedSections
               };
@@ -3207,7 +3238,7 @@ ${rawPdfText.slice(0, 18000)}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
 
-            statusBox.textContent = '✅ PDFの全文対訳の生成が完了しました！';
+            statusBox.textContent = '✅ PDFの全パラグラフ対訳・重要ポイントの生成が完了しました！';
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
