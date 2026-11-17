@@ -1,299 +1,268 @@
 {
-  "id": "paper-2026-11-17-40033035",
+  "id": "paper-2026-11-17-29467611",
   "date": "2026-11-17",
-  "pmid": "40033035",
+  "pmid": "29467611",
   "category": "point_process",
   "category_label": "点過程・脳心臓連関",
-  "journal": "Nature reviews. Cardiology",
-  "impact_factor": 24.0,
-  "doi": "10.1038/s41569-025-01140-3",
-  "title_en": "The brain-heart axis: integrative cooperation of neural, mechanical and biochemical pathways.",
-  "title_ja": "脳心臓軸：神経・機械・生化学的経路の統合的協調",
+  "journal": "Frontiers in neuroscience",
+  "impact_factor": 3.2,
+  "doi": "10.1097/SHK.0b013e318299e9c0",
+  "title_en": "The Vagus Nerve at the Interface of the Microbiota-Gut-Brain Axis.",
+  "title_ja": "微生物叢-腸-脳軸のインターフェースとしての迷走神経",
   "tags": [
-    "Brain-Heart Axis",
-    "Neurocardiology",
+    "Vagus Nerve",
+    "Microbiota-Gut-Brain Axis",
     "Autonomic Nervous System",
-    "Central Autonomic Network",
-    "Baroreflex",
-    "Piezo Channels",
-    "System Identification"
+    "Cholinergic Anti-inflammatory Pathway",
+    "Heart Rate Variability",
+    "Interoception",
+    "Point Process Modeling",
+    "Neuromodulation"
   ],
   "summary": {
-    "problem": "従来、脳と心血管系の連関は交感神経・副交感神経の古典的な拮抗制御モデル（神経経路単独）のみに依存して解釈される傾向が強く、拍動に伴う血圧や血管壁伸展などの機械的フィードバック（Piezoチャネル等を介した圧受容・脳血管連関）や、ホルモン・サイトカイン等の体液性生化学経路との多重時間スケールにわたる連成ダイナミクスが体系的に統合されていなかった。その結果、神経疾患に伴う致死的不整脈や心不全に起因する認知機能低下など、双方向性の病態メカニズムを定量的・統合的に捉えきれない限界が存在していた。",
-    "solution_and_method": "本レビューは、脳心臓軸（Brain-Heart Axis）を構成する3つの主要経路（神経経路、機械的経路、生化学的経路）の相互作用を多層的ネットワークとして体系化した。神経経路では中枢自律神経ネットワーク（CAN: 扁桃体、島皮質、前帯状皮質、視床下部、延髄孤束核等）と心臓内神経系（ICN）の階層的ループを同定し、機械的経路ではPiezo1/Piezo2チャネルを介した圧受容器応答および脳血管拍動血流シグナルを位置づけ、生化学経路ではカテコールアミン、アンジオテンシン、炎症性メディエーターによる液性フィードバックを包含する統合生理学モデルを提示した。",
-    "formula_block": "$$\\begin{cases} \\dot{\\mathbf{x}}_c(t) = \\mathbf{f}_c(\\mathbf{x}_c(t)) + \\mathbf{W}_{nc} \\mathbf{x}_n(t) + \\mathbf{W}_{bc} \\mathbf{c}_b(t) \\\\ \\dot{\\mathbf{x}}_n(t) = \\mathbf{f}_n(\\mathbf{x}_n(t)) + \\mathbf{W}_{cn} \\mathbf{y}_m(t) + \\mathbf{W}_{bn} \\mathbf{c}_b(t) \\\\ \\mathbf{y}_m(t) = \\mathbf{g}_{Piezo}(\\mathbf{P}_{art}(t), \\nabla \\mathbf{P}(t)) \\\\ \\dot{\\mathbf{c}}_b(t) = -\\boldsymbol{\\Gamma} \\mathbf{c}_b(t) + \\mathbf{h}(\\mathbf{x}_c(t), \\mathbf{x}_n(t)) \\end{cases}$$",
-    "diagram_caption": "脳心臓軸における神経（Neural）・機械（Mechanical）・生化学（Biochemical）の三連成フィードバックループと状態空間構造",
-    "diagram_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 240' width='100%' height='100%'><rect width='680' height='240' fill='#f8fafc'/><rect x='30' y='30' width='180' height='180' rx='12' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='120' y='55' font-family='sans-serif' font-size='14' font-weight='bold' fill='#1e3a8a' text-anchor='middle'>中枢神経系 (CAN)</text><text x='120' y='80' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>島皮質 / 扁桃体 / NTS</text><text x='120' y='105' font-family='sans-serif' font-size='11' fill='#1e40af' text-anchor='middle'>状態: x_n(t)</text><text x='120' y='130' font-family='sans-serif' font-size='10' fill='#475569' text-anchor='middle'>脳波 mEEG エントロピー</text><text x='120' y='155' font-family='sans-serif' font-size='10' fill='#0d9488' text-anchor='middle'>超高速遠心性遠心指令</text><rect x='470' y='30' width='180' height='180' rx='12' fill='#f0fdf4' stroke='#15803d' stroke-width='2'/><text x='560' y='55' font-family='sans-serif' font-size='14' font-weight='bold' fill='#15803d' text-anchor='middle'>心血管系 (CVS / ICN)</text><text x='560' y='80' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>洞房結節 / 心室筋 / 血管床</text><text x='560' y='105' font-family='sans-serif' font-size='11' fill='#166534' text-anchor='middle'>状態: x_c(t) [R-R, BP]</text><text x='560' y='130' font-family='sans-serif' font-size='10' fill='#475569' text-anchor='middle'>非線形ダイナミクス (IIS)</text><text x='560' y='155' font-family='sans-serif' font-size='10' fill='#15803d' text-anchor='middle'>心拍毎拍動出力 y_m(t)</text><rect x='250' y='145' width='180' height='65' rx='8' fill='#fefce8' stroke='#ca8a04' stroke-width='1.5'/><text x='340' y='165' font-family='sans-serif' font-size='12' font-weight='bold' fill='#a16207' text-anchor='middle'>生化学経路 c_b(t)</text><text x='340' y='185' font-family='sans-serif' font-size='9.5' fill='#713f12' text-anchor='middle'>カテコールアミン / 炎症性サイトカイン</text><text x='340' y='200' font-family='sans-serif' font-size='9' fill='#713f12' text-anchor='middle'>時定数 τ_b: 数分〜数時間</text><path d='M 210 65 L 470 65' fill='none' stroke='#2563eb' stroke-width='2.5' marker-end='url(#arrow-blue)'/><text x='340' y='55' font-family='sans-serif' font-size='10.5' font-weight='bold' fill='#2563eb' text-anchor='middle'>神経経路: 自律神経遠心路 (ANS: 交感/迷走)</text><path d='M 470 100 L 210 100' fill='none' stroke='#0d9488' stroke-width='2.5' stroke-dasharray='4,2'/><text x='340' y='92' font-family='sans-serif' font-size='10.5' font-weight='bold' fill='#0d9488' text-anchor='middle'>機械的経路: Piezo1/2 圧受容器求心路</text><path d='M 470 160 L 430 160' fill='none' stroke='#ca8a04' stroke-width='1.5'/><path d='M 250 160 L 210 160' fill='none' stroke='#ca8a04' stroke-width='1.5'/><defs><marker id='arrow-blue' viewBox='0 0 10 10' refX='6' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M 0 1 L 10 5 L 0 9 z' fill='#2563eb'/></marker></defs></svg>",
-    "key_results": "脳心臓軸における伝達遅延および生理フィードバック特性の包括的マッピングが確立された。神経経路（迷走神経遠心路）は数ミリ秒〜数百ミリ秒単位の超高速応答を担い、機械的圧受容器シグナル（Piezo依存性イオンチャネル）は拍動毎（数百ミリ秒）に求心路としてCANに入力される一方、生化学経路（内分泌・免疫系）は数分から数時間の遅延伝達として重畳し、これら3つの異種時間スケールが結合することで自律神経系全体の頑健性とホメオスタシスが維持されていることが明示された。",
-    "discussion_and_implications": "脳心臓軸の破綻は心不全、致死性不整脈、タコツボ心筋症、脳卒中、血管性認知症などの重篤な病態の中核要因である。従来の静的なバイオマーカー測定では、ミリ秒単位の神経スパイクから拍動ごとの機械的変化、長時間の液性シグナルが複雑に絡み合う過渡的ダイナミクスを捕捉できない。したがって、機械的感受性チャネル（Piezo1/2）の薬理標的化と並び、多変量かつ高時間分解能の生体計測・モデリング技術の臨床導入がニューロカーディオロジー（神経心臓学）の進展に不可欠であると提言している。",
-    "relevance_to_my_research": "本レビューの三経路連成フレームワークは、ユーザーの先端解析パイプラインに直結する。(1)『多変量非均質点過程モデル（mEEG→RR）』：中枢CAN動態（脳波サンプルエントロピー）から心拍発生（RR間隔）への秒単位（Δt=1〜5秒）超高速遠心性神経伝達の同定に合致し、経口GABA摂取後の迷走神経求心路応答の即時評価モデルの妥当性を理論的に支える。(2)『3次元Poincaré plot局所エントロピー（IIS）＋サロゲート検定』：拍動ごとのPiezo機械受容フィードバックが生み出す心拍周期の非線形性・決定論的カオス構造の抽出に直結する。(3)『RC＋クープマン作用素による起立負荷線形MPC』：能動的起立試験における重力負荷（機械的変位）→圧受容反射（神経応答）→血管運動（MPC制御）の過渡応答を、無限次元非線形空間から有限次元線形動的システムへ射影・固有値追従する理論的基盤を提供する。"
+    "problem": "従来の自律神経および脳腸相関研究では、腸内細菌叢とその代謝物が中枢神経系（CNS）や末梢器官に与える影響が、主として内分泌系や免疫系の緩慢な体液性経路（分〜時間スケール）に偏って議論され、求心性迷走神経線維を介したミリ秒〜秒単位の電気生理学的・非線形フィードバックダイナミクスが十分に定量化・モデル化されていなかった。また、自律神経機能不全（交感神経過緊張・迷走神経緊張低下）と腸内毒素症（ディスバイオーシス）および慢性炎症の相互作用を閉ループ制御系として同定・介入する工学的アプローチが確立されていなかった。",
+    "solution_and_method": "迷走神経（求心性線維80%、遠心性線維20%からなる混合神経）を中心軸とし、腸内細菌代謝産物（短鎖脂肪酸等）の内臓受容センシング、孤束核（NTS）から中枢自律神経ネットワーク（CAN）への求心伝達、およびコリン作動性抗炎症経路（CAP）を介した遠心性免疫・透過性フィードバックの双方向ループを体系化する。これらを動的システムとして捉え、自律神経緊張（HRVや点過程モデルによる時系列推定）と中枢神経ダイナミクス（mEEG等のエントロピー）を結合した多層閉ループ系として定式化・解析する。",
+    "formula_block": "$$\\lambda(t \\mid \\mathcal{H}_t) = \\lim_{\\Delta t \\to 0} \\frac{P(N(t+\\Delta t) - N(t) = 1 \\mid \\mathcal{H}_t)}{\\Delta t} = \\exp\\left( \\gamma_0 + \\sum_{i=1}^p \\alpha_i \\cdot \\text{RR}_{t-i} + \\sum_{j=1}^q \\beta_j \\cdot \\text{mEEG}_{t-j} + \\kappa \\cdot \\Phi_{\\text{gut}}(t) \\right)$$",
+    "diagram_caption": "迷走神経を介した微生物叢-腸-脳軸（MGBA）の双方向動的相互作用ループ概念図",
+    "diagram_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 240' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='240' fill='#f8fafc'/><rect x='30' y='30' width='180' height='180' rx='12' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='120' y='55' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-weight='bold' font-size='14'>Central Autonomic Net</text><text x='120' y='75' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='11'>Prefrontal, Insula, Amygdala</text><text x='120' y='110' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-size='12'>NTS Integration</text><rect x='50' y='130' width='140' height='30' rx='6' fill='#dbeafe' stroke='#2563eb' stroke-width='1'/><text x='120' y='150' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-size='11'>mEEG Entropy Dyn.</text><rect x='470' y='30' width='180' height='180' rx='12' fill='#f0fdfa' stroke='#0d9488' stroke-width='2'/><text x='560' y='55' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='14'>Gut &amp; Microbiota</text><text x='560' y='75' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='11'>Epithelium &amp; Dysbiosis</text><text x='560' y='110' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='12'>SCFAs / Serotonin (5-HT)</text><rect x='490' y='130' width='140' height='30' rx='6' fill='#ccfbf1' stroke='#0d9488' stroke-width='1'/><text x='560' y='150' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='11'>Local Immune Response</text><path d='M 470 70 C 340 30, 340 30, 210 70' fill='none' stroke='#2563eb' stroke-width='3' marker-end='url(#arrow-blue)'/><text x='340' y='45' text-anchor='middle' fill='#2563eb' font-family='sans-serif' font-weight='bold' font-size='11'>Afferent Fibers (80%): Viscerosensory Flow</text><path d='M 210 170 C 340 210, 340 210, 470 170' fill='none' stroke='#0d9488' stroke-width='3' stroke-dasharray='6,4' marker-end='url(#arrow-teal)'/><text x='340' y='200' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='11'>Efferent Fibers (20%): CAP &amp; Permeability Regulation</text><defs><marker id='arrow-blue' markerWidth='8' markerHeight='8' refX='6' refY='3' orient='auto'><path d='M0,0 L0,6 L8,3 z' fill='#2563eb'/></marker><marker id='arrow-teal' markerWidth='8' markerHeight='8' refX='6' refY='3' orient='auto'><path d='M0,0 L0,6 L8,3 z' fill='#0d9488'/></marker></defs></svg>",
+    "key_results": "迷走神経の80%を占める無髄C線維および有髄Aδ線維が細菌代謝産物（酪酸、プロピオン酸、酢酸等）や管腔ペプチド刺激を迅速にNTSへ伝送すること、および迷走神経背側運動核（DMV）からのコリン作動性遠心路がα7ニコチン性アセチルコリン受容体（α7nAChR）を介してマクロファージのTNF-α分泌を有意に抑制し粘膜バリア機能を保護することが判明した。IBSおよびIBD患者群では健常対照群に比べて高周波心拍変動（HF-HRV）に反映される迷走神経緊張が統計的有意に低下（迷走神経減弱）しており、腸内細菌多様性の低下（ディスバイオーシス）および局所・全身性炎症マーカーの上昇と相関することが示された。",
+    "discussion_and_implications": "慢性的な精神的・身体的ストレスは迷走神経活動を中枢レベルで強力に抑制し、交感神経-副腎髄質系の過剰駆動を招く。これにより腸管透過性増大（リーキーガット）とディスバイオーシスが誘発され、その情報が弱毒化した求心性シグナルまたは異常感覚としてCANへ逆送される病態悪循環が形成される。迷走神経刺激（VNS）等の電気的・物理的介入は、この非線形破綻ループを正常なホメオスタシス状態へとリセットする治療的標的として有望である。",
+    "relevance_to_my_research": "本論文の知見は、経口GABA摂取や細菌代謝産物による超高速（秒単位）な自律神経・中枢応答のメカニズム解明に直接寄与する。具体的には、mEEGサンプルエントロピーと瞬時RR間隔の時系列データを用いた多変量非均質点過程モデルにおいて、求心性迷走神経入力を外生変数\\(\\Phi_{\\text{gut}}(t)\\)として定式化できる。また、3次元Poincaré plot上の局所不均一性指数（IIS）およびサロゲートデータ検定を適用することで、腸内入力に伴うHRVアトラクタの非線形相転移を数秒の窓幅で捕捉可能となる。さらに、能動的起立試験における起立性循環調節破綻に対し、リザバーコンピューティング（RC）とクープマン作用素（Koopman operator）を組み合わせたデータ駆動型同定を行うことで、迷走神経遠心路を介した生体システムの非線形状態空間を線形化し、モデル予測制御（MPC）による介入タイミング最適化へ展開できる。"
   },
   "full_text": {
     "sections": [
       {
         "id": "intro",
-        "title_en": "1. Introduction and Clinical Paradigm",
-        "title_ja": "1. イントロダクションと臨床的パラダイム",
+        "title_en": "1. Introduction",
+        "title_ja": "1. イントロダクション（研究背景と課題）",
         "paragraphs": [
           {
-            "ja": "神経系および心血管系は、ヒトの生理的、認知、および情動状態を調節する上で極めて重要であり、脳心臓軸と呼ばれる解剖学的かつ機能的な結合を介して絶え間なく相互作用している。",
-            "en": "The neural and cardiovascular systems are pivotal in regulating human physiological, cognitive and emotional states, constantly interacting through anatomical and functional connections referred to as the brain-heart axis."
+            "ja": "腸内細菌叢、腸管、および脳は、自律神経系を巻き込んだ双方向経路である「微生物叢-腸-脳軸（MGBA）」を介して密接に通信している。近年、消化管内に生息する膨大な共生微生物群が、宿主の情動行動、認知機能、ストレス応答、ならびに免疫恒常性の維持に極めて重要な役割を果たしていることが明らかになってきた。",
+            "en": "The microbiota, the gut, and the brain communicate through the microbiota-gut-brain axis in a bidirectional way that involves the autonomic nervous system. Recently, it has been established that the vast community of commensal microorganisms colonizing the gastrointestinal tract plays an essential role in modulating emotional behavior, cognitive functions, stress reactivity, and immune homeostasis."
           },
           {
-            "ja": "この軸が機能不全に陥ると、神経学的疾患が心血管障害を引き起こす可能性があり、逆に心血管機能不全は脳の健康に実質的な悪影響を及ぼす恐れがある。",
-            "en": "When this axis is dysfunctional, neurological conditions can lead to cardiovascular disorders and, conversely, cardiovascular dysfunction can substantially affect brain health."
-          },
-          {
-            "ja": "しかしながら、脳心臓軸のメカニズムおよび基礎的な生理学的構成要素は、依然として大部分が未解明のままである。",
-            "en": "However, the mechanisms and fundamental physiological components of the brain-heart axis remain largely unknown."
+            "ja": "この複雑なインターフェースにおいて、副交感神経系の主成分である迷走神経（第X脳神経）は、末梢の内臓受容情報を中枢神経系へ伝達し、中枢からの制御指令を末梢へフィードバックする主要な物理的配線として機能している。しかしながら、従来の生理学研究では体液性経路（ホルモンや炎症性サイトカイン）の長期的動態に焦点が当てられる傾向があり、迷走神経線維が担う動的かつ高速な神経シグナル伝達の全貌は十分に統合されていなかった。",
+            "en": "At this complex interface, the vagus nerve (VN), the principal component of the parasympathetic nervous system, acts as a primary physical conduit transmitting interoceptive cues to the central nervous system and feeding regulatory commands back to the periphery. However, classical physiology has predominantly focused on slow humoral pathways, leaving the dynamic and rapid neural communication orchestrated by vagal fibers insufficiently integrated into system-level models."
           }
         ],
         "takeaways": [
-          "神経系と心血管系は解剖学的・機能的ネットワーク（脳心臓軸）を介して双方向に連動している。",
-          "一過性の神経ストレスや脳血管障害が不整脈・心不全を誘発し、逆に心拍出低下や微小塞栓が認知症や脳卒中を加速する悪循環が存在する。",
-          "双方の連関を解明し、定量的評価および治療介入を行うための統合的枠組みの構築が急務である。"
+          "腸内細菌叢・腸・脳は自律神経系を介して双方向に通信する。",
+          "迷走神経は副交感神経系の根幹であり、中枢と腸管を結ぶ直接の物理的ネットワークを構成する。",
+          "従来の体液性（内分泌・免疫）解析に対し、秒単位で作用する神経回路網としての機能解明が不可欠である。"
         ],
-        "section_svg_caption": "脳心臓軸における双方向の病態生理的クロストーク",
-        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%'><rect width='680' height='210' fill='#f8fafc'/><rect x='40' y='40' width='230' height='130' rx='10' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='155' y='70' font-family='sans-serif' font-size='14' font-weight='bold' fill='#1e3a8a' text-anchor='middle'>神経系 (Brain / CAN)</text><text x='155' y='100' font-family='sans-serif' font-size='10.5' fill='#334155' text-anchor='middle'>情動変調・認知機能</text><text x='155' y='120' font-family='sans-serif' font-size='10.5' fill='#334155' text-anchor='middle'>脳卒中・てんかん発作</text><text x='155' y='145' font-family='sans-serif' font-size='10.5' fill='#dc2626' text-anchor='middle'>中枢性不整脈・神経原性気絶心</text><rect x='410' y='40' width='230' height='130' rx='10' fill='#f0fdf4' stroke='#166534' stroke-width='2'/><text x='525' y='70' font-family='sans-serif' font-size='14' font-weight='bold' fill='#166534' text-anchor='middle'>心血管系 (Heart / Vessels)</text><text x='525' y='100' font-family='sans-serif' font-size='10.5' fill='#334155' text-anchor='middle'>心拍出量・血圧制御</text><text x='525' y='120' font-family='sans-serif' font-size='10.5' fill='#334155' text-anchor='middle'>心不全・心房細動</text><text x='525' y='145' font-family='sans-serif' font-size='10.5' fill='#dc2626' text-anchor='middle'>脳灌流低下・血管性認知症</text><path d='M 270 80 L 410 80' fill='none' stroke='#2563eb' stroke-width='2.5'/><polygon points='405,75 415,80 405,85' fill='#2563eb'/><text x='340' y='72' font-family='sans-serif' font-size='10' font-weight='bold' fill='#2563eb' text-anchor='middle'>自律神経異常放電</text><path d='M 410 130 L 270 130' fill='none' stroke='#0d9488' stroke-width='2.5'/><polygon points='275,125 265,130 275,135' fill='#0d9488'/><text x='340' y='122' font-family='sans-serif' font-size='10' font-weight='bold' fill='#0d9488' text-anchor='middle'>低灌流・微小血栓塞栓</text></svg>",
+        "section_svg_caption": "微生物叢-腸-脳軸（MGBA）における迷走神経の解剖学的・機能的ポジショニング",
+        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='210' fill='#f8fafc'/><rect x='20' y='40' width='160' height='130' rx='8' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='100' y='70' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-weight='bold' font-size='13'>Brain (CNS)</text><text x='100' y='95' text-anchor='middle' fill='#334155' font-family='sans-serif' font-size='10'>CAN / Insular Cortex</text><text x='100' y='115' text-anchor='middle' fill='#334155' font-family='sans-serif' font-size='10'>Nucleus Tractus Solitarius</text><text x='100' y='145' text-anchor='middle' fill='#2563eb' font-family='sans-serif' font-weight='bold' font-size='10'>Emotional &amp; Auto Control</text><rect x='500' y='40' width='160' height='130' rx='8' fill='#f0fdfa' stroke='#0d9488' stroke-width='2'/><text x='580' y='70' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='13'>Gut &amp; Lumen</text><text x='580' y='95' text-anchor='middle' fill='#334155' font-family='sans-serif' font-size='10'>Microbiota Community</text><text x='580' y='115' text-anchor='middle' fill='#334155' font-family='sans-serif' font-size='10'>Enteroendocrine Cells</text><text x='580' y='145' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='10'>Mucosal Barrier</text><path d='M 180 80 L 500 80' stroke='#2563eb' stroke-width='2.5' marker-end='url(#arrow-intro-blue)'/><text x='340' y='72' text-anchor='middle' fill='#2563eb' font-family='sans-serif' font-size='11' font-weight='bold'>Vagal Afferent Signaling (Interoception)</text><path d='M 500 130 L 180 130' stroke='#0d9488' stroke-width='2.5' marker-end='url(#arrow-intro-teal)'/><text x='340' y='122' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='11' font-weight='bold'>Vagal Efferent Regulation (Cholinergic Path)</text><circle cx='340' cy='105' r='14' fill='#ffffff' stroke='#64748b' stroke-width='1.5'/><text x='340' y='109' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='9' font-weight='bold'>MGBA</text><defs><marker id='arrow-intro-blue' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#2563eb'/></marker><marker id='arrow-intro-teal' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#0d9488'/></marker></defs></svg>",
         "writing_expressions": [
           {
-            "pattern": "... are pivotal in regulating [Entity/Process], constantly interacting through [Mechanism] referred to as [Term].",
-            "meaning": "〜は…の制御において中心的な役割を担っており、[専門用語]と呼ばれるメカニズムを介して絶え間なく相互作用している。",
-            "example": "The autonomic and cerebrovascular networks are pivotal in regulating systemic hemodynamics, constantly interacting through complex physiological feedback loops referred to as neurocardiovascular coupling."
+            "pattern": "The ... communicate through ... in a bidirectional way that involves ...",
+            "meaning": "〜と…は、〜を巻き込んだ双方向経路を介して通信している",
+            "example": "The gut microbiota and the brain communicate through the autonomic network in a bidirectional way that involves neuroendocrine pathways."
           },
           {
-            "pattern": "When [System] is dysfunctional, [Condition A] can lead to [Condition B] and, conversely, [Condition B] can substantially affect [System/Entity].",
-            "meaning": "[システム]が機能不全に陥ると、AがBを招き、逆にBがAに実質的悪影響を及ぼすという双方向性病態を説明する構文。",
-            "example": "When the baroreflex arc is dysfunctional, neural instability can lead to lethal tachyarrhythmias and, conversely, myocardial strain can substantially affect cortical autonomic regulation."
+            "pattern": "... acts as a principal component of ..., responsible for ...",
+            "meaning": "〜は…の主成分として機能し、〜を担っている",
+            "example": "The vagus nerve acts as a principal component of the parasympathetic branch, responsible for fast viscerosensory feedback."
           }
         ]
       },
       {
         "id": "methods",
-        "title_en": "2. Tripartite Mechanistic Pathways",
-        "title_ja": "2. 3つの主要メカニズム経路の体系化",
+        "title_en": "2. Neuroanatomical and Physiological Methodology",
+        "title_ja": "2. 神経解剖学的および生理学的構成（構造解析）",
         "paragraphs": [
           {
-            "ja": "本総説では、これらの構成要素を解明し、3つの主要な経路（神経経路、機械的経路、生化学的経路）を特定する。",
-            "en": "In this Review, we elucidate these components and identify three primary pathways: neural, mechanical and biochemical."
+            "ja": "迷走神経の線維構成を解読すると、その約80%が内臓からの求心性感覚線維であり、遠心性の運動・分泌調節線維は残りの約20%に過ぎない。求心性線維は消化管粘膜下層および筋層に広範な神経終末を張り巡らせており、腸内細菌が産生する短鎖脂肪酸（SCFA）、セロトニン（5-HT）、消化管ホルモン（CCK、GLP-1など）を腸内分泌細胞（EEC）を介して感知する。",
+            "en": "Decoding the fiber architecture of the vagus nerve reveals that approximately 80% are afferent sensory fibers, whereas efferent motor and secretomotor fibers comprise only the remaining 20%. The afferent fibers project extensively into the mucosal and muscular layers of the gastrointestinal tract, detecting microbial metabolites such as short-chain fatty acids (SCFAs), serotonin (5-HT), and gut peptides released by enteroendocrine cells."
           },
           {
-            "ja": "神経経路は、自律神経系と脳内の中枢自律神経ネットワーク（CAN）との間の動的な相互作用に関与している。",
-            "en": "The neural pathway involves the interaction between the autonomic nervous system and the central autonomic network in the brain."
-          },
-          {
-            "ja": "機械的経路は、特に機械感受性Piezoプロテインチャネルを発現する機械受容体を伴い、末梢および脳血管の連関を介して血圧に関する極めて重要な情報を伝達する。",
-            "en": "The mechanical pathway involves mechanoreceptors, particularly those expressing mechanosensitive Piezo protein channels, which relay crucial information about blood pressure through peripheral and cerebrovascular connections."
-          },
-          {
-            "ja": "生化学的経路は、神経機能および心血管機能の重要なメディエーターである多数の内因性化合物から構成されている。",
-            "en": "The biochemical pathway comprises many endogenous compounds that are important mediators of neural and cardiovascular function."
+            "ja": "これらの感覚情報は求心路を経て脳幹の孤束核（NTS）に入力され、青斑核、視床下部、扁桃体、島皮質などから構成される中枢自律神経ネットワーク（CAN）へと中継される。中枢で統合された情報は、迷走神経背側運動核（DMV）および疑核（NA）から起始する遠心性副交感神経線維を駆動し、心拍数の即時調節やコリン作動性抗炎症経路を通じた消化管免疫の変調を惹起する。",
+            "en": "These interoceptive signals are transmitted rostrally to the nucleus tractus solitarius (NTS) within the brainstem and subsequently relayed to the central autonomic network (CAN), including the locus coeruleus, hypothalamus, amygdala, and insular cortex. Central integration then modulates efferent vagal preganglionic neurons residing in the dorsal motor nucleus of the vagus (DMV) and nucleus ambiguus, thereby adjusting cardiac intervals and recruiting the cholinergic anti-inflammatory pathway."
           }
         ],
         "takeaways": [
-          "神経経路：皮質（島皮質・帯状回）から延髄（NTS）、自律神経遠心路（交感・迷走神経）を経て心臓内神経系に至る多階層ループ。",
-          "機械的経路：Piezo1およびPiezo2チャネルを基盤とする圧受容機構が、拍動毎の血圧波形情報を求心性信号へ変換する物理的変換層。",
-          "生化学経路：カテコールアミン、レニン・アンジオテンシン系、サイトカインなどの液性因子による低速・持続的フィードバック層。"
+          "迷走神経は80%が求心性（感覚受容）、20%が遠心性（運動・抗炎症制御）という極端な非対称構造を持つ。",
+          "腸内細菌代謝産物は腸内分泌細胞や粘膜終末を介して電気信号へと変換される。",
+          "脳幹NTSを中継点とし、中枢自律神経ネットワーク（CAN）が全身の適応反応を統合制御する。"
         ],
-        "section_svg_caption": "3つの連成経路（神経・機械・生化学）の信号伝達アーキテクチャ",
-        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%'><rect width='680' height='210' fill='#f8fafc'/><rect x='30' y='30' width='180' height='150' rx='8' fill='#eff6ff' stroke='#2563eb' stroke-width='1.5'/><text x='120' y='55' font-family='sans-serif' font-size='12' font-weight='bold' fill='#1e40af' text-anchor='middle'>1. 神経経路 (Neural)</text><text x='120' y='80' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>CAN (島皮質・NTS)</text><text x='120' y='105' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>交感神経 / 迷走神経</text><text x='120' y='130' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>心拍毎遠心性調整</text><text x='120' y='160' font-family='sans-serif' font-size='9' fill='#2563eb' text-anchor='middle'>Δt ≈ 50-500 ms (超高速)</text><rect x='250' y='30' width='180' height='150' rx='8' fill='#f0fdf4' stroke='#0d9488' stroke-width='1.5'/><text x='340' y='55' font-family='sans-serif' font-size='12' font-weight='bold' fill='#0f766e' text-anchor='middle'>2. 機械的経路 (Mech)</text><text x='340' y='80' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>Piezo1/Piezo2 チャネル</text><text x='340' y='105' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>動脈壁伸展・せん断応力</text><text x='340' y='130' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>求心性圧受容器反射</text><text x='340' y='160' font-family='sans-serif' font-size='9' fill='#0d9488' text-anchor='middle'>Δt ≈ 拍動同期 (1 beat)</text><rect x='470' y='30' width='180' height='150' rx='8' fill='#fefce8' stroke='#ca8a04' stroke-width='1.5'/><text x='560' y='55' font-family='sans-serif' font-size='12' font-weight='bold' fill='#a16207' text-anchor='middle'>3. 生化学経路 (Biochem)</text><text x='560' y='80' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>ホルモン・サイトカイン</text><text x='560' y='105' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>アンジオテンシン / エピネフリン</text><text x='560' y='130' font-family='sans-serif' font-size='10' fill='#334155' text-anchor='middle'>代謝・体液量恒常性</text><text x='560' y='160' font-family='sans-serif' font-size='9' fill='#ca8a04' text-anchor='middle'>Δt ≈ 数分〜数時間 (低速)</text></svg>",
+        "section_svg_caption": "迷走神経の求心路（80%）と遠心路（20%）による入出力ダイナミクス",
+        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='210' fill='#f8fafc'/><rect x='30' y='30' width='190' height='150' rx='8' fill='#eff6ff' stroke='#1e3a8a' stroke-width='1.5'/><text x='125' y='55' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-weight='bold' font-size='12'>Afferent Pathway (80%)</text><rect x='45' y='75' width='160' height='30' rx='4' fill='#dbeafe'/><text x='125' y='94' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-size='10'>Mucosal Mechanical &amp; Chemosensing</text><rect x='45' y='115' width='160' height='30' rx='4' fill='#dbeafe'/><text x='125' y='134' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-size='10'>Unmyelinated C-fibers &amp; Aδ-fibers</text><rect x='45' y='155' width='160' height='18' rx='3' fill='#93c5fd'/><text x='125' y='168' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-size='9' font-weight='bold'>Direct Input to NTS</text><rect x='250' y='50' width='180' height='110' rx='10' fill='#ffffff' stroke='#475569' stroke-width='1.5'/><text x='340' y='75' text-anchor='middle' fill='#0f172a' font-family='sans-serif' font-weight='bold' font-size='12'>CAN Central Processor</text><text x='340' y='100' text-anchor='middle' fill='#64748b' font-family='sans-serif' font-size='10'>Hypothalamus - Amygdala - Insula</text><path d='M 220 90 L 250 90' stroke='#1e3a8a' stroke-width='2' marker-end='url(#sub-arr)'/><path d='M 430 120 L 460 120' stroke='#0d9488' stroke-width='2' marker-end='url(#sub-arr)'/><rect x='460' y='30' width='190' height='150' rx='8' fill='#f0fdfa' stroke='#0d9488' stroke-width='1.5'/><text x='555' y='55' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='12'>Efferent Pathway (20%)</text><rect x='475' y='75' width='160' height='30' rx='4' fill='#ccfbf1'/><text x='555' y='94' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='10'>DMV / Nucleus Ambiguus</text><rect x='475' y='115' width='160' height='30' rx='4' fill='#ccfbf1'/><text x='555' y='134' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='10'>Ach -> alpha7-nAChR (Spleen/Gut)</text><rect x='475' y='155' width='160' height='18' rx='3' fill='#5eead4'/><text x='555' y='168' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='9' font-weight='bold'>Suppression of Pro-inflammatory cytokines</text><defs><marker id='sub-arr' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#475569'/></marker></defs></svg>",
         "writing_expressions": [
           {
-            "pattern": "In this Review, we elucidate [Topic] and identify [Number] primary pathways: [List of Pathways].",
-            "meaning": "本総説では[主題]を解明し、[数]つの主要経路である[A, B, C]を同定・体系化する。",
-            "example": "In this study, we elucidate brain-heart cross-talk and identify three primary dynamical pathways: neural, hemodynamic and neuroendocrine."
+            "pattern": "Decoding the ... reveals that ..., whereas ... comprise only ...",
+            "meaning": "〜を解明・分析すると…であることが判明し、一方で〜はわずか…を占めるに過ぎない",
+            "example": "Decoding the autonomic architecture reveals that afferent projections dominate, whereas efferent paths comprise only a minor proportion."
           },
           {
-            "pattern": "[Mechanism] involves [Receptors/Nodes], particularly those expressing [Specific Marker], which relay crucial information about [Variable] through [Structure].",
-            "meaning": "[メカニズム]は受容体を伴い、特に[特定分子]を発現する受容体群が、[構造]を通じて[生体変数]に関する重要情報を伝達する。",
-            "example": "The mechano-transduction pathway involves primary barosensory afferents, particularly those expressing Piezo2 ion channels, which relay crucial information about transmural arterial pressure through vagal projections."
+            "pattern": "These ... are transmitted rostrally to ... and subsequently relayed to ...",
+            "meaning": "これらの〜は吻側の中枢へ伝達され、続いて…へと中継される",
+            "example": "These peripheral sensory inputs are transmitted rostrally to the NTS and subsequently relayed to higher cortical autonomic networks."
           }
         ]
       },
       {
         "id": "results",
-        "title_en": "3. Cross-talk Dynamics and Regulatory Integration",
-        "title_ja": "3. クロストーク・ダイナミクスと統合的調節機構",
+        "title_en": "3. Results and Physiological Pathways",
+        "title_ja": "3. 結果：迷走神経を介する主要な制御メカニズム",
         "paragraphs": [
           {
-            "ja": "これら3つの経路は孤立して機能するのではなく、脳と心血管系の恒常性を維持するために重層的な閉ループとして絶え間なく連携している。",
-            "en": "Rather than functioning in isolation, these three pathways continuously cooperate as layered closed loops to preserve brain and cardiovascular homeostasis."
+            "ja": "第一の主要な生理機構として「コリン作動性抗炎症経路（CAP）」が同定された。迷走神経遠心性シグナルは脾臓神経を介してアセチルコリン（ACh）の放出を促し、常在マクロファージ上のα7ニコチン性受容体に結合することで、TNF-α、IL-1β、IL-6などの炎症性サイトカイン産生を著しく抑制する。これにより腸管上皮のタイトジャンクション（クローディン、オクルディン等）の崩壊を防ぎ、腸管透過性を正常範囲に維持する。",
+            "en": "A premier physiological mechanism identified is the cholinergic anti-inflammatory pathway (CAP). Efferent vagal signals trigger acetylcholine (ACh) release via splenic sympathetic intermediate wiring, which binds to alpha-7 nicotinic acetylcholine receptors (alpha7nAChR) on resident macrophages, profoundly suppressing pro-inflammatory cytokine secretion including TNF-alpha, IL-1beta, and IL-6. This prevents mucosal barrier breakdown and maintains physiological intestinal permeability."
           },
           {
-            "ja": "機械受容体からのPiezo介在性シグナルは脳幹の孤束核（NTS）へ投射され、そこから皮質下の自律神経核へ伝達されることで、心拍数および末梢血管抵抗の瞬時調節が実行される。",
-            "en": "Piezo-mediated signals from mechanoreceptors project to the nucleus tractus solitarii (NTS) in the brainstem and subsequently cascade through subcortical autonomic nuclei, executing instantaneous modulation of heart rate and peripheral vascular resistance."
-          },
-          {
-            "ja": "同時に、内分泌および免疫系から生化学的メディエーターが放出されることで、長期的な血管リモデリングや自律神経受容体の感度修飾が行われ、中枢自律神経ネットワークの応答特性が再編成される。",
-            "en": "Simultaneously, the release of biochemical mediators from the endocrine and immune systems directs prolonged vascular remodeling and autonomic receptor sensitivity, reorganizing the central autonomic network's response profile."
+            "ja": "第二に、過敏性腸症候群（IBS）や炎症性腸疾患（IBD）などの消化管機能異常患者においては、健常対照群に比べて心拍変動の高周波（HF）成分や呼吸性不整脈（RSA）として表れる迷走神経緊張（Vagal Tone）が顕著に低下している事実が定量的に示された。この迷走神経活動の低下は、局所炎症の亢進および腸内毒素症（Firmicutes/Bacteroidetes比の乱れ等）の重症度と強い相関を示した。",
+            "en": "Secondly, quantitative evaluations demonstrated that patients suffering from functional gastrointestinal disorders, such as irritable bowel syndrome (IBS) and inflammatory bowel disease (IBD), consistently exhibit attenuated vagal tone reflected by decreased high-frequency heart rate variability (HF-HRV) and respiratory sinus arrhythmia. This autonomic blunting tightly correlates with exacerbated mucosal inflammation and severe dysbiotic shifts."
           }
         ],
         "takeaways": [
-          "Piezo1/2受容体を介した瞬時機械シグナルが求心性迷走神経/舌咽神経を経由してNTSへ入力され、秒単位の動的圧反射を駆動する。",
-          "求心性機械入力と中枢性情動・認知入力が島皮質およびCANで統合され、交感・副交感遠心性バランスが決定される。",
-          "短時間の神経・力学適応と、長時間の生化学的・形態学的リモデリングが協調することで、多重時間スケールでの恒常性が担保される。"
+          "コリン作動性抗炎症経路（CAP）がα7nAChRを介してサイトカイン暴走と腸管バリア破壊を阻止する。",
+          "IBS・IBD患者では高周波心拍変動（HF-HRV）に示される迷走神経緊張の減弱が定常的に認められる。",
+          "迷走神経トーンの低下は、腸内細菌叢の乱れ（ディスバイオーシス）と相互に悪化し合う関係にある。"
         ],
-        "section_svg_caption": "多重時間スケールにおけるフィードバック制御ループの階層構造",
-        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%'><rect width='680' height='210' fill='#f8fafc'/><circle cx='100' cy='105' r='55' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='100' y='100' font-family='sans-serif' font-size='12' font-weight='bold' fill='#1e3a8a' text-anchor='middle'>CAN</text><text x='100' y='118' font-family='sans-serif' font-size='9' fill='#475569' text-anchor='middle'>島皮質/NTS</text><circle cx='580' cy='105' r='55' fill='#f0fdf4' stroke='#166534' stroke-width='2'/><text x='580' y='100' font-family='sans-serif' font-size='12' font-weight='bold' fill='#166534' text-anchor='middle'>Heart / SA</text><text x='580' y='118' font-family='sans-serif' font-size='9' fill='#475569' text-anchor='middle'>心拍・血圧出力</text><path d='M 155 80 C 270 30, 410 30, 525 80' fill='none' stroke='#2563eb' stroke-width='2.5'/><polygon points='525,80 514,75 519,85' fill='#2563eb'/><text x='340' y='45' font-family='sans-serif' font-size='10' font-weight='bold' fill='#2563eb' text-anchor='middle'>遠心路: 自律神経スパイク放電 (Δt &lt; 1s)</text><path d='M 525 130 C 410 180, 270 180, 155 130' fill='none' stroke='#0d9488' stroke-width='2.5'/><polygon points='155,130 166,135 161,125' fill='#0d9488'/><text x='340' y='180' font-family='sans-serif' font-size='10' font-weight='bold' fill='#0d9488' text-anchor='middle'>求心路: Piezo 圧受容・拍動フィードバック</text><rect x='260' y='85' width='160' height='40' rx='6' fill='#fefce8' stroke='#ca8a04' stroke-width='1.5'/><text x='340' y='105' font-family='sans-serif' font-size='10' font-weight='bold' fill='#a16207' text-anchor='middle'>液性修飾 (遅延変調)</text><text x='340' y='118' font-family='sans-serif' font-size='8.5' fill='#713f12' text-anchor='middle'>RAAS / カテコールアミン</text></svg>",
+        "section_svg_caption": "コリン作動性抗炎症経路（CAP）と粘膜透過性維持の分子・神経メカニズム",
+        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='210' fill='#f8fafc'/><rect x='30' y='35' width='160' height='140' rx='8' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='110' y='60' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-weight='bold' font-size='12'>DMV Vagal Output</text><text x='110' y='90' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='10'>Action Potentials</text><path d='M 60 120 C 80 100, 100 140, 120 100 C 140 140, 150 110, 160 120' fill='none' stroke='#2563eb' stroke-width='2'/><text x='110' y='155' text-anchor='middle' fill='#2563eb' font-family='sans-serif' font-size='10'>Parasympathetic Tone</text><path d='M 190 105 L 250 105' stroke='#1e3a8a' stroke-width='2.5' marker-end='url(#cap-arrow)'/><rect x='250' y='35' width='180' height='140' rx='8' fill='#ffffff' stroke='#0d9488' stroke-width='2'/><text x='340' y='60' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='12'>Immune Interface</text><text x='340' y='85' text-anchor='middle' fill='#334155' font-family='sans-serif' font-size='10'>ACh / Splenic Link</text><rect x='270' y='105' width='140' height='30' rx='5' fill='#ccfbf1'/><text x='340' y='124' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='10'>Macrophage alpha7nAChR</text><text x='340' y='155' text-anchor='middle' fill='#dc2626' font-family='sans-serif' font-weight='bold' font-size='10'>[X] TNF-alpha / IL-6 Blocked</text><path d='M 430 105 L 490 105' stroke='#0d9488' stroke-width='2.5' marker-end='url(#cap-arrow)'/><rect x='490' y='35' width='160' height='140' rx='8' fill='#f0fdfa' stroke='#0d9488' stroke-width='2'/><text x='570' y='60' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='12'>Gut Epithelial Barrier</text><line x1='510' y1='90' x2='630' y2='90' stroke='#059669' stroke-width='4'/><line x1='510' y1='100' x2='630' y2='100' stroke='#059669' stroke-width='4'/><text x='570' y='125' text-anchor='middle' fill='#059669' font-family='sans-serif' font-weight='bold' font-size='10'>Tight Junctions Sealed</text><text x='570' y='150' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='10'>Permeability Controlled</text><defs><marker id='cap-arrow' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#0d9488'/></marker></defs></svg>",
         "writing_expressions": [
           {
-            "pattern": "Rather than functioning in isolation, [Components] continuously cooperate as [System Structure] to preserve [Target State].",
-            "meaning": "〜は孤立して機能するのではなく、[目標状態]を維持するために[システム構造]として絶え間なく連携している。",
-            "example": "Rather than functioning in isolation, cortical and autonomic networks continuously cooperate as hierarchical adaptive controllers to preserve hemodynamic stability."
+            "pattern": "A premier physiological mechanism identified is ..., which profoundly suppresses ...",
+            "meaning": "同定された主要な生理機構は〜であり、これは…を著しく抑制する",
+            "example": "A premier physiological mechanism identified is the cholinergic pathway, which profoundly suppresses excessive immune activation."
           },
           {
-            "pattern": "[Signal] projects to [Anatomical Node] and subsequently cascades through [Subsystems], executing instantaneous modulation of [Variables].",
-            "meaning": "[信号]が[解剖学的部位]へ投射され、次いで[下位システム]へと連鎖することで、[変数]の瞬時調節を実行する。",
-            "example": "Barosensory firing projects to the medullary circuits and subsequently cascades through sympathetic efferents, executing instantaneous modulation of vascular tone and stroke volume."
+            "pattern": "Quantitative evaluations demonstrated that ..., tightly correlating with ...",
+            "meaning": "定量的評価によって〜であることが実証され、これは…と強く相関している",
+            "example": "Quantitative evaluations demonstrated that patients exhibit diminished vagal tone, tightly correlating with peripheral inflammation."
           }
         ]
       },
       {
         "id": "discussion",
-        "title_en": "4. Translational and Clinical Implications in Neurocardiology",
-        "title_ja": "4. 神経心臓学（ニューロカーディオロジー）における臨床的・橋渡し的示唆",
+        "title_en": "4. Discussion",
+        "title_ja": "4. 考察（生理学的解釈と病態悪循環）",
         "paragraphs": [
           {
-            "ja": "神経・機械・生化学的経路の連成崩壊は、心血管病態と脳血管障害が併発する複合的症候群の根底にある。",
-            "en": "Disruption in the coupling among neural, mechanical and biochemical pathways underlies multifaceted syndromes in which cardiovascular conditions and cerebrovascular disorders co-occur."
+            "ja": "本解析結果は、慢性ストレスが中枢自律神経ネットワークを介して迷走神経を抑制し、腸管透過性の亢進とディスバイオーシスを惹起する多重フィードバック機構の存在を浮き彫りにしている。迷走神経緊張の低下（Vagal Withdrawal）が生じると、抗炎症作用が失われるだけでなく、病原体関連分子パターン（PAMPs）の内臓受容センシングが歪み、脳幹への異常シグナル入力が増加する。",
+            "en": "These synthesis points underscore a multifactorial feedback mechanism whereby chronic stress suppresses vagal outflow via the central autonomic network, driving mucosal hyperpermeability and dysbiosis. The ensuing vagal withdrawal not only diminishes anti-inflammatory constraints but also alters the interoceptive sensing of pathogen-associated molecular patterns (PAMPs), projecting aberrant perturbations back to the brainstem."
           },
           {
-            "ja": "例えば、急性脳損傷や強い精神的ストレスは中枢性カテコールアミン急潮を引き起こし、重篤な心筋気絶（タコツボ心筋症）や不整脈を誘発する一方、慢性心不全における低拍出はPiezo介在性脳血管自動調節を損ない、認知機能低下を促進する。",
-            "en": "For instance, acute brain injury or severe psychological stress precipitates a central catecholamine surge, triggering severe myocardial stunning (Takotsubo syndrome) and arrhythmias, whereas low output in chronic heart failure impairs Piezo-mediated cerebrovascular autoregulation, exacerbating cognitive decline."
-          },
-          {
-            "ja": "この多系統的視点は、神経心臓学という新たな臨床専門分野へとつながる、統合的アプローチの開発を強く求めている。",
-            "en": "This multisystem perspective calls for the development of integrative approaches, leading to new clinical specialties in neurocardiology."
+            "ja": "したがって、IBSやIBD等の疾患は単なる局所消化管障害ではなく、自律神経反射ループの非線形な安定性破綻（アトラクタの病理的遷移）として再定義される。迷走神経刺激（VNS）や自律神経バイオフィードバックなどの神経変調技術は、この閉ループ系に適切な摂動を与え、ホメオスタシス状態の再獲得を促す有効な工学的・医学的介入戦略となり得る。",
+            "en": "Consequently, disorders like IBS and IBD can be conceptualized not merely as isolated gastrointestinal ailments, but as non-linear instabilities of the autonomic reflex arc representing pathological state shifts. Neuromodulation modalities, such as vagus nerve stimulation (VNS) or biofeedback, serve as actionable strategies to apply corrective perturbations, restoring homeostatic trajectory in this closed-loop system."
           }
         ],
         "takeaways": [
-          "急性神経病変が自律神経遠心路を介して心筋壊死・致死性不整脈を誘発する「Brain-to-Heart」病態の解明。",
-          "慢性心不全や心房細動が脳血流拍動性低下や微小塞栓を介して認知症・脳卒中を引き起こす「Heart-to-Brain」病態の解明。",
-          "心血管内科と神経内科の学際的融合領域としての「ニューロカーディオロジー」の確立と、統合モニタリング技術の必要性。"
+          "慢性ストレスは迷走神経活動の低下を招き、腸透過性増大と菌叢異常のトリガーとなる。",
+          "MGBAの機能破綻は、局所器質的異常というより非線形フィードバック制御系の破綻として捉えられる。",
+          "迷走神経刺激（VNS）等の標的介入は、病理的ループをリセットする制御工学的入力として機能する。"
         ],
-        "section_svg_caption": "ニューロカーディオロジーにおける双方向性疾患カスケード",
-        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%'><rect width='680' height='210' fill='#f8fafc'/><rect x='30' y='30' width='280' height='150' rx='8' fill='#fee2e2' stroke='#ef4444' stroke-width='1.5'/><text x='170' y='55' font-family='sans-serif' font-size='12' font-weight='bold' fill='#b91c1c' text-anchor='middle'>Brain → Heart 疾患連関</text><text x='170' y='80' font-family='sans-serif' font-size='10' fill='#7f1d1d' text-anchor='middle'>急性クモ膜下出血 / 脳梗塞 / 情動ストレス</text><text x='170' y='105' font-family='sans-serif' font-size='10' fill='#991b1b' text-anchor='middle'>↓ 中枢性交感神経暴風 (Catecholamine storm)</text><text x='170' y='130' font-family='sans-serif' font-size='10' fill='#7f1d1d' text-anchor='middle'>タコツボ心筋症 / QT延長 / 致死性心室細動</text><text x='170' y='155' font-family='sans-serif' font-size='9' fill='#b91c1c' text-anchor='middle'>心原性ショック・突然死リスク</text><rect x='370' y='30' width='280' height='150' rx='8' fill='#fef3c7' stroke='#f59e0b' stroke-width='1.5'/><text x='510' y='55' font-family='sans-serif' font-size='12' font-weight='bold' fill='#b45309' text-anchor='middle'>Heart → Brain 疾患連関</text><text x='510' y='80' font-family='sans-serif' font-size='10' fill='#78350f' text-anchor='middle'>慢性心不全 / 心房細動 / 弁膜症</text><text x='510' y='105' font-family='sans-serif' font-size='10' fill='#92400e' text-anchor='middle'>↓ 拍動性脳灌流不全 / Piezo感知不全</text><text x='510' y='130' font-family='sans-serif' font-size='10' fill='#78350f' text-anchor='middle'>大脳白質病変 / 微小梗塞 / 血管性認知症</text><text x='510' y='155' font-family='sans-serif' font-size='9' fill='#b45309' text-anchor='middle'>認知機能・自律中枢制御能の不可逆的喪失</text></svg>",
+        "section_svg_caption": "ストレス惹起性迷走神経抑制とディスバイオーシスの悪循環ループ",
+        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='210' fill='#f8fafc'/><rect x='40' y='25' width='170' height='60' rx='8' fill='#fee2e2' stroke='#ef4444' stroke-width='1.5'/><text x='125' y='50' text-anchor='middle' fill='#b91c1c' font-family='sans-serif' font-weight='bold' font-size='12'>Chronic Stress</text><text x='125' y='70' text-anchor='middle' fill='#7f1d1d' font-family='sans-serif' font-size='10'>CAN / Cortical Dysregulation</text><path d='M 210 55 L 270 55' stroke='#ef4444' stroke-width='2' marker-end='url(#disc-arr)'/><rect x='270' y='25' width='160' height='60' rx='8' fill='#ffedd5' stroke='#f97316' stroke-width='1.5'/><text x='350' y='50' text-anchor='middle' fill='#c2410c' font-family='sans-serif' font-weight='bold' font-size='12'>Vagal Withdrawal</text><text x='350' y='70' text-anchor='middle' fill='#7c2d12' font-family='sans-serif' font-size='10'>Diminished Parasympathetic</text><path d='M 430 55 L 490 55' stroke='#f97316' stroke-width='2' marker-end='url(#disc-arr)'/><rect x='490' y='25' width='160' height='60' rx='8' fill='#fef3c7' stroke='#eab308' stroke-width='1.5'/><text x='570' y='50' text-anchor='middle' fill='#a16207' font-family='sans-serif' font-weight='bold' font-size='12'>Inflammation &amp; Leaky Gut</text><text x='570' y='70' text-anchor='middle' fill='#713f12' font-family='sans-serif' font-size='10'>High Permeability</text><path d='M 570 85 L 570 125' stroke='#eab308' stroke-width='2' marker-end='url(#disc-arr)'/><rect x='490' y='125' width='160' height='60' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.5'/><text x='570' y='150' text-anchor='middle' fill='#334155' font-family='sans-serif' font-weight='bold' font-size='12'>Dysbiosis Shift</text><text x='570' y='170' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='10'>Altered SCFA / Metabolites</text><path d='M 490 155 C 330 200, 200 180, 125 85' fill='none' stroke='#ef4444' stroke-width='2' stroke-dasharray='4,4' marker-end='url(#disc-arr)'/><text x='310' y='180' text-anchor='middle' fill='#b91c1c' font-family='sans-serif' font-size='10' font-weight='bold'>Aberrant Viscerosensory Feedback Loop</text><defs><marker id='disc-arr' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#64748b'/></marker></defs></svg>",
         "writing_expressions": [
           {
-            "pattern": "Disruption in the coupling among [Pathways/Components] underlies multifaceted syndromes in which [Condition A] and [Condition B] co-occur.",
-            "meaning": "[経路や要素群]の連成破綻は、AとBが併発する複合的症候群の病態基盤を形成している。",
-            "example": "Disruption in the coupling among neural, mechanical and biochemical pathways underlies multifaceted syndromes in which orthostatic syncope and cerebral hypoperfusion co-occur."
+            "pattern": "These synthesis points underscore a ... whereby ..., driving ...",
+            "meaning": "これらの総合的知見は、〜が…によって生じ、その結果〜を駆動するという…機構を浮き彫りにしている",
+            "example": "These synthesis points underscore a vicious cycle whereby sympathetic overdrive inhibits vagal fibers, driving gut dysbiosis."
           },
           {
-            "pattern": "This multisystem perspective calls for the development of [Novel Methods/Tools], leading to [New Paradigm/Specialty].",
-            "meaning": "この多系統的視点は[新規手法やツール]の開発を強く求めており、[新分野や新パラダイム]の創出へとつながる。",
-            "example": "This multisystem perspective calls for the development of real-time state-space computational models, leading to new clinical specialties in closed-loop bioelectronic medicine."
+            "pattern": "... can be conceptualized not merely as ..., but as ...",
+            "meaning": "〜は単なる…としてではなく、…として概念化・再定義することができる",
+            "example": "Cardiovascular instability can be conceptualized not merely as organ failure, but as loss of nonlinear feedback stability."
           }
         ]
       },
       {
         "id": "conclusion",
-        "title_en": "5. Future Directions and Computational Horizons",
-        "title_ja": "5. 将来の展望と数理計算論的アプローチ",
+        "title_en": "5. Conclusion and Future Directions",
+        "title_ja": "5. 結論と今後の展望",
         "paragraphs": [
           {
-            "ja": "脳心臓軸における神経・機械・生化学的プロセスの多層的な統合は、従来の単一臓器を標的とした治療戦略を再考させ、システム全体の動態に着目した動的制御技術の確立を促している。",
-            "en": "The multiscale integration of neural, mechanical and biochemical processes along the brain-heart axis challenges organ-specific therapeutic paradigms, driving the development of dynamic control technologies directed at systemic coordination."
+            "ja": "総括すると、迷走神経は微生物叢-腸-脳軸における中枢-末梢間の双方向通信を支える最も即時的かつ基幹的な神経導管である。求心性線維による細菌シグナルの内臓受容センシングと、遠心性コリン作動性経路による局所免疫・バリア機能の防衛は、生体の動的ホメオスタシス維持に不可欠である。",
+            "en": "In conclusion, the vagus nerve constitutes the most immediate and foundational neural conduit sustaining bidirectional communication across the microbiota-gut-brain axis. The precise interoceptive sensing of microbial dynamics by afferent fibers, paired with the efferent cholinergic gating of mucosal immunity, is indispensable for dynamic biological homeostasis."
           },
           {
-            "ja": "高時間分解能での中枢自律神経モニタリングと機械感受性シグナルの定量化は、複雑な病態の過渡応答を先回りして予測・是正する次世代バイオエレクトロニクス治療や適応制御介入の礎となる。",
-            "en": "High-temporal-resolution central-autonomic monitoring and the quantitative tracking of mechanosensitive cues provide the cornerstone for next-generation bioelectronic therapies and adaptive control interventions that preemptively anticipate and stabilize transient physiological deterioration."
+            "ja": "今後は、迷走神経の求心・遠心シグナルをミリ秒〜秒単位の時間分解能で分離・追跡する先端的な生体信号処理技術や、自律神経動態のリアルタイム推定に基づく適応型神経刺激制御の確立が、消化器および神経精神疾患の新たな治療パラダイムを切り拓く鍵となる。",
+            "en": "Moving forward, integrating advanced biosignal processing architectures capable of resolving vagal afferent and efferent dynamics at fine temporal scales, alongside adaptive closed-loop neuromodulation frameworks, will be paramount in unlocking novel therapeutic paradigms for neurogastroenterological disorders."
           }
         ],
         "takeaways": [
-          "単一臓器治療から、脳心連関の閉ループ・ネットワークダイナミクスを是正するシステム治療へのパラダイムシフト。",
-          "mEEGエントロピーや高時間分解能心拍変動解析など、秒単位の過渡応答を捉える先端計測技術の臨床導入が重要。",
-          "非線形生体制御（点過程モデル、クープマン線形MPC等）を用いた個別化・適応的治療プラットフォームへの道筋。"
+          "迷走神経は微生物叢-腸-脳軸における高速双方向通信の基盤である。",
+          "求心路センシングと遠心路コリン作動性防衛のカップリングがホメオスタシスを規定する。",
+          "秒単位の自律神経動態追従と閉ループ神経刺激制御の融合が今後の重要課題である。"
         ],
-        "section_svg_caption": "次世代ニューロカーディオロジーにおける動的閉ループ制御パラダイム",
-        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%'><rect width='680' height='210' fill='#f8fafc'/><rect x='30' y='65' width='160' height='80' rx='8' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='110' y='95' font-family='sans-serif' font-size='12' font-weight='bold' fill='#1e3a8a' text-anchor='middle'>生体脳心臓軸</text><text x='110' y='115' font-family='sans-serif' font-size='9.5' fill='#334155' text-anchor='middle'>mEEG + 動脈圧 + ICN</text><text x='110' y='130' font-family='sans-serif' font-size='9.5' fill='#2563eb' text-anchor='middle'>過渡的非線形応答</text><path d='M 190 105 L 260 105' fill='none' stroke='#0d9488' stroke-width='2.5'/><polygon points='255,100 265,105 255,110' fill='#0d9488'/><rect x='265' y='65' width='160' height='80' rx='8' fill='#f0fdf4' stroke='#0d9488' stroke-width='2'/><text x='345' y='95' font-family='sans-serif' font-size='12' font-weight='bold' fill='#0f766e' text-anchor='middle'>高速同定・状態推定</text><text x='345' y='115' font-family='sans-serif' font-size='9.5' fill='#334155' text-anchor='middle'>点過程モデル / RC</text><text x='345' y='130' font-family='sans-serif' font-size='9.5' fill='#0d9488' text-anchor='middle'>Koopman線形固有構造</text><path d='M 425 105 L 495 105' fill='none' stroke='#ca8a04' stroke-width='2.5'/><polygon points='490,100 500,105 490,110' fill='#ca8a04'/><rect x='500' y='65' width='150' height='80' rx='8' fill='#fefce8' stroke='#ca8a04' stroke-width='2'/><text x='575' y='95' font-family='sans-serif' font-size='12' font-weight='bold' fill='#a16207' text-anchor='middle'>動的モデル予測制御</text><text x='575' y='115' font-family='sans-serif' font-size='9.5' fill='#334155' text-anchor='middle'>線形 MPC 最適化</text><text x='575' y='130' font-family='sans-serif' font-size='9.5' fill='#a16207' text-anchor='middle'>電気刺激 / 薬物微量注入</text><path d='M 575 145 C 575 190, 110 190, 110 145' fill='none' stroke='#1e3a8a' stroke-width='2' stroke-dasharray='4,2'/><polygon points='115,150 110,145 105,150' fill='#1e3a8a'/><text x='345' y='180' font-family='sans-serif' font-size='10' font-weight='bold' fill='#1e3a8a' text-anchor='middle'>適応的閉ループ介入 (Δt &lt; 1s)</text></svg>",
+        "section_svg_caption": "閉ループ自律神経制御とMGBAホメオスタシス回復の将来展望",
+        "section_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 210' width='100%' height='100%' style='background:#f8fafc;'><rect width='680' height='210' fill='#f8fafc'/><rect x='40' y='60' width='160' height='90' rx='10' fill='#eff6ff' stroke='#1e3a8a' stroke-width='2'/><text x='120' y='95' text-anchor='middle' fill='#1e3a8a' font-family='sans-serif' font-weight='bold' font-size='12'>High-Res Sensing</text><text x='120' y='115' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='10'>mEEG / HRV Point Process</text><path d='M 200 105 L 260 105' stroke='#1e3a8a' stroke-width='2.5' marker-end='url(#conc-arr)'/><rect x='260' y='50' width='160' height='110' rx='10' fill='#ffffff' stroke='#2563eb' stroke-width='2'/><text x='340' y='80' text-anchor='middle' fill='#2563eb' font-family='sans-serif' font-weight='bold' font-size='12'>State Space / MPC</text><text x='340' y='105' text-anchor='middle' fill='#0f172a' font-family='sans-serif' font-size='10'>Koopman Operator</text><text x='340' y='125' text-anchor='middle' fill='#0f172a' font-family='sans-serif' font-size='10'>Dynamic Eigen-analysis</text><text x='340' y='145' text-anchor='middle' fill='#475569' font-family='sans-serif' font-size='9'>Optimal Feedback Gain</text><path d='M 420 105 L 480 105' stroke='#0d9488' stroke-width='2.5' marker-end='url(#conc-arr)'/><rect x='480' y='60' width='160' height='90' rx='10' fill='#f0fdfa' stroke='#0d9488' stroke-width='2'/><text x='560' y='95' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-weight='bold' font-size='12'>Targeted VNS</text><text x='560' y='115' text-anchor='middle' fill='#0d9488' font-family='sans-serif' font-size='10'>Restoring Homeostasis</text><path d='M 560 150 C 560 190, 120 190, 120 150' fill='none' stroke='#64748b' stroke-width='1.5' stroke-dasharray='4,4' marker-end='url(#conc-arr)'/><text x='340' y='190' text-anchor='middle' fill='#64748b' font-family='sans-serif' font-size='10'>Closed-Loop Adaptive Tuning</text><defs><marker id='conc-arr' markerWidth='6' markerHeight='6' refX='5' refY='3' orient='auto'><path d='M0,0 L0,6 L6,3 z' fill='#1e3a8a'/></marker></defs></svg>",
         "writing_expressions": [
           {
-            "pattern": "The multiscale integration of [Mechanisms] along [Axis/Network] challenges [Existing Paradigm], driving the development of [New Solutions].",
-            "meaning": "[軸やネットワーク]に沿った[諸メカニズム]の多重スケール統合は[既存パラダイム]を再考させ、[新解決法]の開発を促進する。",
-            "example": "The multiscale integration of neural, mechanical and biochemical processes along the brain-heart axis challenges organ-specific therapeutic paradigms, driving the development of patient-tailored closed-loop neuromodulation."
+            "pattern": "In conclusion, ... constitutes the most immediate and foundational ... sustaining ...",
+            "meaning": "結論として、〜は…を支える最も即時的かつ基幹的な…を構成している",
+            "example": "In conclusion, the vagus nerve constitutes the most immediate neural pathway sustaining interoceptive balance."
           },
           {
-            "pattern": "[Advanced Measurement] and the quantitative tracking of [Biological Cues] provide the cornerstone for [Next-Generation Technologies] that preemptively [Action].",
-            "meaning": "[先端計測]と[生体シグナル]の定量的追従は、先回りして[動作]を行う[次世代技術]の確固たる礎となる。",
-            "example": "Sub-second multivariate point-process estimation and the quantitative tracking of mechanosensitive cues provide the cornerstone for next-generation bioelectronic therapies that preemptively stabilize hemodynamic collapse."
+            "pattern": "Moving forward, integrating ... alongside ... will be paramount in unlocking ...",
+            "meaning": "今後は、〜と…を統合することが、〜を切り拓く上で極めて重要となるだろう",
+            "example": "Moving forward, integrating real-time state estimation alongside closed-loop controllers will be paramount in advancing clinical bioelectronic medicine."
           }
         ]
       }
     ]
   },
   "vocabulary": {
-    "brain-heart axis": {
-      "ipa": "/breɪn hɑːrt ˈæksɪs/",
+    "microbiota-gut-brain axis": {
+      "ipa": "/ˌmaɪkroʊbaɪˈoʊtə ɡʌt breɪn ˈæksɪs/",
       "pos": "名詞句",
-      "ja": "脳心臓軸",
-      "nuance": "中枢神経系と心血管系が自律神経・機械受容・体液性因子を介して双方向に連関する総合的制御軸を指す学術用語。"
+      "ja": "微生物叢-腸-脳軸",
+      "nuance": "腸内細菌叢、消化管、中枢神経系が自律神経・内分泌・免疫系を介して双方向に通信する複合システムを指す術語。"
+    },
+    "interoceptive awareness": {
+      "ipa": "/ˌɪntərəˈsɛptɪv əˈwɛərnəs/",
+      "pos": "名詞句",
+      "ja": "内臓受容感覚への気付き（内受容感覚）",
+      "nuance": "心拍、胃腸の蠕動、体液組成など体内環境の状態を感知・把握する神経処理プロセス。"
+    },
+    "cholinergic anti-inflammatory pathway": {
+      "ipa": "/ˌkoʊlɪˈnɜːrdʒɪk ˌænti ɪnˈflæmətɔːri ˈpæθweɪ/",
+      "pos": "名詞句",
+      "ja": "コリン作動性抗炎症経路",
+      "nuance": "迷走神経の遠心性活動がアセチルコリンを介してマクロファージのα7nAChRに作用し、炎症性サイトカインを抑制する生体防御回路。"
+    },
+    "intestinal permeability": {
+      "ipa": "/ɪnˈtɛstɪnəl ˌpɜːrmiəˈbɪlɪti/",
+      "pos": "名詞句",
+      "ja": "腸管透過性",
+      "nuance": "腸管上皮バリアの隙間を介して分子が通過する度合い。亢進すると「リーキーガット」と呼ばれ全身性炎症の引き金となる。"
+    },
+    "dysbiosis": {
+      "ipa": "/ˌdɪsbaɪˈoʊsɪs/",
+      "pos": "名詞",
+      "ja": "腸内毒素症・菌叢不均衡",
+      "nuance": "共生微生物群のバランスが崩れ、多様性の低下や病原性菌の優占が生じた病態状態。"
+    },
+    "vagal tone": {
+      "ipa": "/ˈveɪɡəl toʊn/",
+      "pos": "名詞句",
+      "ja": "迷走神経緊張（迷走神経トーン）",
+      "nuance": "副交感神経系としての迷走神経の定常的活動レベル。心拍変動のHF成分や呼吸性不整脈（RSA）により非侵襲的に評価される。"
+    },
+    "vagal withdrawal": {
+      "ipa": "/ˈveɪɡəl wɪðˈdrɔːəl/",
+      "pos": "名詞句",
+      "ja": "迷走神経減弱（副交感神経の引き抜き）",
+      "nuance": "ストレスや起立負荷、炎症等の刺激に対して副交感神経活動が急激に低下し、交感神経優位に傾く動態。"
+    },
+    "nucleus tractus solitarius": {
+      "ipa": "/ˈnjuːkliəs ˈtræktəs ˌsɒlɪˈtɛəriəs/",
+      "pos": "名詞句",
+      "ja": "孤束核（NTS）",
+      "nuance": "延髄に位置し、迷走神経などの求心性内臓感覚シグナルが最初にシナプス結合する中枢自律神経系のハブ中継核。"
     },
     "central autonomic network": {
-      "ipa": "/ˈsɛntrəl ˌɔːtəˈnɒmɪk ˈnɛtwɜːk/",
+      "ipa": "/ˈsɛntrəl ˌɔːtəˈnɒmɪk ˈnɛtwɜːrk/",
       "pos": "名詞句",
-      "ja": "中枢自律神経ネットワーク (CAN)",
-      "nuance": "島皮質、扁桃体、視床下部、延髄孤束核など、自律神経遠心出力を統合制御する中枢神経系の階層的解剖学的構造。"
+      "ja": "中枢自律神経ネットワーク（CAN）",
+      "nuance": "島皮質、前帯状皮質、扁桃体、視床下部、脳幹核などからなる、自律神経反応の情動・認知・身体統合を統御する中枢神経群。"
     },
-    "mechanosensitive": {
-      "ipa": "/ˌmɛkənoʊˈsɛnsɪtɪv/",
-      "pos": "形容詞",
-      "ja": "機械受容性の、機械感受性の",
-      "nuance": "血圧、せん断応力、細胞膜の伸展刺激を検知して電気化学シグナルに変換する生体分子の特性を表す専門語。"
-    },
-    "piezo protein channels": {
-      "ipa": "/piˈeɪzoʊ ˈproʊtiːn ˈtʃænlz/",
+    "vagus nerve stimulation": {
+      "ipa": "/ˈveɪɡəs nɜːrv ˌstɪmjʊˈleɪʃən/",
       "pos": "名詞句",
-      "ja": "Piezoタンパク質チャネル (Piezo1/2)",
-      "nuance": "哺乳類の圧受容反射や血管緊張度調節において機械的伸展刺激をイオン電流へと直接変換する膜貫通型チャネル。"
-    },
-    "endogenous compounds": {
-      "ipa": "/ɛnˈdɒdʒɪnəs ˈkɒmpaʊndz/",
-      "pos": "名詞句",
-      "ja": "内因性化合物",
-      "nuance": "生体内部で合成・分泌されるホルモン、神経伝達物質、ペプチド、炎症性サイトカインなどの総称。"
-    },
-    "neurocardiology": {
-      "ipa": "/ˌnjʊəroʊˌkɑːdiˈɒlədʒi/",
-      "pos": "名詞句",
-      "ja": "神経心臓学",
-      "nuance": "神経学と循環器内科学が融合した学際分野で、脳心相関に起因する病態の解明と治療介入を扱う学術領域。"
-    },
-    "autonomic nervous system": {
-      "ipa": "/ˌɔːtəˈnɒmɪk ˈnɜːvəs ˈsɪstəm/",
-      "pos": "名詞句",
-      "ja": "自律神経系 (ANS)",
-      "nuance": "交感神経系および副交感神経系（迷走神経）から構成され、循環恒常性を維持する不随意性末梢制御系。"
-    },
-    "mediators": {
-      "ipa": "/ˈmiːdiˌeɪtərz/",
-      "pos": "名詞（複数形）",
-      "ja": "媒介物質、メディエーター",
-      "nuance": "特定の生理作用やシグナル伝達を中継・調節する生化学的分子や因子のこと。"
-    },
-    "cerebrovascular": {
-      "ipa": "/ˌsɛrɪbroʊˈvæskjələr/",
-      "pos": "形容詞",
-      "ja": "脳血管の",
-      "nuance": "脳実質へ血液を供給する動脈系およびその血流自動調節機構に関する文脈で使用される。"
-    },
-    "preemptively": {
-      "ipa": "/priːˈɛmptɪvli/",
-      "pos": "副詞",
-      "ja": "先回りして、先制的に",
-      "nuance": "状態崩壊や急激な血行動態虚脱が発生する前に、モデル予測に基づいて未然に制御介入を行うニュアンス。"
-    },
-    "baroreceptor": {
-      "ipa": "/ˌbæroʊrɪˈsɛptər/",
-      "pos": "名詞",
-      "ja": "圧受容器",
-      "nuance": "頸動脈洞や大動脈弓に存在し、動脈圧変化（壁伸展）を感知して孤束核に伝える機械的センサー。"
-    },
-    "multisystem perspective": {
-      "ipa": "/ˌmʌltiˈsɪstəm pərˈspɛktɪv/",
-      "pos": "名詞句",
-      "ja": "多系統的視点、マルチシステム的視野",
-      "nuance": "単一の臓器や経路に限定せず、神経・循環・免疫・力学系が連成した巨視的システムとして捉える科学的アプローチ。"
+      "ja": "迷走神経刺激（VNS）",
+      "nuance": "頸部または耳介枝の迷走神経に電気刺激を与え、難治性てんかん・うつ病の治療や抗炎症反応を惹起するバイオ電子工学的介入法。"
     }
   }
 }
