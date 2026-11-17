@@ -168,20 +168,12 @@ def fetch_pubmed_verified_metadata(pmid: str) -> Optional[dict]:
 
 
 # =========================================================================
-# 4. Gemini API クライアント（タイムアウト制限付き・1回一括生成）
+# 4. Gemini API クライアント（503混雑時の自動モデル切り替え対応）
 # =========================================================================
-def get_active_client_and_model():
-    # SDKの無限リトライによるフリーズを防ぐため、タイムアウト60秒・リトライ1回に設定
-    client = genai.Client(
-        api_key=GEMINI_API_KEY,
-        http_options={
-            "api_version": "v1beta",
-            "timeout": 60000,
-            "retry_options": {"attempts": 1}
-        }
-    )
+def get_candidate_models(client) -> List[str]:
     preferred = [
         "gemini-3.8-flash",
+        "gemini-3.8-flash-lite",
         "gemini-3.5-flash",
         "gemini-3-flash-preview",
         "gemini-3.0-flash",
@@ -192,26 +184,31 @@ def get_active_client_and_model():
             methods = getattr(m, "supported_actions", None) or getattr(m, "supported_generation_methods", None) or []
             if not methods or "generateContent" in methods:
                 name = m.name.replace("models/", "")
-                if "gemini" in name and "embedding" not in name and "imagen" not in name:
+                if "gemini" in name and "embedding" not in name and "imagen" not in name and "2.0" not in name and "2.5" not in name:
                     available.append(name)
     except Exception as e:
         print(f"Model list check skipped: {e}")
 
-    for candidate in preferred:
-        if candidate in available:
-            return client, candidate
+    ordered = [m for m in preferred if m in available]
+    for m in sorted(available, reverse=True):
+        if m not in ordered and "pro" not in m:
+            ordered.append(m)
 
-    flash_models = sorted(
-        [m for m in available if "flash" in m and "2.0" not in m and "2.5" not in m and "lite" not in m],
-        reverse=True
+    return ordered if ordered else ["gemini-3.8-flash", "gemini-3.8-flash-lite"]
+
+
+def generate_batch_digests(candidates: List[dict]) -> List[SinglePaperDigest]:
+    client = genai.Client(
+        api_key=GEMINI_API_KEY,
+        http_options=types.HttpOptions(
+            api_version="v1beta",
+            timeout=60000,
+            retry_options=types.HttpRetryOptions(attempts=2, initial_delay=3.0, max_delay=10.0)
+        )
     )
-    if flash_models:
-        return client, flash_models[0]
+    models_to_try = get_candidate_models(client)
+    print(f"Candidate Gemini models (in priority order): {models_to_try}")
 
-    return client, "gemini-3.8-flash"
-
-
-def generate_batch_digests(client, model_name: str, candidates: List[dict]) -> List[SinglePaperDigest]:
     papers_block = []
     for c in candidates:
         m = c["meta"]
@@ -236,18 +233,29 @@ def generate_batch_digests(client, model_name: str, candidates: List[dict]) -> L
 
 {chr(10).join(papers_block)}
 """
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=BatchDigestResponse,
-            temperature=0.1
-        )
-    )
-    parsed = BatchDigestResponse.model_validate_json(response.text)
-    return parsed.digests
 
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            print(f"Sending {len(candidates)} papers in 1 batch request to {model_name}...")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=BatchDigestResponse,
+                    temperature=0.1
+                )
+            )
+            parsed = BatchDigestResponse.model_validate_json(response.text)
+            print(f"Success with model: {model_name}")
+            return parsed.digests
+        except Exception as e:
+            print(f"Model {model_name} unavailable or failed ({e}). Trying next model...")
+            last_error = e
+            time.sleep(3)
+
+    raise RuntimeError(f"All candidate Gemini models failed. Last error: {last_error}")
 
 # =========================================================================
 # 5. メイン実行フロー
