@@ -1,0 +1,87 @@
+{
+  "id": "paper-2026-11-18-31996623",
+  "entry_type": "daily_paper",
+  "date": "2026-11-18",
+  "pmid": "31996623",
+  "pmcid": "PMC7745651",
+  "doi_url": "https://doi.org/10.1212/CON.0000000000000819",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/31996623/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7745651/",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "Continuum (Minneapolis, Minn.) (2020)",
+  "impact_factor": 8.0,
+  "doi": "10.1212/CON.0000000000000819",
+  "title_en": "Synucleinopathies.",
+  "title_ja": "シヌクレイノパチー",
+  "tags": [
+    "α-シヌクレイン",
+    "自律神経不全",
+    "パーキンソン病",
+    "多系統萎縮症"
+  ],
+  "summary": {
+    "problem": "α-シヌクレインの凝集を特徴とする疾患群（シヌクレイノパチー）において、自律神経不全の現れ方が疾患ごとにどのように異なり、それが予後予測にどう役立つかを整理する必要がある。",
+    "solution_and_method": "純粋自律神経不全症（PAF）、多系統萎縮症（MSA）、レビー小体型認知症（DLB）、パーキンソン病（PD）に関する臨床および実験データのレビュー。",
+    "formula_block": "$$ \text{Risk}_{\text{progression}} = f(\text{Autonomic Pattern}) $$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31996623</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1212/CON.0000000000000819</text>\n</svg>",
+    "key_results": "自律神経障害のパターン（末梢性vs中枢性）により疾患を鑑別可能。PAFから運動症状を伴う疾患への移行リスクは、自律神経機能の評価によって予測できる。",
+    "discussion_and_implications": "自律神経不全は単なる随伴症状ではなく、病理の局在（末梢レビー小体病変vs中枢MSA病変）を反映する重要なバイオマーカーである。",
+    "relevance_to_my_research": "自律神経不全の定量的評価（HRV解析など）は、シヌクレイノパチーの早期診断や病態遷移のモニタリングにおける重要なバイオマーカーとなる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31996623</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1212/CON.0000000000000819</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "[PURPOSE OF REVIEW] This article reviews the α-synucleinopathies pure autonomic failure, multiple system atrophy, dementia with Lewy bodies, and Parkinson disease with respect to autonomic failure.\n\n[RECENT FINDINGS] The pattern and severity of autonomic involvement in the synucleinopathies is related to differences in cellular deposition and neuronal populations affected by α-synuclein aggregation, which influences the degree and manifestation of autonomic failure. Clinical and laboratory autonomic features distinguish the different synucleinopathies based on pattern and severity. These features also determine which patients are at risk for evolution from pure autonomic failure to the synucleinopathies with prominent motor involvement, such as multiple system atrophy, dementia with Lewy bodies, or Parkinson disease.\n\n[SUMMARY] Autonomic failure is a key feature of the synucleinopathies, with varying type and degree of dysfunction from predominantly peripheral involvement in the Lewy body disorders to central involvement in multiple system atrophy.",
+            "ja": "本総説では、純粋自律神経不全症、多系統萎縮症、レビー小体型認知症、およびパーキンソン病について、自律神経不全の観点から概説する。シヌクレイノパチーにおける自律神経障害のパターンと重症度は、α-シヌクレイン凝集体の細胞内沈着の差異と、影響を受ける神経細胞集団に関連しており、これが自律神経不全の程度と発現に影響を与える。臨床的および実験室的な自律神経の特徴は、パターンと重症度に基づいて異なるシヌクレイノパチーを区別する。これらの特徴はまた、どの患者が純粋自律神経不全症から、多系統萎縮症、レビー小体型認知症、パーキンソン病などの顕著な運動症状を伴うシヌクレイノパチーへと進展するリスクがあるかを決定する。自律神経不全はシヌクレイノパチーの主要な特徴であり、レビー小体疾患における主に末梢性の障害から、多系統萎縮症における中枢性の障害まで、機能障害のタイプと程度は多岐にわたる。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "synucleinopathies": {
+      "ipa": "/sɪˌnjuːkliɪˈnɒpəθiz/",
+      "pos": "noun",
+      "ja": "シヌクレイノパチー",
+      "nuance": "α-シヌクレインタンパク質の異常凝集を特徴とする神経変性疾患の総称。"
+    },
+    "autonomic failure": {
+      "ipa": "/ˌɔːtəˈnɒmɪk ˈfeɪljər/",
+      "pos": "noun",
+      "ja": "自律神経不全",
+      "nuance": "自律神経系が正常に機能せず、血圧調節や排尿などに支障をきたす状態。"
+    },
+    "aggregation": {
+      "ipa": "/ˌæɡrɪˈɡeɪʃən/",
+      "pos": "noun",
+      "ja": "凝集",
+      "nuance": "タンパク質などが集まって塊を形成すること。病理学的な毒性を持つことが多い。"
+    },
+    "multiple system atrophy": {
+      "ipa": "/ˈmʌltɪpl ˈsɪstəm ˈætrəfi/",
+      "pos": "noun",
+      "ja": "多系統萎縮症",
+      "nuance": "自律神経症状、小脳症状、パーキンソニズムを呈する進行性の神経疾患。"
+    },
+    "lewy bodies": {
+      "ipa": "/ˈluːi ˈbɒdiz/",
+      "pos": "noun",
+      "ja": "レビー小体",
+      "nuance": "神経細胞内に形成されるα-シヌクレインを主成分とする異常な構造物。"
+    },
+    "pure autonomic failure": {
+      "ipa": "/pjʊər ˌɔːtəˈnɒmɪk ˈfeɪljər/",
+      "pos": "noun",
+      "ja": "純粋自律神経不全症",
+      "nuance": "運動症状を伴わず、自律神経症状のみが孤立して現れる疾患。"
+    }
+  }
+}

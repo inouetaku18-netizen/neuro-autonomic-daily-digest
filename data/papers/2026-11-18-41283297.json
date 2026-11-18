@@ -1,0 +1,87 @@
+{
+  "id": "paper-2026-11-18-41283297",
+  "entry_type": "daily_paper",
+  "date": "2026-11-18",
+  "pmid": "41283297",
+  "pmcid": "PMC12641644",
+  "doi_url": "https://doi.org/10.3390/neurosci6040108",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/41283297/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12641644/",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "NeuroSci (2025)",
+  "impact_factor": 3.5,
+  "doi": "10.3390/neurosci6040108",
+  "title_en": "Neuroscience of Behavior.",
+  "title_ja": "行動の神経科学",
+  "tags": [
+    "神経ダイナミクス",
+    "予測処理",
+    "運動制御",
+    "計算神経科学"
+  ],
+  "summary": {
+    "problem": "行動を単なる刺激応答の連鎖と捉える従来の視点では、計画や予測といった内部プロセスを伴う動的な行動の性質を十分に説明できない。",
+    "solution_and_method": "生物学的、環境的、計算論的視点を統合した概念的レビュー。次元削減や計算モデリングを用いて、神経集団の活動と行動データを同等の複雑さで解析する手法を検討。",
+    "formula_block": "$$ \\dot{\\mathbf{x}} = \\mathbf{f}(\\mathbf{x}, \\mathbf{u}, \\theta) $$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 41283297</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3390/neurosci6040108</text>\n</svg>",
+    "key_results": "神経ダイナミクスが意図や予測誤差といった潜在変数と相関すること、および神経活動と行動の組織化を繋ぐ共有計算アーキテクチャの存在を特定。",
+    "discussion_and_implications": "脳、身体、環境を統合したフレームワークにより、柔軟な適応行動の生成メカニズムを理解できる。神経活動の意味は詳細な行動モデルによって定義される。",
+    "relevance_to_my_research": "神経集団のダイナミクスから潜在変数を抽出するアプローチは、Koopman制御を用いた脳状態の推定と制御に応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 41283297</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3390/neurosci6040108</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Behavior is not a mere sequence of responses to stimuli but the dynamic expression of internal processes such as planning, prediction, valuation, and inference. These functions arise from distributed and metabolically costly neural systems and are best understood by considering behavior and neural activity together. This article presents a narrative and conceptual review of the neuroscience of behavior, integrating biological, environmental, and computational perspectives. We synthesize evidence from motor control, neural population dynamics, predictive processing, and spontaneous behavior, showing that behavior cannot be explained without the neural systems that generate it, and that neural activity gains meaning only through detailed behavioral models. Neural dynamics correlate with latent variables, such as intention and prediction error, that structure adaptive action across timescales. Recent advances in behavioral analysis, dimensionality reduction, and computational modeling enable the analysis of neural and behavioral data with comparable complexity, revealing shared computational architectures that link population activity with the organization of action. Our methodology involved a targeted literature search in PubMed and Web of Science (1919-2025), supplemented by seminal earlier works. By combining mechanistic and functional analysis, we outline a unified framework that explains how brains, bodies, and environments together generate flexible, adaptive behavior.",
+            "ja": "行動は単なる刺激に対する反応の連鎖ではなく、計画、予測、評価、推論といった内部プロセスの動的な表現である。これらの機能は、分散され代謝コストの高い神経系から生じ、行動と神経活動を共に考慮することで最もよく理解される。本論文は、生物学的、環境的、計算論的視点を統合し、行動の神経科学に関するナラティブかつ概念的なレビューを提示する。運動制御、神経集団ダイナミクス、予測処理、および自発的行動からの証拠を統合し、行動はそれを生成する神経系なしでは説明できず、神経活動は詳細な行動モデルを通じてのみ意味を得ることを示す。神経ダイナミクスは、時間スケールを超えて適応行動を構造化する意図や予測誤差などの潜在変数と相関する。行動分析、次元削減、および計算モデリングの最近の進歩により、神経データと行動データを同等の複雑さで分析することが可能になり、集団活動と行動の組織化を結びつける共有された計算アーキテクチャが明らかになった。我々の手法には、PubMedおよびWeb of Science（1919-2025年）における標的を絞った文献検索が含まれ、主要な初期の研究によって補完された。メカニズム分析と機能分析を組み合わせることで、脳、身体、環境がどのように協力して柔軟で適応的な行動を生成するかを説明する統一的な枠組みを概説する。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "latent variables": {
+      "ipa": "/ˈleɪtnt ˈvɛəriəblz/",
+      "pos": "noun",
+      "ja": "潜在変数",
+      "nuance": "直接観測できないが、観測データ（行動や神経活動）の背後にある構造を規定する変数。"
+    },
+    "dimensionality reduction": {
+      "ipa": "/daɪˌmɛnʃəˈnælɪti rɪˈdʌkʃən/",
+      "pos": "noun",
+      "ja": "次元削減",
+      "nuance": "高次元の神経活動データを、その本質的な特徴を保持したまま低次元の空間に投影する手法。"
+    },
+    "predictive processing": {
+      "ipa": "/prɪˈdɪktɪv ˈproʊsɛsɪŋ/",
+      "pos": "noun",
+      "ja": "予測処理",
+      "nuance": "脳が外部環境からの入力を予測し、その誤差を最小化するように情報を処理するという理論的枠組み。"
+    },
+    "inference": {
+      "ipa": "/ˈɪnfərəns/",
+      "pos": "noun",
+      "ja": "推論",
+      "nuance": "不完全な情報から、感覚入力の原因や将来の状態を統計的に推定するプロセス。"
+    },
+    "population dynamics": {
+      "ipa": "/ˌpɒpjuˈleɪʃən daɪˈnæmɪks/",
+      "pos": "noun",
+      "ja": "集団ダイナミクス",
+      "nuance": "個々のニューロンではなく、神経細胞集団全体の活動パターンの時間的変化。"
+    },
+    "adaptive action": {
+      "ipa": "/əˈdæptɪv ˈækʃən/",
+      "pos": "noun",
+      "ja": "適応行動",
+      "nuance": "環境の変化や内部状態に応じて柔軟に調整される、生存に有利な行動。"
+    }
+  }
+}

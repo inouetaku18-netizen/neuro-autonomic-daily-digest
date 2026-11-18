@@ -1,0 +1,87 @@
+{
+  "id": "paper-2026-11-18-31730854",
+  "entry_type": "daily_paper",
+  "date": "2026-11-18",
+  "pmid": "31730854",
+  "pmcid": "PMC6916730",
+  "doi_url": "https://doi.org/10.1016/j.cell.2019.10.031",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/31730854/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6916730/",
+  "category": "brain_heart",
+  "category_label": "③ 脳-心臓連関・迷走神経",
+  "journal": "Cell (2019)",
+  "impact_factor": 66.8,
+  "doi": "10.1016/j.cell.2019.10.031",
+  "title_en": "Genetic Identification of Vagal Sensory Neurons That Control Feeding.",
+  "title_ja": "摂食を制御する迷走神経感覚ニューロンの遺伝学的同定",
+  "tags": [
+    "迷走神経",
+    "内受容感覚",
+    "摂食行動",
+    "単一細胞解析"
+  ],
+  "summary": {
+    "problem": "迷走神経が多様な消化管シグナルを脳に伝えることは知られているが、どの特定のニューロンがどのシグナル（機械的vs化学的）を介して摂食を抑制するのかが不明であった。",
+    "solution_and_method": "単一細胞RNAシーケンシングによる細胞型マッピング、光遺伝学を用いた末梢迷走神経の特異的刺激、および視床下部AgRPニューロンの活動記録。",
+    "formula_block": "$$ P(\\text{spike} | \\text{stretch}) = \\frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}} $$",
+    "diagram_caption": "③ 脳-心臓連関・迷走神経 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31730854</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cell.2019.10.031</text>\n</svg>",
+    "key_results": "腸の機械受容器の刺激は摂食を強力に抑制し、視床下部AgRPニューロンの活動を低下させた。対照的に、栄養素に反応する粘膜求心路の刺激は摂食に影響を与えなかった。",
+    "discussion_and_implications": "摂食の満腹感信号において、栄養素の化学的検出よりも腸の物理的な伸展（機械受容）が支配的な役割を果たしていることが示唆された。",
+    "relevance_to_my_research": "迷走神経の点過程発火パターンが機械的刺激（伸展）に依存してAgRPニューロンを制御する仕組みは、脳心臓連関の点過程モデル構築に直接的な知見を与える。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 31730854</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cell.2019.10.031</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Energy homeostasis requires precise measurement of the quantity and quality of ingested food. The vagus nerve innervates the gut and can detect diverse interoceptive cues, but the identity of the key sensory neurons and corresponding signals that regulate food intake remains unknown. Here, we use an approach for target-specific, single-cell RNA sequencing to generate a map of the vagal cell types that innervate the gastrointestinal tract. We show that unique molecular markers identify vagal neurons with distinct innervation patterns, sensory endings, and function. Surprisingly, we find that food intake is most sensitive to stimulation of mechanoreceptors in the intestine, whereas nutrient-activated mucosal afferents have no effect. Peripheral manipulations combined with central recordings reveal that intestinal mechanoreceptors, but not other cell types, potently and durably inhibit hunger-promoting AgRP neurons in the hypothalamus. These findings identify a key role for intestinal mechanoreceptors in the regulation of feeding.",
+            "ja": "エネルギー恒常性には、摂取した食物の量と質の正確な測定が必要である。迷走神経は腸に分布し、多様な内受容感覚シグナルを検出できるが、摂食を調節する主要な感覚ニューロンの正体と対応するシグナルは不明なままである。本研究では、標的特異的な単一細胞RNAシーケンシングを用いて、胃腸道に分布する迷走神経細胞型のマップを作成した。固有の分子マーカーが、異なる神経分布パターン、感覚終末、および機能を持つ迷走神経ニューロンを識別することを示す。驚くべきことに、摂食行動は腸の機械受容器の刺激に対して最も敏感であり、一方で栄養素によって活性化される粘膜求心路は効果を示さないことがわかった。末梢への介入と中枢での記録を組み合わせることで、腸の機械受容器が（他の細胞型ではなく）視床下部の空腹促進性AgRPニューロンを強力かつ持続的に抑制することを明らかにした。これらの知見は、摂食調節における腸の機械受容器の重要な役割を同定するものである。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "vagus nerve": {
+      "ipa": "/ˈveɪɡəs nɜːrv/",
+      "pos": "noun",
+      "ja": "迷走神経",
+      "nuance": "脳と内臓を結ぶ主要な副交感神経であり、内受容感覚の伝達に不可欠。"
+    },
+    "interoceptive": {
+      "ipa": "/ˌɪntəroʊˈsɛptɪv/",
+      "pos": "adj",
+      "ja": "内受容感覚の",
+      "nuance": "体内の状態（心拍、消化管の充満感など）を感知する感覚に関する。"
+    },
+    "mechanoreceptors": {
+      "ipa": "/ˌmɛkənoʊrɪˈsɛptərz/",
+      "pos": "noun",
+      "ja": "機械受容器",
+      "nuance": "圧力や伸展などの物理的な変形を感知して電気信号に変換する受容体。"
+    },
+    "afferents": {
+      "ipa": "/ˈæfərənts/",
+      "pos": "noun",
+      "ja": "求心路",
+      "nuance": "末梢から中枢神経系へ向かって信号を伝える神経線維。"
+    },
+    "homeostasis": {
+      "ipa": "/ˌhoʊmioʊˈsteɪsɪs/",
+      "pos": "noun",
+      "ja": "恒常性",
+      "nuance": "内部環境を一定の状態に保とうとする生物学的プロセス。"
+    },
+    "single-cell rna sequencing": {
+      "ipa": "/ˈsɪŋɡəl sɛl ˌɑːr ɛn eɪ ˈsiːkwənsɪŋ/",
+      "pos": "noun",
+      "ja": "単一細胞RNAシーケンシング",
+      "nuance": "個々の細胞レベルで遺伝子発現を網羅的に解析する手法。"
+    }
+  }
+}

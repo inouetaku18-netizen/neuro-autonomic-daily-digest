@@ -1,0 +1,87 @@
+{
+  "id": "paper-2026-11-18-34171308",
+  "entry_type": "daily_paper",
+  "date": "2026-11-18",
+  "pmid": "34171308",
+  "pmcid": "PMC8273140",
+  "doi_url": "https://doi.org/10.1016/j.cell.2021.05.022",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/34171308/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8273140/",
+  "category": "ai_control",
+  "category_label": "④ AI・数理神経制御",
+  "journal": "Cell (2021)",
+  "impact_factor": 66.8,
+  "doi": "10.1016/j.cell.2021.05.022",
+  "title_en": "Representational geometry of perceptual decisions in the monkey parietal cortex.",
+  "title_ja": "サル頭頂葉皮質における知覚決定の表現幾何学",
+  "tags": [
+    "神経多様体",
+    "意思決定",
+    "頭頂葉皮質",
+    "表現幾何学"
+  ],
+  "summary": {
+    "problem": "従来の意思決定モデルは、神経活動が行動計画と直結していると仮定していたが、異なるタスク文脈における神経表現の柔軟性や幾何学的構造については十分に理解されていなかった。",
+    "solution_and_method": "サルのLIP、外側・内側前頭前皮質からの神経活動記録。顔識別タスクと運動識別タスクを比較し、状態空間における集団活動の多様体（manifold）解析を実施。",
+    "formula_block": "$$ \text{dist}(\text{manifold}_A, \text{manifold}_B) = \theta $$",
+    "diagram_caption": "④ AI・数理神経制御 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 34171308</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cell.2021.05.022</text>\n</svg>",
+    "key_results": "顔識別タスクでは証拠が増えるほどLIP発火率が低下するという、運動識別タスクとは逆のパターンを発見。決定は行動表現軸からズレた「湾曲した多様体」上で進行し、タスク文脈に応じて多様体が回転することを確認。",
+    "discussion_and_implications": "神経表現は固定的な行動計画ではなく、タスク文脈に応じて柔軟に再構成される幾何学的構造（多様体）を持つ。これにより、脳は異なる課題に対して最適な情報読み出しを実現している。",
+    "relevance_to_my_research": "神経活動の「湾曲した多様体」の同定と、文脈によるその回転（ダイナミクスの変化）は、RC+Koopmanを用いた非線形状態空間のモデル化と一致する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 34171308</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.cell.2021.05.022</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Lateral intraparietal (LIP) neurons represent formation of perceptual decisions involving eye movements. In circuit models for these decisions, neural ensembles that encode actions compete to form decisions. Consequently, representation and readout of the decision variables (DVs) are implemented similarly for decisions with identical competing actions, irrespective of input and task context differences. Further, DVs are encoded as partially potentiated action plans through balance of activity of action-selective ensembles. Here, we test those core principles. We show that in a novel face-discrimination task, LIP firing rates decrease with supporting evidence, contrary to conventional motion-discrimination tasks. These opposite response patterns arise from similar mechanisms in which decisions form along curved population-response manifolds misaligned with action representations. These manifolds rotate in state space based on context, indicating distinct optimal readouts for different tasks. We show similar manifolds in lateral and medial prefrontal cortices, suggesting similar representational geometry across decision-making circuits.",
+            "ja": "外側頭頂間野（LIP）ニューロンは、眼球運動を伴う知覚決定の形成を表現している。これらの決定に関する回路モデルでは、行動をコードする神経アンサンブルが競合して決定を形成する。その結果、入力やタスクの文脈が異なっても、同一の競合行動を伴う決定については、決定変数（DV）の表現と読み出しは同様に実装される。さらに、DVは行動選択的なアンサンブルの活動バランスを通じて、部分的に増強された行動計画としてコードされる。本研究では、これらの核心的な原理を検証する。新しい顔識別タスクにおいて、従来の運動識別タスクとは逆に、LIPの発火率が支持証拠とともに減少することを示す。これらの相反する応答パターンは、行動表現とは一致しない湾曲した集団応答多様体に沿って決定が形成されるという同様のメカニズムから生じる。これらの多様体は文脈に基づいて状態空間内で回転し、異なるタスクに対して異なる最適な読み出しが存在することを示唆している。外側および内側前頭前皮質でも同様の多様体が見られ、意思決定回路全体で共通の表現幾何学が存在することが示唆された。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "representational geometry": {
+      "ipa": "/ˌrɛprɪzɛnˈteɪʃənəl dʒiˈɒmətri/",
+      "pos": "noun",
+      "ja": "表現幾何学",
+      "nuance": "神経活動パターンが状態空間内で形成する幾何学的な構造や配置。"
+    },
+    "manifolds": {
+      "ipa": "/ˈmænɪfoʊldz/",
+      "pos": "noun",
+      "ja": "多様体",
+      "nuance": "高次元データが実際に分布している、より低次元の連続的な空間構造。"
+    },
+    "decision variables": {
+      "ipa": "/dɪˈsɪʒən ˈvɛəriəblz/",
+      "pos": "noun",
+      "ja": "決定変数",
+      "nuance": "証拠を蓄積し、最終的な選択を導くために脳内で計算される変数。"
+    },
+    "firing rates": {
+      "ipa": "/ˈfaɪərɪŋ reɪts/",
+      "pos": "noun",
+      "ja": "発火率",
+      "nuance": "単位時間あたりにニューロンが生成する活動電位の数。"
+    },
+    "state space": {
+      "ipa": "/steɪt speɪs/",
+      "pos": "noun",
+      "ja": "状態空間",
+      "nuance": "システムのすべての可能な状態を座標として表す多次元空間。"
+    },
+    "readout": {
+      "ipa": "/ˈriːdaʊt/",
+      "pos": "noun",
+      "ja": "読み出し",
+      "nuance": "下流の神経回路が特定の集団活動から情報を抽出するプロセス。"
+    }
+  }
+}

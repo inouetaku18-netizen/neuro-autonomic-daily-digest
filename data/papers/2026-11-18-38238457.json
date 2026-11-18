@@ -1,0 +1,87 @@
+{
+  "id": "paper-2026-11-18-38238457",
+  "entry_type": "daily_paper",
+  "date": "2026-11-18",
+  "pmid": "38238457",
+  "pmcid": "PMC10796939",
+  "doi_url": "https://doi.org/10.1038/s41598-024-51457-1",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38238457/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10796939/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Scientific reports (2024)",
+  "impact_factor": 4.6,
+  "doi": "10.1038/s41598-024-51457-1",
+  "title_en": "Central autonomic network and early prognosis in patients with disorders of consciousness.",
+  "title_ja": "意識障害患者における中枢自律神経ネットワークと早期予後",
+  "tags": [
+    "心拍変動",
+    "意識障害",
+    "中枢自律神経ネットワーク",
+    "機械学習"
+  ],
+  "summary": {
+    "problem": "意識障害（DOC）患者の早期段階において、将来の意識回復の可能性（予後）を正確に予測することは臨床的に困難である。",
+    "solution_and_method": "58名のDOC患者を対象に、安静時および刺激時の心電図からHRV指標（HF-PSD, SDNN, Sample Entropy）を算出。これらを受傷後経過時間と共にSVMに入力し、3ヶ月後のCRS-Rスコアを予測。",
+    "formula_block": "$$ \\text{SampEn}(m, r, N) = -\\ln \\left( \\frac{A}{B} \\right) $$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38238457</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41598-024-51457-1</text>\n</svg>",
+    "key_results": "SVMを用いた予後予測精度は、訓練データで96％、独立した検証データで100％に達した。",
+    "discussion_and_implications": "HRV、特に非線形指標であるサンプルエントロピーとCANの活動を反映する指標を組み合わせることで、DOC患者の極めて高精度な予後予測が可能である。",
+    "relevance_to_my_research": "非線形HRV指標（サンプルエントロピー）を用いた状態予測は、脳心臓連関のダイナミクスをRCやKoopmanで解析する際の重要な特徴量となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38238457</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41598-024-51457-1</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The central autonomic network (CAN) plays a crucial role in modulating the autonomic nervous system. Heart rate variability (HRV) is a valuable marker for assessing CAN function in disorders of consciousness (DOC) patients. We used HRV analysis for early prognosis in 58 DOC patients enrolled within ten days of hospitalization. They underwent a five-minute electrocardiogram during baseline and acoustic/visual stimulation. The coma recovery scale-revised (CRS-R) was used to define the patient's consciousness level and categorize the good/bad outcome at three months. The high-frequency Power Spectrum Density and the standard deviation of normal-to-normal peaks in baseline, the sample entropy during the stimulation, and the time from injury features were used in the support vector machine analysis (SVM) for outcome prediction. The SVM predicted the patients' outcome with an accuracy of 96% in the training test and 100% in the validation test, underscoring its potential to provide crucial clinical information about prognosis.",
+            "ja": "中枢自律神経ネットワーク（CAN）は、自律神経系の調節において重要な役割を果たす。心拍変動（HRV）は、意識障害（DOC）患者におけるCAN機能を評価するための貴重な指標である。我々は、入院後10日以内に登録された58名のDOC患者の早期予後判定にHRV解析を用いた。患者は、安静時および音響・視覚刺激中に5分間の心電図測定を受けた。意識レベルの定義および3ヶ月後の予後（良好/不良）の分類には、改訂昏睡回復尺度（CRS-R）を用いた。予後予測のためのサポートベクターマシン（SVM）解析には、安静時の高周波パワースペクトル密度（HF-PSD）と正常心拍間隔の標準偏差（SDNN）、刺激中のサンプルエントロピー、および受傷からの経過時間を用いた。SVMは、訓練テストで96％、検証テストで100％の精度で患者の予後を予測し、予後に関する重要な臨床情報を提供する可能性を強調した。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "disorders of consciousness": {
+      "ipa": "/dɪsˈɔːrdərz əv ˈkɒnʃəsnəs/",
+      "pos": "noun",
+      "ja": "意識障害",
+      "nuance": "植物状態や最小意識状態など、覚醒や認識が損なわれた臨床状態の総称。"
+    },
+    "heart rate variability": {
+      "ipa": "/hɑːrt reɪt ˌvɛəriəˈbɪlɪti/",
+      "pos": "noun",
+      "ja": "心拍変動",
+      "nuance": "連続する心拍間の時間の変動。自律神経活動の指標として用いられる。"
+    },
+    "sample entropy": {
+      "ipa": "/ˈsæmpl ˈɛntrəpi/",
+      "pos": "noun",
+      "ja": "サンプルエントロピー",
+      "nuance": "時系列データの複雑性や不規則性を測定する非線形指標。"
+    },
+    "prognosis": {
+      "ipa": "/prɒɡˈnoʊsɪs/",
+      "pos": "noun",
+      "ja": "予後",
+      "nuance": "病気や状態の将来的な経過や回復の見込み。"
+    },
+    "support vector machine": {
+      "ipa": "/səˈpɔːrt ˈvɛktər məˈʃiːn/",
+      "pos": "noun",
+      "ja": "サポートベクターマシン",
+      "nuance": "データを分類または回帰するための教師あり学習モデル。"
+    },
+    "central autonomic network": {
+      "ipa": "/ˈsɛntrəl ˌɔːtəˈnɒmɪk ˈnɛtwɜːrk/",
+      "pos": "noun",
+      "ja": "中枢自律神経ネットワーク",
+      "nuance": "脳内の自律神経制御を司る領域（島皮質、扁桃体、視床下部など）のネットワーク。"
+    }
+  }
+}
