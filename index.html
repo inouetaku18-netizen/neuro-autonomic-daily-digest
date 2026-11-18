@@ -2811,6 +2811,7 @@
                 addedAt: new Date().toISOString().slice(0, 10)
               });
               safeSaveState();
+              syncStudyDataToGoogleDrive();
               if (typeof updateHeaderStats === 'function') updateHeaderStats();
             }
           }
@@ -2847,6 +2848,254 @@
           pop.style.left = `${left}px`;
           pop.classList.remove('hidden');
         });
+      }
+
+      // =========================================================================
+      // ☁️ Google Drive 永続同期＆バックアップエンジン
+      // =========================================================================
+      function getDriveWebhookUrl() {
+        return (localStorage.getItem('GOOGLE_DRIVE_GAS_URL') || '').trim();
+      }
+
+      function updateDriveSyncBadge(statusText, tone = 'neutral') {
+        const badge = document.getElementById('gdrive-sync-status-badge');
+        if (!badge) return;
+        badge.textContent = statusText;
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full ' + (
+          tone === 'ok' ? 'bg-emerald-100 text-emerald-900' :
+          tone === 'syncing' ? 'bg-amber-100 text-amber-900' :
+          tone === 'err' ? 'bg-red-100 text-red-900' :
+          'bg-slate-200 text-slate-700'
+        );
+      }
+
+      window.syncPaperToGoogleDrive = async function(paperObj) {
+        const url = getDriveWebhookUrl();
+        if (!url || !paperObj || !paperObj.id) return;
+        updateDriveSyncBadge('☁️ Drive保存中...', 'syncing');
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'save_paper', paper: paperObj })
+          });
+          const data = await res.json().catch(() => ({ ok: true }));
+          if (data.ok === false) throw new Error(data.error || 'Drive save failed');
+          updateDriveSyncBadge('☁️ Drive同期済', 'ok');
+        } catch (e) {
+          console.error('Drive paper sync error:', e);
+          updateDriveSyncBadge('⚠️ Drive保存失敗', 'err');
+        }
+      };
+
+      window.deletePaperFromGoogleDrive = async function(paperId) {
+        const url = getDriveWebhookUrl();
+        if (!url || !paperId) return;
+        try {
+          await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'delete_paper', paperId: paperId })
+          });
+        } catch (e) {
+          console.error('Drive paper delete error:', e);
+        }
+      };
+
+      window.syncStudyDataToGoogleDrive = async function() {
+        const url = getDriveWebhookUrl();
+        if (!url) return;
+        updateDriveSyncBadge('☁️ Drive保存中...', 'syncing');
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'save_study_data',
+              notes: window.englishStudyNotes || [],
+              wordbook: (typeof wordbook !== 'undefined' && Array.isArray(wordbook)) ? wordbook : [],
+              grammarCache: window.sentenceGrammarCache || {}
+            })
+          });
+          const data = await res.json().catch(() => ({ ok: true }));
+          if (data.ok === false) throw new Error(data.error || 'Drive study sync failed');
+          updateDriveSyncBadge('☁️ Drive同期済', 'ok');
+        } catch (e) {
+          console.error('Drive study sync error:', e);
+          updateDriveSyncBadge('⚠️ Drive保存失敗', 'err');
+        }
+      };
+
+      window.restoreAllFromGoogleDrive = async function(silent = false) {
+        const url = getDriveWebhookUrl();
+        if (!url) {
+          if (!silent) alert('先にGoogle Apps ScriptのウェブアプリURLを入力して保存してください。');
+          return;
+        }
+        updateDriveSyncBadge('☁️ Drive読込中...', 'syncing');
+        try {
+          const res = await fetch(`${url}?action=load&t=${Date.now()}`);
+          const data = await res.json();
+          if (!data || data.ok === false) {
+            throw new Error(data?.error || 'Google Driveからのデータ取得に失敗しました');
+          }
+
+          let restoredPapersCount = 0;
+          if (Array.isArray(data.papers)) {
+            for (const p of data.papers) {
+              if (!p || !p.id) continue;
+              const normalized = {
+                ...p,
+                entry_type: 'daily_paper',
+                type: 'paper',
+                pdfDecoded: true,
+                isCustomPdf: true
+              };
+              const idx = items.findIndex(existing => existing.id === p.id);
+              if (idx !== -1) {
+                items[idx] = normalized;
+              } else {
+                items.unshift(normalized);
+              }
+              if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(p.id);
+              if (p.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
+                Object.entries(p.vocabulary).forEach(([k, v]) => {
+                  if (v && typeof v === 'object') {
+                    ACADEMIC_GLOSSARY[k.toLowerCase()] = {
+                      ipa: v.ipa || '',
+                      pos: v.pos || '',
+                      ja: v.ja || v.meaning || '',
+                      meaning: v.meaning || v.ja || '',
+                      nuance: v.nuance || ''
+                    };
+                  }
+                });
+              }
+              restoredPapersCount++;
+            }
+          }
+
+          if (data.studyData) {
+            if (Array.isArray(data.studyData.notes) && data.studyData.notes.length > 0) {
+              const existingIds = new Set((window.englishStudyNotes || []).map(n => n.id));
+              for (const n of [...data.studyData.notes].reverse()) {
+                if (!existingIds.has(n.id)) window.englishStudyNotes.unshift(n);
+              }
+              localStorage.setItem('ACADEMIC_ENGLISH_NOTES', JSON.stringify(window.englishStudyNotes));
+              updateNoteCountBadge();
+            }
+            if (Array.isArray(data.studyData.wordbook) && typeof wordbook !== 'undefined' && Array.isArray(wordbook)) {
+              const existingTerms = new Set(wordbook.map(w => (w.term || w.word || '').toLowerCase()));
+              for (const w of [...data.studyData.wordbook].reverse()) {
+                const key = (w.term || w.word || '').toLowerCase();
+                if (key && !existingTerms.has(key)) wordbook.unshift(w);
+              }
+              if (typeof updateHeaderStats === 'function') updateHeaderStats();
+            }
+            if (data.studyData.grammarCache && typeof data.studyData.grammarCache === 'object') {
+              window.sentenceGrammarCache = { ...data.studyData.grammarCache, ...(window.sentenceGrammarCache || {}) };
+              localStorage.setItem('SENTENCE_GRAMMAR_CACHE', JSON.stringify(window.sentenceGrammarCache));
+            }
+          }
+
+          if (restoredPapersCount > 0) {
+            persistCustomImportedPapers();
+            if (typeof ensureValidSelection === 'function') ensureValidSelection();
+            if (typeof renderAll === 'function') renderAll();
+            setTimeout(() => {
+              if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
+            }, 250);
+          }
+
+          updateDriveSyncBadge(`☁️ Drive同期済 (${restoredPapersCount}件)`, 'ok');
+          if (!silent) {
+            alert(`✅ Google Driveから解読済みPDF ${restoredPapersCount} 件と学習ノート・単語帳を復元しました！`);
+          }
+        } catch (err) {
+          console.error('Drive restore error:', err);
+          updateDriveSyncBadge('⚠️ Drive接続エラー', 'err');
+          if (!silent) alert('❌ Google Drive復元エラー: ' + err.message);
+        }
+      };
+
+      function setupGoogleDriveSyncUI() {
+        if (document.getElementById('open-gdrive-sync-btn')) return;
+
+        const gBtn = document.createElement('button');
+        gBtn.id = 'open-gdrive-sync-btn';
+        gBtn.style.bottom = '11.5rem';
+        gBtn.style.right = '1.5rem';
+        gBtn.className = 'fixed z-40 bg-slate-800 hover:bg-slate-700 text-white font-semibold px-4 py-2.5 rounded-full shadow-xl border border-slate-600 flex items-center gap-2 transition cursor-pointer text-xs sm:text-sm';
+        const initialUrl = getDriveWebhookUrl();
+        gBtn.innerHTML = `☁️ Google Drive連携 <span id="gdrive-sync-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full ${initialUrl ? 'bg-emerald-100 text-emerald-900' : 'bg-slate-200 text-slate-700'}">${initialUrl ? '☁️ 連携中' : '未設定'}</span>`;
+        document.body.appendChild(gBtn);
+
+        const modal = document.createElement('div');
+        modal.id = 'gdrive-sync-modal';
+        modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-4';
+        modal.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 class="text-base sm:text-lg font-extrabold text-slate-900">☁️ Google Drive 永続バックアップ・同期設定</h3>
+              <button id="close-gdrive-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Google Apps Script のウェブアプリURLを登録すると、<strong>解読したPDF（全文対訳・図表）・英語表現ノート・マイ単語帳</strong>があなたの Google Drive 内の <code>NeuroCardio_Research_Archive</code> フォルダに自動保存され、ブラウザの履歴を消しても消えなくなります。
+            </p>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script ウェブアプリ URL</label>
+              <input
+                id="gdrive-gas-url-input"
+                type="url"
+                placeholder="https://script.google.com/macros/s/xxxxx/exec"
+                class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600"
+              />
+            </div>
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button id="gdrive-save-and-sync-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs sm:text-sm font-extrabold cursor-pointer">
+                💾 URLを保存して今すぐ同期
+              </button>
+              <button id="gdrive-manual-restore-btn" class="py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-extrabold cursor-pointer">
+                📥 Driveから復元
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        const urlInput = document.getElementById('gdrive-gas-url-input');
+        urlInput.value = getDriveWebhookUrl();
+
+        gBtn.onclick = () => {
+          urlInput.value = getDriveWebhookUrl();
+          modal.classList.remove('hidden');
+        };
+        document.getElementById('close-gdrive-modal').onclick = () => modal.classList.add('hidden');
+
+        document.getElementById('gdrive-save-and-sync-btn').onclick = async () => {
+          const val = urlInput.value.trim();
+          localStorage.setItem('GOOGLE_DRIVE_GAS_URL', val);
+          if (!val) {
+            updateDriveSyncBadge('未設定', 'neutral');
+            alert('URLをクリアしました。');
+            return;
+          }
+          // 現在ローカルにある解読済みPDFとノートをDriveへ全件アップロードしてから双方向復元
+          const decodedPapers = items.filter(i => i && (i.isCustomPdf || i.pdfDecoded));
+          for (const p of decodedPapers) {
+            await window.syncPaperToGoogleDrive(p);
+          }
+          await window.syncStudyDataToGoogleDrive();
+          await window.restoreAllFromGoogleDrive(false);
+          modal.classList.add('hidden');
+        };
+
+        document.getElementById('gdrive-manual-restore-btn').onclick = async () => {
+          const val = urlInput.value.trim();
+          if (val) localStorage.setItem('GOOGLE_DRIVE_GAS_URL', val);
+          await window.restoreAllFromGoogleDrive(false);
+          modal.classList.add('hidden');
+        };
       }
 
       // =========================================================================
@@ -2928,6 +3177,7 @@
                 addedAt: new Date().toISOString().slice(0, 10)
               });
               safeSaveState();
+              syncStudyDataToGoogleDrive();
               if (typeof updateHeaderStats === 'function') updateHeaderStats();
             }
           }
@@ -3162,7 +3412,352 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
       }
 
       // =========================================================================
-      // 学術英語表現ノート（保存・管理・PDF出力）システム
+      // ✍️ 英語論文執筆・推敲サポートスタジオ
+      // =========================================================================
+      function setupAcademicWritingUI() {
+        if (document.getElementById('open-academic-writing-btn')) return;
+
+        const writeBtn = document.createElement('button');
+        writeBtn.id = 'open-academic-writing-btn';
+        writeBtn.style.bottom = '8.5rem';
+        writeBtn.style.right = '1.5rem';
+        writeBtn.className = 'fixed z-40 bg-emerald-800 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-full shadow-xl border border-emerald-600 flex items-center gap-2 transition cursor-pointer text-sm';
+        writeBtn.innerHTML = '✍️ 英語論文ライティング支援';
+        document.body.appendChild(writeBtn);
+
+        const modal = document.createElement('div');
+        modal.id = 'academic-writing-modal';
+        modal.className = 'fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6';
+        modal.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-6 py-4 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white">
+              <div>
+                <h3 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+                  <span>✍️ 学術英語論文 執筆・推敲アシスタント</span>
+                </h3>
+                <p class="text-[11px] text-emerald-200">日本語下書き・粗い英文から、セクション適切な時制・ヘッジングを備えたトップジャーナル英文を生成します</p>
+              </div>
+              <button id="close-academic-writing-modal" class="text-slate-300 hover:text-white text-2xl leading-none px-2 cursor-pointer">&times;</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+              <div class="lg:col-span-5 p-5 space-y-4 bg-slate-50/70">
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">1. 執筆対象セクション（時制・主張の強さを自動調整）</label>
+                  <select id="aw-section-select" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white font-semibold text-slate-800">
+                    <option value="Introduction (背景・課題設定・研究目的)">Introduction（背景・既存手法の限界・研究目的）</option>
+                    <option value="Methods (実験プロトコル・数理モデル・統計解析)">Methods（実験プロトコル・信号処理・数理定式化）</option>
+                    <option value="Results (定量的結果・統計比較の客観的記述)">Results（定量的結果・図表の客観的記述・過去形）</option>
+                    <option value="Discussion (生理学的解釈・先行研究比較・限界と展望)">Discussion（メカニズム考察・比較・ヘッジング・限界）</option>
+                    <option value="Abstract (構造化要旨・研究のインパクト要約)">Abstract（要旨・簡潔で強いインパクト表現）</option>
+                    <option value="Response to Reviewers (査読コメントへの丁寧かつ論理的な返答)">Response to Reviewers（査読者への返答・修正説明）</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">2. 構成テンプレートを挿入（任意・クリックで下書き欄に反映）</label>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button type="button" data-tpl="intro_gap" class="aw-tpl-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-800 cursor-pointer">従来手法の限界→提案</button>
+                    <button type="button" data-tpl="method_proc" class="aw-tpl-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-800 cursor-pointer">計測・前処理手順</button>
+                    <button type="button" data-tpl="result_stat" class="aw-tpl-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-800 cursor-pointer">群間比較・統計結果</button>
+                    <button type="button" data-tpl="disc_hedge" class="aw-tpl-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-800 cursor-pointer">メカニズム考察(弱め)</button>
+                    <button type="button" data-tpl="rebuttal" class="aw-tpl-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-300 hover:border-emerald-500 hover:text-emerald-800 cursor-pointer">査読者への謝意＋反論</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">3. 日本語の下書き、または推敲したい英文を入力</label>
+                  <textarea
+                    id="aw-input-text"
+                    rows="7"
+                    placeholder="日本語でも英語でも入力できます..."
+                    class="w-full p-3 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-emerald-600"
+                  ></textarea>
+                </div>
+
+                <div class="space-y-2 bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                  <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                    <input id="aw-use-notes" type="checkbox" checked class="rounded text-emerald-600" />
+                    <span>📓 「英語表現ノート」の保存済み構文を優先活用する</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                    <input id="aw-use-paper-ctx" type="checkbox" checked class="rounded text-emerald-600" />
+                    <span>📄 現在選択中の論文の専門用語・文脈に合わせる</span>
+                  </label>
+                </div>
+
+                <button
+                  id="aw-generate-btn"
+                  class="w-full py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>✨ 学術英文を生成・推敲する（3パターン＋ニュアンス解説）</span>
+                </button>
+              </div>
+
+              <div id="aw-output-container" class="lg:col-span-7 p-5 space-y-4 bg-white overflow-y-auto">
+                <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-12 px-4">
+                  <div class="text-4xl mb-3">📝</div>
+                  <p class="text-sm font-bold text-slate-600 mb-1">左側に日本語メモまたは英文を入力して生成ボタンを押してください</p>
+                  <p class="text-xs leading-relaxed max-w-md">
+                    「① 標準・明快」「② トップジャーナル向け洗練表現」「③ 文字数削減版」の3パターンに加え、<strong>逆翻訳チェック</strong>と<strong>文法・ニュアンス解説</strong>を提示します。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        const templates = {
+          intro_gap: '従来の〇〇解析は△△という仮定に依存しているため、非定常な生体信号の動的変化を十分に捉えられないという限界があった。この課題を解決するため、本研究では□□に基づく新たなフレームワークを提案する。',
+          method_proc: '健常成人〇名を対象に、安静臥位および立位負荷（Active stand test）中の心電図および脳波をサンプリング周波数〇〇Hzで同時計測した。得られたR-R間隔時系列に対して△△フィルタを適用し、アーチファクトを除去した。',
+          result_stat: '条件Aと比較して条件Bでは指標Xが有意に増加した（p < 0.01, Wilcoxon signed-rank test）。さらに、指標Xと収縮期血圧の変動との間には有意な正の相関が認められた。',
+          disc_hedge: 'これらの結果は、迷走神経活動の減弱が中枢-自律神経連関の非線形ダイナミクスを変化させる可能性を示唆している。ただし、本研究はサンプルサイズが限られているため、今後は臨床群を含めた検証が必要である。',
+          rebuttal: '査読者の先生方の有益なご指摘に深く感謝いたします。ご指摘いただいた時間窓長の選定根拠について、Methodsセクションの2.3節に感度分析の結果を追記し、以下の通り文章を明確化いたしました。'
+        };
+
+        modal.querySelectorAll('.aw-tpl-btn').forEach(b => {
+          b.onclick = () => {
+            const key = b.dataset.tpl;
+            const ta = document.getElementById('aw-input-text');
+            if (ta && templates[key]) {
+              ta.value = templates[key];
+              ta.focus();
+            }
+          };
+        });
+
+        writeBtn.onclick = () => modal.classList.remove('hidden');
+        document.getElementById('close-academic-writing-modal').onclick = () => modal.classList.add('hidden');
+
+        window.copyWritingVariant = function(btnEl, encodedText) {
+          const text = decodeURIComponent(encodedText || '');
+          navigator.clipboard?.writeText(text);
+          const orig = btnEl.textContent;
+          btnEl.textContent = '✓ コピー完了';
+          setTimeout(() => { btnEl.textContent = orig; }, 1500);
+        };
+
+        window.speakWritingVariant = function(encodedText) {
+          const text = decodeURIComponent(encodedText || '');
+          if (!text || !('speechSynthesis' in window)) return;
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-US';
+          window.speechSynthesis.speak(u);
+        };
+
+        window.saveWritingVariantToNote = function(btnEl, encodedTitle, encodedEn, encodedBackJa, encodedNote) {
+          if (typeof window.addEnglishStudyNote === 'function') {
+            window.addEnglishStudyNote({
+              category: 'ライティング表現',
+              pattern: decodeURIComponent(encodedTitle || '論文執筆推敲'),
+              en: decodeURIComponent(encodedEn || ''),
+              ja: decodeURIComponent(encodedBackJa || ''),
+              analysis: decodeURIComponent(encodedNote || '')
+            });
+          }
+          btnEl.textContent = '✓ ノート保存済';
+          setTimeout(() => { btnEl.textContent = '📓 ノート保存'; }, 1500);
+        };
+
+        document.getElementById('aw-generate-btn').onclick = async () => {
+          const rawInput = document.getElementById('aw-input-text').value.trim();
+          if (!rawInput) {
+            alert('執筆または推敲したいテキストを入力してください。');
+            return;
+          }
+
+          const apiKey = (localStorage.getItem('USER_GEMINI_API_KEY') || '').trim();
+          if (!apiKey) {
+            alert('先にGemini APIキーを設定してください（右下の「📄 任意PDFをアーカイブに追加・解読」から入力できます）。');
+            modal.classList.add('hidden');
+            document.getElementById('pdf-decoder-modal')?.classList.remove('hidden');
+            return;
+          }
+
+          const sectionLabel = document.getElementById('aw-section-select').value;
+          const useNotes = document.getElementById('aw-use-notes').checked;
+          const usePaperCtx = document.getElementById('aw-use-paper-ctx').checked;
+          const outEl = document.getElementById('aw-output-container');
+
+          outEl.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center py-12 text-emerald-900">
+              <div class="text-3xl animate-spin mb-3">⏳</div>
+              <p class="text-sm font-extrabold">学術英語3パターンとニュアンス解説を生成中（約4〜8秒）...</p>
+            </div>
+          `;
+
+          const savedNotes = (useNotes && Array.isArray(window.englishStudyNotes))
+            ? window.englishStudyNotes.slice(0, 12).map(n => `- ${n.pattern}: ${n.en}`).join('\n')
+            : '';
+          const currentPaper = (usePaperCtx && Array.isArray(items)) ? items.find(i => i.id === selectedItemId) : null;
+          const paperHint = currentPaper
+            ? `参照中の論文: ${currentPaper.title_en} / キーワード: ${(currentPaper.tags || []).join(', ')}`
+            : '';
+
+          const prompt = `
+あなたはNature, IEEE Transactions, Royal Society Open Science等の査読者・ネイティブエディターを務める生体医工学・神経科学・制御工学の専門研究者です。
+ユーザーが入力した【下書き（日本語または英語）】を、指定された【論文セクション】に最適な学術英語へ変換・推敲してください。
+
+【対象セクション】
+${sectionLabel}
+
+【ユーザー入力テキスト】
+${rawInput}
+
+${paperHint ? `【分野・用語コンテキスト】\n${paperHint}\n` : ''}
+${savedNotes ? `【ユーザーが学習ノートに保存している好みの学術表現（文脈に合えば自然に活用すること）】\n${savedNotes}\n` : ''}
+
+以下の単一JSONオブジェクトのみを出力してください。
+{
+  "variants": [
+    {
+      "label": "① Standard Academic（明快・標準）",
+      "en": "英語文1",
+      "back_translation_ja": "英語のニュアンスを忠実に反映した確認用日本語訳",
+      "nuance_note": "時制（現在形/過去形）や助動詞・構文選択の理由（日本語）"
+    },
+    {
+      "label": "② Top-Journal Polish（洗練・ネイティブ調）",
+      "en": "英語文2",
+      "back_translation_ja": "確認用日本語訳",
+      "nuance_note": "より洗練された表現にしたポイント（日本語）"
+    },
+    {
+      "label": "③ Concise（簡潔・語数削減版）",
+      "en": "英語文3",
+      "back_translation_ja": "確認用日本語訳",
+      "nuance_note": "語数を圧縮した工夫（日本語）"
+    }
+  ],
+  "key_vocabulary_tips": [
+    {
+      "phrase": "採用した学術表現・コロケーション",
+      "explanation": "なぜこの単語が適切か・類似表現とのニュアンスの違い（日本語）"
+    }
+  ]
+}
+`;
+
+          try {
+            const models = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash-lite'];
+            let parsed = null;
+            let lastErr = '';
+
+            for (const m of models) {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 35000);
+              try {
+                const res = await fetch(
+                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                      contents: [{ parts: [{ text: prompt }] }],
+                      generationConfig: {
+                        responseMimeType: 'application/json',
+                        temperature: 0.25
+                      }
+                    })
+                  }
+                );
+                clearTimeout(timer);
+                if (res.ok) {
+                  const json = await res.json();
+                  const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
+                  parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
+                  break;
+                } else {
+                  const errData = await res.json().catch(() => ({}));
+                  lastErr = errData.error?.message || `HTTP ${res.status}`;
+                }
+              } catch (e) {
+                clearTimeout(timer);
+                lastErr = e.message;
+              }
+            }
+
+            if (!parsed || !Array.isArray(parsed.variants)) {
+              throw new Error(lastErr || '生成に失敗しました。再度お試しください。');
+            }
+
+            const variantsHTML = parsed.variants.map((v, idx) => {
+              const badgeStyle = idx === 1
+                ? 'bg-emerald-100 text-emerald-900 border-emerald-200'
+                : idx === 2
+                  ? 'bg-amber-100 text-amber-900 border-amber-200'
+                  : 'bg-indigo-100 text-indigo-900 border-indigo-200';
+              const wordCount = String(v.en || '').trim().split(/\s+/).filter(Boolean).length;
+              return `
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 space-y-2.5 shadow-2xs">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded-md text-xs font-extrabold border ${badgeStyle}">${escapeHtmlSafe(v.label)}</span>
+                      <span class="text-[11px] font-mono text-slate-500">${wordCount} words</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <button
+                        onclick="speakWritingVariant('${encodeURIComponent(v.en || '')}')"
+                        class="px-2 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer"
+                        title="音声で確認"
+                      >🔊</button>
+                      <button
+                        onclick="copyWritingVariant(this, '${encodeURIComponent(v.en || '')}')"
+                        class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-white cursor-pointer"
+                      >📋 コピー</button>
+                      <button
+                        onclick="saveWritingVariantToNote(this, '${encodeURIComponent(sectionLabel + ' / ' + (v.label || ''))}', '${encodeURIComponent(v.en || '')}', '${encodeURIComponent(v.back_translation_ja || '')}', '${encodeURIComponent(v.nuance_note || '')}')"
+                        class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                      >📓 ノート保存</button>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-xl border border-slate-200/90 p-3.5 text-sm text-slate-950 font-sans leading-relaxed select-all">
+                    ${escapeHtmlSafe(v.en)}
+                  </div>
+
+                  <div class="text-xs text-slate-600 bg-white/80 rounded-lg px-3 py-2 border border-slate-100">
+                    <span class="font-bold text-slate-700">🔄 逆翻訳チェック：</span>${escapeHtmlSafe(v.back_translation_ja)}
+                  </div>
+
+                  <div class="text-xs text-indigo-950 bg-indigo-50/70 rounded-lg px-3 py-2 border border-indigo-100/80 leading-relaxed">
+                    <span class="font-extrabold text-indigo-800">💡 表現・時制のポイント：</span>${escapeHtmlSafe(v.nuance_note)}
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            const tips = Array.isArray(parsed.key_vocabulary_tips) ? parsed.key_vocabulary_tips : [];
+            const tipsHTML = tips.length > 0 ? `
+              <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 space-y-2">
+                <div class="text-xs font-extrabold text-amber-950">📖 採用した重要学術コロケーション・語彙の解説</div>
+                <div class="space-y-2">
+                  ${tips.map(t => `
+                    <div class="bg-white rounded-lg p-2.5 border border-amber-100 text-xs">
+                      <span class="font-mono font-bold text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded mr-1.5">${escapeHtmlSafe(t.phrase)}</span>
+                      <span class="text-slate-700 leading-relaxed">${escapeHtmlSafe(t.explanation)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : '';
+
+            outEl.innerHTML = variantsHTML + tipsHTML;
+          } catch (err) {
+            outEl.innerHTML = `
+              <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+                ❌ 生成エラー: ${escapeHtmlSafe(err.message)}
+              </div>
+            `;
+          }
+        };
+      }
+
+      // =========================================================================
+      // 学術英語表現ノート（保存・管理・PDF出力）システム（Drive自動同期対応）
       // =========================================================================
       window.englishStudyNotes = JSON.parse(localStorage.getItem('ACADEMIC_ENGLISH_NOTES') || '[]');
 
@@ -3173,6 +3768,7 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
           console.error('Failed to save notes:', e);
         }
         updateNoteCountBadge();
+        syncStudyDataToGoogleDrive();
       }
 
       function updateNoteCountBadge() {
@@ -3733,6 +4329,7 @@ ${jaText}
               delete window.sentenceGrammarCache[keys[0]];
             }
             localStorage.setItem('SENTENCE_GRAMMAR_CACHE', JSON.stringify(window.sentenceGrammarCache));
+            syncStudyDataToGoogleDrive();
           } catch (_) {}
 
           panel.innerHTML = renderGrammarAnalysisHTML(parsed, rowId);
@@ -3809,10 +4406,11 @@ ${jaText}
       }
 
       window.deleteCustomImportedPaper = function(paperId) {
-        if (!confirm('この手動追加したPDF論文をアーカイブから削除しますか？')) return;
+        if (!confirm('この手動追加したPDF論文をアーカイブ（およびGoogle Drive）から削除しますか？')) return;
         items = items.filter(i => i.id !== paperId);
         if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.delete(paperId);
         persistCustomImportedPapers();
+        deletePaperFromGoogleDrive(paperId);
         if (selectedItemId === paperId) {
           const next = items.find(i => i.entry_type === 'daily_paper') || items[0];
           selectedItemId = next ? next.id : null;
@@ -3891,7 +4489,7 @@ ${jaText}
       }
 
       // =========================================================================
-      // 全文精読ビュー制御（全セクション網羅対応・1文連動・1文学術解説・ノート保存付き）
+      // 全文精読ビュー制御
       // =========================================================================
       window.getFullTextSections = function(item) {
         if (!item || !item.pdfDecoded) return [];
@@ -4291,13 +4889,18 @@ ${jaText}
               if (typeof renderMathInTarget === 'function') renderMathInTarget(document.body);
             }, 250);
           }
+
+          // Google Drive が設定されている場合はクラウド側から最新の保存データを自動復元
+          if (getDriveWebhookUrl()) {
+            await window.restoreAllFromGoogleDrive(true);
+          }
         } catch (e) {
           console.error('Manifest load error:', e);
         }
       }
 
       // =========================================================================
-      // PDFアップロード＆セクション分割・100%全文AI解読エンジン（無題Introduction対応）
+      // PDFアップロード＆セクション分割・100%全文AI解読エンジン（Drive自動保存連携）
       // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
@@ -4326,7 +4929,7 @@ ${jaText}
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>Scientific Reports等のように見出しがない導入部（Introduction）も含め全セクションを1段落も省略せず分割抽出</strong>し、1文ごとの対訳・図表・要約を生成します。
+              論文PDFをドロップすると、<strong>Scientific Reports等の無題Introductionも含め全セクションを1段落も省略せず分割抽出</strong>し、Google Drive 連携設定済みの場合は自動的にクラウドへ永続保存します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -4655,9 +5258,6 @@ ${jaText}
             const candidateModels = await getAvailableGeminiModels(apiKey);
             const detectedFigLabels = Object.keys(extractedFigures);
 
-            // =================================================================
-            // STEP 1: 全セクション目次マップ生成（Scientific Reports等の無題Introductionにも対応）
-            // =================================================================
             statusBox.textContent = '2/3 論文全体の構造マップ（無題のIntroductionを含む全セクション見出し）と要約を解析中...';
 
             const outlinePrompt = `
@@ -4716,9 +5316,6 @@ ${rawPdfText.slice(0, 90000)}
               });
             }
 
-            // =================================================================
-            // アンカー位置に基づき原文テキストを隙間なくセクション分割（冒頭テキスト切り捨て防止ガード付き）
-            // =================================================================
             const rawOutline = Array.isArray(metaParsed.section_outline) ? metaParsed.section_outline : [];
             const locatedSections = [];
             let cursor = 0;
@@ -4735,8 +5332,6 @@ ${rawPdfText.slice(0, 90000)}
               }
             }
 
-            // 【重要ガード】最初の見出しより前に400文字以上のテキスト（無題のIntroduction等）が残っている場合、
-            // 0文字目から最初の見出し直前までを自動的に先頭セクションとして補完し、絶対に切り捨てない！
             if (locatedSections.length > 0 && locatedSections[0].startPos > 400) {
               locatedSections.unshift({
                 title_en: 'Abstract & Introduction',
@@ -4778,9 +5373,6 @@ ${rawPdfText.slice(0, 90000)}
               }
             }
 
-            // =================================================================
-            // STEP 2: セクションごとに1文も省略せず全パラグラフの1文対訳を生成する
-            // =================================================================
             const normalizedSections = [];
             const usedLabels = new Set();
             const figHintText = detectedFigLabels.length > 0
@@ -4919,6 +5511,7 @@ ${subText}
 
             const mode = document.getElementById('pdf-target-mode').value;
             const targetIdx = items.findIndex(i => i.id === selectedItemId);
+            let savedPaperObj = null;
 
             if (mode === 'current' && targetIdx !== -1 && items[targetIdx]) {
               const prev = items[targetIdx];
@@ -4934,6 +5527,7 @@ ${subText}
                 ...prev,
                 entry_type: 'daily_paper',
                 pdfDecoded: true,
+                isCustomPdf: true,
                 vocabulary: metaParsed.vocabulary || prev.vocabulary || {},
                 problem: nextProblem,
                 method: nextMethod,
@@ -4953,6 +5547,7 @@ ${subText}
                 full_text: { sections: normalizedSections },
                 sections: normalizedSections
               };
+              savedPaperObj = items[targetIdx];
             } else {
               const newId = 'pdf-' + Date.now();
               const catSelect = document.getElementById('pdf-category-select');
@@ -5008,6 +5603,7 @@ ${subText}
               };
               items.unshift(newPaper);
               selectedItemId = newId;
+              savedPaperObj = newPaper;
               if (typeof synthSelectedIds !== 'undefined') synthSelectedIds.add(newId);
             }
 
@@ -5015,6 +5611,9 @@ ${subText}
             if (typeof activeCategory !== 'undefined') activeCategory = 'ALL';
 
             safeSaveState();
+            if (savedPaperObj) {
+              syncPaperToGoogleDrive(savedPaperObj);
+            }
             if (typeof ensureValidSelection === 'function') ensureValidSelection();
             if (typeof renderAll === 'function') renderAll();
             setTimeout(() => {
@@ -5025,7 +5624,7 @@ ${subText}
               (acc, s) => acc + s.paragraphs.reduce((a, p) => a + (p.sentences?.length || 0), 0),
               0
             );
-            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を省略なしで抽出しました`;
+            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を抽出しました${getDriveWebhookUrl() ? '（Google Driveにも自動保存中）' : ''}`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
@@ -5040,6 +5639,8 @@ ${subText}
       setupVocabPopup();
       setupSelectionExplainerUI();
       setupEnglishNoteUI();
+      setupAcademicWritingUI();
+      setupGoogleDriveSyncUI();
       setupPdfDecoderUI();
       loadRemoteManifest();
       setTimeout(() => renderMathInTarget(document.body), 350);
