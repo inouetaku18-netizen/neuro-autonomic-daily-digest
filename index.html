@@ -4900,8 +4900,10 @@ ${jaText}
       }
 
       // =========================================================================
-      // PDFアップロード＆セクション分割・100%全文AI解読エンジン（Drive自動保存連携）
+      // PDFアップロード＆省リクエスト・100%全文AI解読エンジン（API消費最適化版）
       // =========================================================================
+      window.dailyQuotaExhaustedModels = new Set();
+
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
           const sc = document.createElement('script');
@@ -4929,7 +4931,7 @@ ${jaText}
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>Scientific Reports等の無題Introductionも含め全セクションを1段落も省略せず分割抽出</strong>し、Google Drive 連携設定済みの場合は自動的にクラウドへ永続保存します。
+              論文PDFをドロップすると、<strong>Scientific Reports等の無題Introductionも含め全セクションを1段落も省略せずバッチ抽出（API消費最小化）</strong>し、Google Drive 連携済みの場合は自動保存します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -4992,6 +4994,7 @@ ${jaText}
         keyInput.value = localStorage.getItem('USER_GEMINI_API_KEY') || '';
         keyInput.addEventListener('change', () => {
           localStorage.setItem('USER_GEMINI_API_KEY', keyInput.value.trim());
+          window.dailyQuotaExhaustedModels.clear();
         });
 
         btn.onclick = () => {
@@ -5125,7 +5128,7 @@ ${jaText}
           return { fullText: fullText.trim(), extractedFigures };
         }
 
-        async function fetchWithTimeout(url, options, timeoutMs = 65000) {
+        async function fetchWithTimeout(url, options, timeoutMs = 75000) {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           try {
@@ -5136,12 +5139,13 @@ ${jaText}
         }
 
         async function getAvailableGeminiModels(apiKey) {
+          // 無料枠の1日リクエスト上限が高い flash-lite 系を最優先し、RPD枯渇を防ぐ
           const preferred = [
+            'gemini-3.8-flash-lite',
             'gemini-3.8-flash',
             'gemini-3.5-flash',
             'gemini-3-flash-preview',
-            'gemini-3.0-flash',
-            'gemini-3.8-flash-lite'
+            'gemini-3.0-flash'
           ];
           try {
             const res = await fetchWithTimeout(
@@ -5160,15 +5164,19 @@ ${jaText}
             for (const m of available.sort().reverse()) {
               if (!ordered.includes(m) && !m.includes('pro')) ordered.push(m);
             }
-            return ordered.length > 0 ? ordered : preferred;
+            const active = ordered.filter(m => !window.dailyQuotaExhaustedModels.has(m));
+            return active.length > 0 ? active : (ordered.length > 0 ? ordered : preferred);
           } catch (_) {
             return preferred;
           }
         }
 
-        async function callGeminiJsonWithFallback(apiKey, models, prompt, timeoutMs = 65000) {
+        async function callGeminiJsonWithFallback(apiKey, models, prompt, timeoutMs = 75000) {
           let lastErr = '';
-          for (const modelName of models) {
+          const candidateList = models.filter(m => !window.dailyQuotaExhaustedModels.has(m));
+          const tryList = candidateList.length > 0 ? candidateList : models;
+
+          for (const modelName of tryList) {
             try {
               const apiRes = await fetchWithTimeout(
                 `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -5195,7 +5203,17 @@ ${jaText}
               } else {
                 const errJson = await apiRes.json().catch(() => ({}));
                 lastErr = errJson.error?.message || `API Error: ${apiRes.status}`;
-                if ([404, 429, 500, 503].includes(apiRes.status)) {
+                if (apiRes.status === 429) {
+                  // 1日あたりの上限（PerDay / limit: 20）の場合はそのモデルを即座にスキップリストへ登録
+                  if (/PerDay|per day|limit:\s*20/i.test(lastErr)) {
+                    window.dailyQuotaExhaustedModels.add(modelName);
+                    continue;
+                  }
+                  // 分間レート制限（RPM）の場合は4秒待機してリトライ
+                  await new Promise(r => setTimeout(r, 4000));
+                  continue;
+                }
+                if ([404, 500, 503].includes(apiRes.status)) {
                   await new Promise(r => setTimeout(r, 800));
                   continue;
                 }
@@ -5209,7 +5227,7 @@ ${jaText}
               throw e;
             }
           }
-          throw new Error(lastErr || 'すべてのGeminiモデルが混雑しています。少し時間を置いてお試しください。');
+          throw new Error(lastErr || 'APIの無料枠上限に達しました。Google AI Studioで請求設定を有効にするか、別プロジェクトのAPIキーをお試しください。');
         }
 
         function findAnchorPosition(fullText, anchorStr, fallbackHeading, searchFromIdx = 0) {
@@ -5258,7 +5276,10 @@ ${jaText}
             const candidateModels = await getAvailableGeminiModels(apiKey);
             const detectedFigLabels = Object.keys(extractedFigures);
 
-            statusBox.textContent = '2/3 論文全体の構造マップ（無題のIntroductionを含む全セクション見出し）と要約を解析中...';
+            // =================================================================
+            // STEP 1: 全セクション目次マップ生成（1リクエスト）
+            // =================================================================
+            statusBox.textContent = '2/3 論文全体の構造マップと要約を解析中...';
 
             const outlinePrompt = `
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
@@ -5266,10 +5287,9 @@ ${jaText}
 
 【タスク】
 1. 論文のタイトル・ジャーナル・DOI・4項目要約・重要用語辞書を作成してください。
-2. **最重要：この論文に存在する「すべてのセクションおよびサブセクション」を、先頭から出現順に1つも抜かさずリストアップしてください（ReferencesやEthics等の末尾事務欄は除く）。**
-   - **【無題のIntroductionへの厳重注意】Scientific Reports / Nature / PNAS / Science などの論文では、「Introduction」という見出し文字が存在せず、アブストラクトの直後から導入部の本文段落がいきなり始まります。この場合、決して導入部をスキップせず、必ず "title_en": "Introduction"（"title_ja": "1. 序論（導入部）"）をリストの先頭（またはAbstractの次）に追加し、"start_anchor" には【アブストラクト直後の導入部第1文の冒頭6〜8単語をPDF原文から一字一句そのままコピー】して入れてください。**
-   - 親見出しの直後にサブセクション（例: "2. Methods" の直後に "2.1. Participants"）がある場合は、本文を持つ末端のセクション／サブセクション単位（2.1, 2.2...）で分割してください。
-   - 各項目の "start_anchor" には、そのセクションの**見出し（無題セクションの場合は本文冒頭）の最初の6〜8単語をPDF原文から一字一句そのままコピー**して入れてください。
+2. **この論文に存在する「すべてのセクションおよびサブセクション」を、先頭から出現順に1つも抜かさずリストアップしてください（ReferencesやEthics等の末尾事務欄は除く）。**
+   - **Scientific Reports / Nature 等の論文で「Introduction」見出しがなくアブストラクト直後から導入本文が始まる場合は、必ず "title_en": "Introduction"（"title_ja": "1. 序論（導入部）"）を先頭に追加し、"start_anchor" に導入部第1文の冒頭6〜8単語をPDF原文そのまま入れてください。**
+   - 各項目の "start_anchor" には、そのセクションの冒頭6〜8単語をPDF原文から一字一句そのままコピーして入れてください。
 
 以下の単一JSONオブジェクトのみを出力してください。
 {
@@ -5286,9 +5306,9 @@ ${jaText}
   "relevance_to_my_research": "脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用ヒント（日本語）",
   "section_outline": [
     {
-      "title_en": "Introduction（または元の英語見出し）",
-      "title_ja": "1. 序論（またはその日本語訳）",
-      "start_anchor": "PDF原文に実際に書かれている冒頭6〜8単語"
+      "title_en": "元の英語セクション見出し",
+      "title_ja": "その日本語訳",
+      "start_anchor": "PDF原文の冒頭6〜8単語"
     }
   ],
   "vocabulary": {
@@ -5300,7 +5320,7 @@ ${jaText}
 ${rawPdfText.slice(0, 90000)}
 `;
 
-            const metaParsed = await callGeminiJsonWithFallback(apiKey, candidateModels, outlinePrompt, 60000);
+            const metaParsed = await callGeminiJsonWithFallback(apiKey, candidateModels, outlinePrompt, 65000);
 
             if (metaParsed.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
               Object.entries(metaParsed.vocabulary).forEach(([k, v]) => {
@@ -5359,7 +5379,7 @@ ${rawPdfText.slice(0, 90000)}
                 }
               }
             } else {
-              const chunkSize = 7500;
+              const chunkSize = 13500;
               const cleanBody = rawPdfText.slice(0, bodyEndPos);
               let part = 1;
               for (let pos = 0; pos < cleanBody.length; pos += chunkSize) {
@@ -5373,75 +5393,126 @@ ${rawPdfText.slice(0, 90000)}
               }
             }
 
-            const normalizedSections = [];
+            // =================================================================
+            // 短いセクションを約14,000文字単位のバッチに束ねてAPI呼び出し回数を最小化（約2〜3回）
+            // =================================================================
+            const MAX_BATCH_CHARS = 14000;
+            const batches = [];
+            let currentBatch = [];
+            let currentBatchLen = 0;
+
+            for (const sec of sectionSlices) {
+              if (sec.rawText.length > MAX_BATCH_CHARS) {
+                if (currentBatch.length > 0) {
+                  batches.push(currentBatch);
+                  currentBatch = [];
+                  currentBatchLen = 0;
+                }
+                for (let p = 0; p < sec.rawText.length; p += MAX_BATCH_CHARS) {
+                  batches.push([{
+                    id: sec.id,
+                    title_en: sec.title_en,
+                    title_ja: sec.title_ja,
+                    rawText: sec.rawText.slice(p, p + MAX_BATCH_CHARS)
+                  }]);
+                }
+              } else if (currentBatchLen + sec.rawText.length > MAX_BATCH_CHARS && currentBatch.length > 0) {
+                batches.push(currentBatch);
+                currentBatch = [sec];
+                currentBatchLen = sec.rawText.length;
+              } else {
+                currentBatch.push(sec);
+                currentBatchLen += sec.rawText.length;
+              }
+            }
+            if (currentBatch.length > 0) batches.push(currentBatch);
+
+            // =================================================================
+            // STEP 2: バッチ単位で全セクションの1文ごと対訳を生成（全文網羅＋最小リクエスト数）
+            // =================================================================
+            const sectionMap = new Map();
+            for (const sec of sectionSlices) {
+              sectionMap.set(sec.id, {
+                id: sec.id,
+                title_en: sec.title_en,
+                title_ja: sec.title_ja,
+                paragraphs: [],
+                figures: [],
+                takeaways: [],
+                writing_expressions: [],
+                diagram_svg: '',
+                section_svg: ''
+              });
+            }
+
             const usedLabels = new Set();
             const figHintText = detectedFigLabels.length > 0
               ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}`
               : '図表ラベル未検出';
 
-            for (let sIdx = 0; sIdx < sectionSlices.length; sIdx++) {
-              const secSlice = sectionSlices[sIdx];
-              statusBox.textContent = `3/3 全文精読データを生成中 (${sIdx + 1}/${sectionSlices.length}: ${secSlice.title_en})...`;
+            for (let bIdx = 0; bIdx < batches.length; bIdx++) {
+              const batch = batches[bIdx];
+              const batchNames = batch.map(s => s.title_en).join(' / ');
+              statusBox.textContent = `3/3 全文精読データをバッチ生成中 (${bIdx + 1}/${batches.length}: ${batchNames})...`;
 
-              const maxChunkChars = 11000;
-              const subChunks = [];
-              for (let p = 0; p < secSlice.rawText.length; p += maxChunkChars) {
-                subChunks.push(secSlice.rawText.slice(p, p + maxChunkChars));
-              }
+              const combinedInput = batch.map(s =>
+                `=== SECTION_ID: ${s.id} | TITLE: ${s.title_en} ===\n${s.rawText}`
+              ).join('\n\n');
 
-              const mergedParagraphs = [];
-              let mergedTakeaways = [];
-              let mergedExpressions = [];
-              let mergedFigRefs = [];
-
-              for (let cIdx = 0; cIdx < subChunks.length; cIdx++) {
-                const subText = subChunks[cIdx];
-                const secPrompt = `
+              const batchPrompt = `
 あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル翻訳者です。
-以下は論文のセクション「${secSlice.title_en}」の実際の英文テキスト（${subChunks.length > 1 ? `パート ${cIdx + 1}/${subChunks.length}` : '全文'}）です。
+以下は論文の複数セクションをまとめた実際の英文テキストです。
 
 【絶対厳守ルール（1文たりとも省略・要約・スキップ禁止）】
-1. **下記の【セクション原文テキスト】に含まれるすべての段落・すべての文を、最初から最後まで1文も飛ばさずに順番通り翻訳してください。**
-   - もし冒頭にタイトル・著者名・所属・アブストラクトと無題の導入部（Introduction）が連続している場合も、アブストラクトと導入部のすべての段落・すべての文を漏らさず翻訳してください。
-   - 要約したり、途中の文を飛ばしたり、「〜以降省略」とすることは厳禁です。
+1. **入力に含まれるすべての SECTION_ID について、それぞれの原文に含まれるすべての段落・すべての文を最初から最後まで1文も飛ばさずに順番通り翻訳してください。**
+   - 要約したり途中の文を省いたりすることは厳禁です。
    - "sentences" 配列には、各段落の英文を**1文ずつ**切り分けた "en"（原文そのまま）と "ja"（忠実な学術日本語訳）を1対1で入れてください。
-2. このテキスト内で言及されている図や表（${figHintText}）があれば "figure_refs" にラベルと日本語解説を入れてください。
-3. このセクションの重要ポイント（"takeaways"：3〜5個）と、この英文から学べる学術英語表現（"writing_expressions"：1〜2個）を抽出してください。
+2. 各セクション内で言及されている図や表（${figHintText}）があれば "figure_refs" にラベルと日本語解説を入れてください。
+3. 各セクションの重要ポイント（"takeaways"：3〜4個）と、学術英語表現（"writing_expressions"：1〜2個）も出力してください。
 
 以下の単一JSONオブジェクトのみを出力してください。
 {
-  "paragraphs": [
+  "sections": [
     {
-      "sentences": [
-        { "en": "第1文の英語原文そのまま.", "ja": "第1文の正確な日本語訳。" },
-        { "en": "第2文の英語原文そのまま.", "ja": "第2文の正確な日本語訳。" }
+      "id": "入力で指定されたSECTION_ID（例: sec-1）",
+      "paragraphs": [
+        {
+          "sentences": [
+            { "en": "第1文の英語原文そのまま.", "ja": "第1文の正確な日本語訳。" }
+          ]
+        }
+      ],
+      "figure_refs": [
+        { "label": "Fig. 1", "caption_ja": "図1の日本語解説" }
+      ],
+      "takeaways": [
+        "このセクションの重要ポイント1",
+        "このセクションの重要ポイント2"
+      ],
+      "writing_expressions": [
+        { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
       ]
     }
-  ],
-  "figure_refs": [
-    { "label": "Fig. 1", "caption_ja": "図1の日本語解説" }
-  ],
-  "takeaways": [
-    "このセクションの重要ポイント1",
-    "このセクションの重要ポイント2"
-  ],
-  "writing_expressions": [
-    { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
   ]
 }
 
-【セクション原文テキスト（${secSlice.title_en}）】
-${subText}
+【対象セクション原文】
+${combinedInput}
 `;
-                const secResult = await callGeminiJsonWithFallback(apiKey, candidateModels, secPrompt, 65000);
+              const batchResult = await callGeminiJsonWithFallback(apiKey, candidateModels, batchPrompt, 75000);
+              const returnedSecs = Array.isArray(batchResult.sections) ? batchResult.sections : [];
 
-                if (Array.isArray(secResult.paragraphs)) {
-                  for (const para of secResult.paragraphs) {
+              for (const rSec of returnedSecs) {
+                const target = sectionMap.get(rSec.id) || sectionMap.get(batch[0]?.id);
+                if (!target) continue;
+
+                if (Array.isArray(rSec.paragraphs)) {
+                  for (const para of rSec.paragraphs) {
                     const sents = Array.isArray(para.sentences)
                       ? para.sentences.filter(s => s && (s.en || s.ja))
                       : ((para.en || para.ja) ? [{ en: para.en || '', ja: para.ja || '' }] : []);
                     if (sents.length > 0) {
-                      mergedParagraphs.push({
+                      target.paragraphs.push({
                         en: sents.map(s => s.en).join(' '),
                         ja: sents.map(s => s.ja).join(''),
                         sentences: sents
@@ -5449,50 +5520,39 @@ ${subText}
                     }
                   }
                 }
-                if (Array.isArray(secResult.takeaways)) {
-                  mergedTakeaways.push(...secResult.takeaways);
+                if (Array.isArray(rSec.takeaways)) {
+                  target.takeaways.push(...rSec.takeaways);
                 }
-                if (Array.isArray(secResult.writing_expressions)) {
-                  mergedExpressions.push(...secResult.writing_expressions);
+                if (Array.isArray(rSec.writing_expressions)) {
+                  target.writing_expressions.push(...rSec.writing_expressions);
                 }
-                if (Array.isArray(secResult.figure_refs)) {
-                  mergedFigRefs.push(...secResult.figure_refs);
-                }
-              }
-
-              const figs = [];
-              for (const ref of mergedFigRefs) {
-                const rawLabel = String(ref?.label || '');
-                const numMatch = rawLabel.match(/(\d+)/);
-                const isTable = /table/i.test(rawLabel);
-                const normLabel = numMatch
-                  ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
-                  : rawLabel;
-
-                const imgObj = extractedFigures[normLabel];
-                if (imgObj && !usedLabels.has(normLabel)) {
-                  usedLabels.add(normLabel);
-                  figs.push({
-                    label: normLabel,
-                    page: imgObj.page,
-                    imageUrl: imgObj.imageUrl,
-                    captionJa: ref?.caption_ja || ''
-                  });
+                if (Array.isArray(rSec.figure_refs)) {
+                  for (const ref of rSec.figure_refs) {
+                    const rawLabel = String(ref?.label || '');
+                    const numMatch = rawLabel.match(/(\d+)/);
+                    const isTable = /table/i.test(rawLabel);
+                    const normLabel = numMatch
+                      ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
+                      : rawLabel;
+                    const imgObj = extractedFigures[normLabel];
+                    if (imgObj && !usedLabels.has(normLabel)) {
+                      usedLabels.add(normLabel);
+                      target.figures.push({
+                        label: normLabel,
+                        page: imgObj.page,
+                        imageUrl: imgObj.imageUrl,
+                        captionJa: ref?.caption_ja || ''
+                      });
+                    }
+                  }
                 }
               }
-
-              normalizedSections.push({
-                id: secSlice.id,
-                title_en: secSlice.title_en,
-                title_ja: secSlice.title_ja,
-                paragraphs: mergedParagraphs,
-                figures: figs,
-                takeaways: mergedTakeaways.length > 0 ? mergedTakeaways : [`${secSlice.title_ja} の全文対訳です。`],
-                writing_expressions: mergedExpressions,
-                diagram_svg: '',
-                section_svg: ''
-              });
             }
+
+            const normalizedSections = Array.from(sectionMap.values()).map(sec => ({
+              ...sec,
+              takeaways: sec.takeaways.length > 0 ? sec.takeaways : [`${sec.title_ja} の全文対訳です。`]
+            }));
 
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
@@ -5624,7 +5684,7 @@ ${subText}
               (acc, s) => acc + s.paragraphs.reduce((a, p) => a + (p.sentences?.length || 0), 0),
               0
             );
-            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を抽出しました${getDriveWebhookUrl() ? '（Google Driveにも自動保存中）' : ''}`;
+            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を抽出しました（API消費: 計 ${batches.length + 1} 回）`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
@@ -5635,12 +5695,497 @@ ${subText}
         }
       }
 
+      // =========================================================================
+      // 🧭 「3. アーカイブ横断」統合型・研究戦略＆世界課題解決AIエージェント
+      // =========================================================================
+      function setupResearchStrategyAgentUI() {
+        // 1. ナビゲーションの「3. アーカイブ横断」タブを特定してラベルを更新
+        const allButtons = Array.from(document.querySelectorAll('button, a'));
+        const tab3Btn = allButtons.find(el =>
+          /3\.\s*アーカイブ横断/.test(el.textContent || '') ||
+          (el.getAttribute('onclick') || '').includes('synthesis')
+        );
+        const otherTabBtns = allButtons.filter(el =>
+          /^[12]\.\s*/.test((el.textContent || '').trim())
+        );
+
+        if (tab3Btn) {
+          tab3Btn.innerHTML = '3. 🧭 研究戦略・課題解決AI';
+        }
+
+        // 2. メイン画面内に専用ワークスペースコンテナを作成
+        let agentPanel = document.getElementById('strategy-agent-embedded-view');
+        if (!agentPanel) {
+          agentPanel = document.createElement('section');
+          agentPanel.id = 'strategy-agent-embedded-view';
+          agentPanel.className = 'hidden max-w-7xl mx-auto px-4 sm:px-6 py-6';
+          agentPanel.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+              <!-- ヘッダー -->
+              <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white">
+                <div>
+                  <h2 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+                    <span>🧭 研究戦略・世界課題解決 AIエージェント（アーカイブ横断統合）</span>
+                  </h2>
+                  <p class="text-xs text-indigo-200 mt-0.5">アーカイブ内の蓄積論文 × 最新の世界課題検索を自律統合し、研究の方向性・社会的意義・実行計画を立案します</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button id="sa-export-pdf-btn" class="hidden px-3.5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition cursor-pointer">
+                    🖨️ 計画書をPDF出力
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2ペイン本体 -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                <!-- 左カラム：入力・アーカイブ選択 -->
+                <div class="lg:col-span-5 p-5 space-y-4 bg-slate-50/80">
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">1. ターゲットとする世界・社会課題の領域</label>
+                    <select id="sa-domain-select" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white font-semibold text-slate-800">
+                      <option value="global_brain_heart">脳神経疾患・認知症の急増と早期バイオマーカー開発</option>
+                      <option value="preventive_cardio">超高齢社会における循環器・自律神経失調の非侵襲予見</option>
+                      <option value="closed_loop_neuromod">次世代クローズドループ神経制御・ニューロモジュレーション</option>
+                      <option value="global_health_equity">医療リソース不足地域でも使える低コスト・カフレス生体計測</option>
+                      <option value="custom">自由記述で課題・テーマを指定する</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">2. あなたのコア技術・研究リソース（編集可）</label>
+                    <textarea
+                      id="sa-core-assets"
+                      rows="4"
+                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
+                    >・脳波(EEG)と心拍変動(HRV)の脳-心臓連関（Brain-Heart Interactions）解析
+・非線形ダイナミクス（Fast Sample Entropy、サロゲートデータ検定、ポアンカレプロット）
+・リザバー計算（RC）とKoopman作用素理論を組み合わせた非線形状態空間の線形化・制御
+・光電容積脈波（PPG）・脈波伝播時間（PAT）を用いた非侵襲・カフレス血圧推定、起立負荷試験・GABA介入実験</textarea>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="text-xs font-extrabold text-slate-700">3. 根拠として統合するアーカイブ論文（選択可）</label>
+                      <button type="button" id="sa-toggle-all-papers" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer">すべて選択/解除</button>
+                    </div>
+                    <div id="sa-archive-paper-checklist" class="max-h-36 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2.5 space-y-1.5 text-xs"></div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">4. 重点的に解決したい問い・制約条件（任意）</label>
+                    <textarea
+                      id="sa-focus-prompt"
+                      rows="2"
+                      placeholder="例：今後2年間で国際トップジャーナル論文と科研費申請書につながる、社会実装性の高い計画を立ててほしい。"
+                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
+                    ></textarea>
+                  </div>
+
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                      <input id="sa-use-web-search" type="checkbox" checked class="rounded text-indigo-600" />
+                      <span>🌐 Google検索で最新の世界課題・国際動向をリアルタイム調査する</span>
+                    </label>
+                  </div>
+
+                  <button
+                    id="sa-run-agent-btn"
+                    class="w-full py-3 px-4 rounded-xl bg-indigo-700 hover:bg-indigo-600 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>🚀 自律エージェントを起動して研究計画を立案</span>
+                  </button>
+                </div>
+
+                <!-- 右カラム：出力結果 -->
+                <div id="sa-output-area" class="lg:col-span-7 p-5 sm:p-6 bg-white space-y-5">
+                  <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-14 px-4">
+                    <div class="text-4xl mb-3">🧭</div>
+                    <p class="text-sm font-bold text-slate-700 mb-1">アーカイブ横断の論文知見 × 最新の世界課題から研究戦略を設計します</p>
+                    <p class="text-xs leading-relaxed max-w-lg">
+                      左側の論文リストとターゲット課題を確認して「🚀 自律エージェントを起動」を押すと、<strong>①世界課題の定義と解決アーキテクチャ、②研究の学術的・社会的意義、③フェーズ別実行計画</strong>を自動生成します。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // メインコンテンツ領域の適切な位置に挿入
+          const mainHost = document.querySelector('main') || document.body;
+          mainHost.appendChild(agentPanel);
+        }
+
+        // アーカイブ内の論文一覧をチェックリストに描画する関数
+        function renderArchivePaperChecklist() {
+          const listEl = document.getElementById('sa-archive-paper-checklist');
+          if (!listEl || !Array.isArray(items)) return;
+          if (items.length === 0) {
+            listEl.innerHTML = '<div class="text-slate-400 text-[11px] py-2 text-center">アーカイブに論文がありません</div>';
+            return;
+          }
+          listEl.innerHTML = items.map((p, idx) => `
+            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded">
+              <input type="checkbox" class="sa-paper-cb mt-0.5 rounded text-indigo-600" value="${escapeHtmlSafe(p.id)}" ${idx < 8 ? 'checked' : ''} />
+              <span class="text-[11px] text-slate-700 leading-snug line-clamp-2">
+                <strong class="text-indigo-900">[${escapeHtmlSafe(p.date || '')}]</strong> ${escapeHtmlSafe(p.title_ja || p.title_en)}
+              </span>
+            </label>
+          `).join('');
+        }
+
+        document.getElementById('sa-toggle-all-papers').onclick = () => {
+          const cbs = Array.from(document.querySelectorAll('.sa-paper-cb'));
+          const anyUnchecked = cbs.some(cb => !cb.checked);
+          cbs.forEach(cb => { cb.checked = anyUnchecked; });
+        };
+
+        // 従来の「アーカイブ横断」用コンテナ（もし存在すれば）を特定
+        function getLegacySynthesisContainers() {
+          return Array.from(document.querySelectorAll('[id*="synth" i], [id*="archive" i], [id*="cross" i]'))
+            .filter(el => el.id !== 'strategy-agent-embedded-view' && el.tagName !== 'BUTTON');
+        }
+
+        function showEmbeddedStrategyAgent() {
+          renderArchivePaperChecklist();
+          // 既存のメインビュー要素を一時非表示にしてエージェント画面を表示
+          const feedEl = document.getElementById('feedAndClinicalContainer');
+          const readerEl = document.getElementById('fullTextReaderContainer');
+          if (feedEl) feedEl.classList.add('hidden');
+          if (readerEl) readerEl.classList.add('hidden');
+          getLegacySynthesisContainers().forEach(el => el.classList.add('hidden'));
+          agentPanel.classList.remove('hidden');
+        }
+
+        function hideEmbeddedStrategyAgent() {
+          agentPanel.classList.add('hidden');
+        }
+
+        if (tab3Btn) {
+          tab3Btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // タブのアクティブ見た目も切り替え
+            otherTabBtns.forEach(b => {
+              b.classList.remove('bg-indigo-600', 'text-white', 'bg-slate-900');
+            });
+            tab3Btn.classList.add('bg-indigo-600', 'text-white');
+            showEmbeddedStrategyAgent();
+          }, true);
+        }
+
+        otherTabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (tab3Btn) tab3Btn.classList.remove('bg-indigo-600', 'text-white');
+            hideEmbeddedStrategyAgent();
+          }, true);
+        });
+
+        let latestStrategyPlan = null;
+
+        document.getElementById('sa-export-pdf-btn').onclick = () => {
+          if (!latestStrategyPlan) return;
+          const p = latestStrategyPlan;
+          const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+          const today = new Date().toISOString().slice(0, 10);
+
+          const win = window.open('', '_blank', 'width=920,height=780');
+          if (!win) {
+            alert('ポップアップがブロックされました。許可してから再度お試しください。');
+            return;
+          }
+          win.document.write(`
+            <!DOCTYPE html>
+            <html lang="ja">
+            <head>
+              <meta charset="UTF-8" />
+              <title>研究戦略・世界課題解決プロポーザル (${today})</title>
+              <style>
+                @page { size: A4; margin: 16mm; }
+                body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; color: #1e293b; line-height: 1.65; font-size: 11.5px; }
+                h1 { font-size: 18px; color: #0f172a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; }
+                h2 { font-size: 13.5px; color: #1e3a8a; background: #eff6ff; padding: 5px 10px; border-left: 4px solid #2563eb; margin-top: 16px; }
+                .box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; break-inside: avoid; }
+                .en-grant { font-family: Arial, sans-serif; background: #f8fafc; border-left: 3px solid #059669; padding: 8px 10px; font-size: 11px; margin-top: 6px; }
+              </style>
+            </head>
+            <body>
+              <h1>🧭 研究戦略・世界課題解決プロポーザル（${today}）</h1>
+              <div class="box"><strong>研究ビジョン：</strong>${esc(p.vision_title)}<br><strong>ターゲット課題：</strong>${esc(p.global_challenge_analysis)}</div>
+              <h2>1. 研究の学術的意義と社会的インパクト</h2>
+              <div class="box">${esc(p.scientific_and_social_significance)}
+                ${p.english_grant_abstract ? `<div class="en-grant"><strong>[English Proposal Summary]</strong><br>${esc(p.english_grant_abstract)}</div>` : ''}
+              </div>
+              <h2>2. 世界課題を解決する技術アーキテクチャ（3つの解決策）</h2>
+              ${(p.solution_pillars || []).map((s, i) => `
+                <div class="box"><strong>解決策 ${i + 1}: ${esc(s.title)}</strong><br>${esc(s.mechanism)}<br><em>期待される社会効果：</em>${esc(s.impact)}</div>
+              `).join('')}
+              <h2>3. 段階的研究実行計画（ロードマップ）</h2>
+              ${(p.research_roadmap || []).map(r => `
+                <div class="box"><strong>${esc(r.phase)}（${esc(r.duration)}）: ${esc(r.objective)}</strong><br>
+                ・具体的タスク: ${esc(r.tasks)}<br>
+                ・到達目標 / 論文・成果物: ${esc(r.deliverable)}</div>
+              `).join('')}
+              <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); };<\/script>
+            </body>
+            </html>
+          `);
+          win.document.close();
+        };
+
+        window.saveStrategyAbstractToNotes = function(btnEl) {
+          if (!latestStrategyPlan || typeof window.addEnglishStudyNote !== 'function') return;
+          window.addEnglishStudyNote({
+            category: 'ライティング表現',
+            pattern: `研究戦略・グラント要旨: ${latestStrategyPlan.vision_title || ''}`,
+            en: latestStrategyPlan.english_grant_abstract || '',
+            ja: latestStrategyPlan.scientific_and_social_significance || '',
+            analysis: `【ターゲット世界課題】\n${latestStrategyPlan.global_challenge_analysis || ''}`
+          });
+          btnEl.textContent = '✓ ノート保存済';
+        };
+
+        document.getElementById('sa-run-agent-btn').onclick = async () => {
+          const apiKey = (localStorage.getItem('USER_GEMINI_API_KEY') || '').trim();
+          if (!apiKey) {
+            alert('先にGemini APIキーを設定してください（右下の「📄 任意PDFをアーカイブに追加・解読」から入力できます）。');
+            document.getElementById('pdf-decoder-modal')?.classList.remove('hidden');
+            return;
+          }
+
+          const domainEl = document.getElementById('sa-domain-select');
+          const domainLabel = domainEl.options[domainEl.selectedIndex].text;
+          const coreAssets = document.getElementById('sa-core-assets').value.trim();
+          const focusPrompt = document.getElementById('sa-focus-prompt').value.trim();
+          const useWebSearch = document.getElementById('sa-use-web-search').checked;
+          const outEl = document.getElementById('sa-output-area');
+
+          const checkedIds = new Set(
+            Array.from(document.querySelectorAll('.sa-paper-cb:checked')).map(cb => cb.value)
+          );
+          const selectedPapers = Array.isArray(items)
+            ? items.filter(p => checkedIds.has(p.id))
+            : [];
+
+          const archiveSummary = selectedPapers.map((p, idx) =>
+            `[${idx + 1}] ${p.title_en} (${p.journal}): 課題=${(p.problem || '').slice(0, 140)} / 手法=${(p.method || '').slice(0, 140)} / 結果=${(p.results || '').slice(0, 140)}`
+          ).join('\n');
+
+          outEl.innerHTML = `
+            <div class="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-6 space-y-3">
+              <div class="flex items-center gap-2.5 text-indigo-950 font-extrabold text-sm">
+                <span class="animate-spin inline-block text-lg">⚙️</span>
+                <span>選択されたアーカイブ論文（${selectedPapers.length}本）と世界規模の未解決課題を統合分析中...</span>
+              </div>
+              <div class="text-xs text-slate-600 leading-relaxed">
+                ${useWebSearch ? '・Google検索グラウンディングで最新の国際医療・ニューロテック課題を調査しています<br>' : ''}
+                ・あなたのコア技術と先行研究のギャップを統合し、実行可能な研究ロードマップを設計しています（約10〜20秒）...
+              </div>
+            </div>
+          `;
+
+          const agentPrompt = `
+あなたは世界トップクラスの研究戦略ディレクター（PI）・科学技術政策アドバイザー兼、生体医工学・神経科学・非線形制御工学の専門家です。
+以下の【研究者のコア技術】【選択されたアーカイブ論文群】【ターゲット世界課題】を自律的に統合分析し、世界が現在抱えている重要課題を解決するための研究戦略・社会的意義・段階的実行計画を策定してください。
+
+【ターゲットとする世界・社会課題領域】
+${domainLabel}
+
+【研究者のコア技術・実験資産】
+${coreAssets}
+
+${focusPrompt ? `【追加の重点テーマ・要望】\n${focusPrompt}\n` : ''}
+${archiveSummary ? `【アーカイブから選択された根拠論文群】\n${archiveSummary}\n` : ''}
+
+【策定すべき内容（すべて具体的・論理的かつ実践的に記述すること）】
+1. vision_title: この研究が目指す核心的ビジョンを表すタイトル（日本語・35字以内）
+2. global_challenge_analysis: 世界が現在直面している具体的課題の現状（疫学・医療負荷・既存技術の限界）と、なぜ今この研究が必要なのかの分析（日本語・4〜6文）
+3. scientific_and_social_significance: 学術的な新規性（ブレイクスルー）と、医療・社会への波及効果（科研費や国際グラントの「研究目的・意義」にそのまま使える水準の日本語・5〜7文）
+4. english_grant_abstract: 上記の研究ビジョンと意義をまとめた、国際グラント・トップジャーナル向けの洗練された英語サマリー（120〜160語）
+5. solution_pillars: 世界課題を解決するための具体的な技術アプローチ・解決策（必ず3つ）
+   - title: 解決策の名称
+   - mechanism: コア技術（非線形解析・状態空間モデル・生体フォトニクス等）や選択論文の知見をどう組み合わせて解決するかの技術的仕組み
+   - impact: 実現した際の定量的・社会的インパクト
+6. research_roadmap: 実現に向けた段階的な研究計画（必ず3フェーズ：Phase 1 基礎数理・アルゴリズム確立、Phase 2 生理実験・データ実証、Phase 3 臨床応用・社会実装）
+   - phase: フェーズ名
+   - duration: 想定期間（例: 1〜6ヶ月目）
+   - objective: 到達目標
+   - tasks: 具体的な実験・解析・検証タスク
+   - deliverable: 期待される成果物（投稿論文テーマ・オープンソースツール・プロトタイプ等）
+7. potential_risks_and_mitigations: 研究遂行上の技術的リスク（個人差・アーチファクト・サンプルサイズ等）とその回避策（2〜3点）
+
+以下の単一JSONオブジェクトのみを出力してください（Markdownのコードブロック記号は不要です）。
+{
+  "vision_title": "研究ビジョンタイトル",
+  "global_challenge_analysis": "世界課題の現状と必然性",
+  "scientific_and_social_significance": "学術的意義と社会的インパクト",
+  "english_grant_abstract": "English summary of vision and significance...",
+  "solution_pillars": [
+    { "title": "解決策1", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
+    { "title": "解決策2", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
+    { "title": "解決策3", "mechanism": "技術的仕組み", "impact": "社会的インパクト" }
+  ],
+  "research_roadmap": [
+    { "phase": "Phase 1: ...", "duration": "1〜6ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
+    { "phase": "Phase 2: ...", "duration": "7〜14ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
+    { "phase": "Phase 3: ...", "duration": "15〜24ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" }
+  ],
+  "potential_risks_and_mitigations": [
+    { "risk": "想定リスク", "mitigation": "具体的対策" }
+  ]
+}
+`;
+
+          try {
+            const models = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash-lite'];
+            let parsed = null;
+            let lastErr = '';
+
+            for (const m of models) {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 50000);
+              try {
+                const bodyObj = {
+                  contents: [{ parts: [{ text: agentPrompt }] }],
+                  generationConfig: {
+                    temperature: 0.3,
+                    maxOutputTokens: 16384
+                  }
+                };
+                if (useWebSearch) {
+                  bodyObj.tools = [{ google_search: {} }];
+                } else {
+                  bodyObj.generationConfig.responseMimeType = 'application/json';
+                }
+
+                const res = await fetch(
+                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify(bodyObj)
+                  }
+                );
+                clearTimeout(timer);
+
+                if (res.ok) {
+                  const json = await res.json();
+                  let rawText = json.candidates?.[0]?.content?.parts?.map(pt => pt.text || '').join('') || '';
+                  rawText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+                  const firstBrace = rawText.indexOf('{');
+                  const lastBrace = rawText.lastIndexOf('}');
+                  if (firstBrace !== -1 && lastBrace !== -1) {
+                    rawText = rawText.slice(firstBrace, lastBrace + 1);
+                  }
+                  const obj = JSON.parse(rawText);
+                  parsed = Array.isArray(obj) ? obj[0] : obj;
+                  break;
+                } else {
+                  const errData = await res.json().catch(() => ({}));
+                  lastErr = errData.error?.message || `HTTP ${res.status}`;
+                }
+              } catch (e) {
+                clearTimeout(timer);
+                lastErr = e.message;
+              }
+            }
+
+            if (!parsed || !parsed.vision_title) {
+              throw new Error(lastErr || '研究計画の生成に失敗しました。再度お試しください。');
+            }
+
+            latestStrategyPlan = parsed;
+            document.getElementById('sa-export-pdf-btn').classList.remove('hidden');
+
+            const pillarsHTML = (parsed.solution_pillars || []).map((s, idx) => `
+              <div class="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 space-y-1.5">
+                <div class="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px]">解決策 ${idx + 1}</span>
+                  <span>${escapeHtmlSafe(s.title)}</span>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed"><strong>技術メカニズム：</strong>${escapeHtmlSafe(s.mechanism)}</p>
+                <p class="text-xs text-teal-900 bg-teal-50/80 px-2.5 py-1.5 rounded-lg border border-teal-100"><strong>期待される社会効果：</strong>${escapeHtmlSafe(s.impact)}</p>
+              </div>
+            `).join('');
+
+            const roadmapHTML = (parsed.research_roadmap || []).map((r) => `
+              <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs sm:text-sm font-extrabold text-slate-900">${escapeHtmlSafe(r.phase)}</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900">${escapeHtmlSafe(r.duration)}</span>
+                </div>
+                <div class="text-xs font-bold text-indigo-800">🎯 到達目標：${escapeHtmlSafe(r.objective)}</div>
+                <p class="text-xs text-slate-700 leading-relaxed"><strong>具体タスク：</strong>${escapeHtmlSafe(r.tasks)}</p>
+                <div class="text-xs text-emerald-900 bg-emerald-50/80 px-2.5 py-1 rounded border border-emerald-100">
+                  <strong>📄 成果物・論文アウトプット：</strong>${escapeHtmlSafe(r.deliverable)}
+                </div>
+              </div>
+            `).join('');
+
+            const risksHTML = (parsed.potential_risks_and_mitigations || []).map(rk => `
+              <div class="text-xs bg-amber-50/70 border border-amber-200/80 rounded-lg p-2.5">
+                <span class="font-bold text-amber-950">⚠️ ${escapeHtmlSafe(rk.risk)}：</span>
+                <span class="text-slate-700">${escapeHtmlSafe(rk.mitigation)}</span>
+              </div>
+            `).join('');
+
+            outEl.innerHTML = `
+              <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 space-y-2 shadow-md">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Strategic Research Vision</div>
+                <h4 class="text-base sm:text-lg font-extrabold leading-snug">${escapeHtmlSafe(parsed.vision_title)}</h4>
+                <p class="text-xs text-slate-200 leading-relaxed pt-1">${escapeHtmlSafe(parsed.global_challenge_analysis)}</p>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🏛️ 研究の学術的意義と社会的インパクト</h5>
+                  <button onclick="saveStrategyAbstractToNotes(this)" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">
+                    📓 英語要旨をノート保存
+                  </button>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed">${escapeHtmlSafe(parsed.scientific_and_social_significance)}</p>
+                ${parsed.english_grant_abstract ? `
+                  <div class="bg-white rounded-xl border border-slate-200 p-3 text-xs font-sans text-slate-900 leading-relaxed">
+                    <div class="text-[10px] font-bold text-indigo-600 mb-1">ENGLISH GRANT / PAPER SUMMARY</div>
+                    ${escapeHtmlSafe(parsed.english_grant_abstract)}
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="space-y-2.5">
+                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">💡 世界課題を解決する3つの技術アプローチ</h5>
+                <div class="grid grid-cols-1 gap-3">${pillarsHTML}</div>
+              </div>
+
+              <div class="space-y-2.5">
+                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🗓️ 段階的研究実行計画（ロードマップ）</h5>
+                <div class="space-y-3">${roadmapHTML}</div>
+              </div>
+
+              ${risksHTML ? `
+                <div class="space-y-2">
+                  <h5 class="text-xs font-extrabold text-slate-700">🛡️ 想定される技術的リスクと回避策</h5>
+                  <div class="space-y-1.5">${risksHTML}</div>
+                </div>
+              ` : ''}
+            `;
+          } catch (err) {
+            outEl.innerHTML = `
+              <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+                ❌ エージェント実行エラー: ${escapeHtmlSafe(err.message)}
+              </div>
+            `;
+          }
+        };
+      }
+
       initApp();
       setupVocabPopup();
       setupSelectionExplainerUI();
       setupEnglishNoteUI();
       setupAcademicWritingUI();
       setupGoogleDriveSyncUI();
+      setupResearchStrategyAgentUI();
       setupPdfDecoderUI();
       loadRemoteManifest();
       setTimeout(() => renderMathInTarget(document.body), 350);
