@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-37609645",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "37609645",
+  "pmcid": "PMC10441633",
+  "doi_url": "https://doi.org/10.2147/OPTH.S405529",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37609645/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10441633/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Clinical ophthalmology (Auckland, N.Z.) (2023)",
+  "impact_factor": 1.9,
+  "doi": "10.2147/OPTH.S405529",
+  "title_en": "Heart-Rate Variability Correlates to Choroidal Thickness in Central Serous Chorioretinopathy.",
+  "title_ja": "中心性漿液性脈絡網膜症における脈絡膜厚と心拍変動の相関",
+  "tags": [
+    "Heart Rate Variability",
+    "Choroidal Thickness",
+    "Central Serous Chorioretinopathy",
+    "Autonomic Nervous System"
+  ],
+  "summary": {
+    "problem": "中心性漿液性脈絡網膜症（CSC）における脈絡膜の肥厚と、迷走神経活動を反映する心拍変動（HRV）との関連性が明確になっていなかった。",
+    "solution_and_method": "急性CSC患者21名と健常対照31名を対象に、中心窩下OCTで脈絡膜厚を測定し、標準プロトコルに従ってSDNN、RMSDD、LF/HF比、ポアンカレプロットのSD2/SD1比を算出して両者の相関を解析した。",
+    "formula_block": "$$\\text{LF/HF} = \\frac{\\text{Power}_{\\text{LF}}}{\\text{Power}_{\\text{HF}}}, \\quad \\frac{\\text{SD2}}{\\text{SD1}} = \\sqrt{\\frac{2\\,\\text{SDNN}^2 - \\frac{1}{2}\\text{RMSSD}^2}{\\frac{1}{2}\\text{RMSSD}^2}}$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37609645</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.2147/OPTH.S405529</text>\n</svg>",
+    "key_results": "脈絡膜厚はCSC群（342±80 μm）が対照群（235±60 μm）より有意に大きく（p<0.0001）、CSC群内でLF/HF比と脈絡膜厚に有意な相関が認められた（r=0.63, p=0.02）。またCSC群のLF/HF比およびSD2/SD1比は対照群に比べ境界域の低下を示した（p=0.06）。",
+    "discussion_and_implications": "CSC患者では自律神経系（特に迷走神経活動）の変調が存在し、脈絡膜循環および組織肥厚病態に関与している可能性が示唆された。",
+    "relevance_to_my_research": "ポアンカレプロット（SD1/SD2）や周波数領域HRV指標が末梢器官の血流動態・組織構造変容と連関することを示しており、非線形HRV解析を自律神経機能バイオマーカーとして用いる際の根拠となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37609645</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.2147/OPTH.S405529</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "[PURPOSE] Patients with central serous chorioretinopathy (CSC) have previously been shown to have a lower heart rate variability (HRV), implying a lower vagal tone. Vagal tone alters mineralocorticoids, which in turn affect the thickness of the choroid. Since increased choroidal thickness is characteristic of CSC, we wanted to investigate its correlation with HRV.\n\n[PATIENTS AND METHODS] In this case-control study, 21 acute CSC patients and 31 healthy controls were included. Diagnosis was confirmed by optical coherence tomography (OCT) and retinal examination. HRV was evaluated following accepted standards. Outcome measures were chosen beforehand as follows: Standard deviation of N-N intervals (SDNN), root mean square of successive differences (RMSDD), low frequency/high frequency ratio (LF/HF ratio), and standard deviation ratio from commonly used Poincare plot (SD2/SD1 ratio). Choroidal thickness was measured using OCT directly under the foveola.\n\n[RESULTS] Patients and healthy controls did not differ in health and medical characteristics in addition to CSC disease. Choroidal thickness was greatest in patients with CSC (mean±SD: 342±80 μm) compared to controls (235±60 μm, p<0.0001). A correlation was observed between LF/HF ratio and choroidal thickness in patients with CSC (Pearson correlation 0.63, p=0.02), where the CSC group had a lower LF/HF ratio (Median 2.39 ms2, IQR: 1.2-4.34 ms2) compared to controls (Median 1.2 ms2, IQR: 0.9-2.4 ms2, p=0.06) and SD2/SD1 ratio (CSC 0.59±0.2 vs controls 0.74±0.3, p=0.06).\n\n[CONCLUSION] We found a correlation between the thickness of the choroid and the HRV-measured LF/HF ratio in patients with CSC and showed a borderline significant reduction in HRV measurements in patients with CSC. The data imply that vagal alterations exist in patients with CSC. Due to the low n, this should be considered as a pilot study. Further studies are warranted to elucidate mechanisms and validate findings.",
+            "ja": "【目的】中心性漿液性脈絡網膜症（CSC）患者は以前の研究で心拍変動（HRV）の低下を示すことが報告されており、これは迷走神経活動（vagal tone）の低下を示唆している。迷走神経活動は鉱質コルチコイドを変化させ、それが脈絡膜の厚さに影響を与える。脈絡膜厚の増加はCSCの特徴であるため、脈絡膜厚とHRVとの相関を調査することを目的とした。【患者および方法】この症例対照研究には、急性CSC患者21名と健康対照群31名が含まれた。診断は光干渉断層撮影（OCT）および網膜検査によって確定された。HRVは標準的な基準に従って評価された。評価項目は事前に以下のように設定された：NN間隔の標準偏差（SDNN）、連続差の二乗平均平方根（RMSDD）、低周波/高周波比（LF/HF比）、および一般的に使用されるポアンカレプロットからの標準偏差比（SD2/SD1比）。脈絡膜厚は中心窩直下でOCTを用いて測定された。【結果】患者群と健康対照群との間で、CSC疾患以外の健康および医学的特徴に差はなかった。脈絡膜厚は対照群（235±60 μm）と比較してCSC患者（平均±SD: 342±80 μm）で最も大きかった（p<0.0001）。CSC患者においてLF/HF比と脈絡膜厚の間に相関が観察され（ピアソンの相関係数 0.63, p=0.02）、CSC群は対照群と比較してLF/HF比が低く（中央値 2.39 ms2, IQR: 1.2-4.34 ms2 対 中央値 1.2 ms2, IQR: 0.9-2.4 ms2, p=0.06）、SD2/SD1比も低値傾向を示した（CSC群 0.59±0.2 対 対照群 0.74±0.3, p=0.06）。【結論】CSC患者において脈絡膜厚とHRV測定によるLF/HF比との相関が認められ、CSC患者におけるHRV測定値の境界域の有意な低下が示された。これらのデータは、CSC患者に迷走神経の変調が存在することを示唆している。サンプルサイズが小さいため本研究はパイロット研究とみなされるべきである。メカニズムを解明し知見を検証するためにさらなる研究が必要である。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "choroidal thickness": {
+      "ipa": "/kəˈrɔɪdəl ˈθɪknɪs/",
+      "pos": "noun",
+      "ja": "脈絡膜厚",
+      "nuance": "眼球の脈絡膜組織の厚みであり、OCTで非侵襲的に測定される血流・組織パラメータ。"
+    },
+    "vagal tone": {
+      "ipa": "/ˈveɪɡəl toʊn/",
+      "pos": "noun",
+      "ja": "迷走神経活動 / 迷走神経緊張",
+      "nuance": "副交感神経系を介した抑制性・調節性の神経活動の定常水準。"
+    },
+    "poincare plot": {
+      "ipa": "/pwæ̃kaˈreɪ plɒt/",
+      "pos": "noun",
+      "ja": "ポアンカレプロット",
+      "nuance": "連続する心拍間隔（RR_n 対 RR_{n+1}）を2次元平面にプロットする非線形心拍変動解析法。"
+    },
+    "lf/hf ratio": {
+      "ipa": "/ˌɛlˈɛf eɪtʃˈɛf ˈreɪʃioʊ/",
+      "pos": "noun",
+      "ja": "LF/HF比（低周波/高周波比）",
+      "nuance": "心拍変動解析において交感神経と副交感神経の自律神経バランスの指標として用いられる比率。"
+    },
+    "optical coherence tomography": {
+      "ipa": "/ˈɒptɪkəl koʊˈhɪərəns tɒˈmɒɡrəfi/",
+      "pos": "noun",
+      "ja": "光干渉断層撮影（OCT）",
+      "nuance": "近赤外光干渉を利用して生体組織の微細断面を高解像度で断層撮影する技術。"
+    }
+  }
+}

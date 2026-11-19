@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-33548494",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "33548494",
+  "pmcid": "",
+  "doi_url": "https://doi.org/10.1016/j.jbspin.2021.105149",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/33548494/",
+  "pmc_url": "",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "Joint bone spine (2021)",
+  "impact_factor": 3.7,
+  "doi": "10.1016/j.jbspin.2021.105149",
+  "title_en": "Vagus nerve stimulation in musculoskeletal diseases.",
+  "title_ja": "筋骨格系疾患における迷走神経刺激",
+  "tags": [
+    "Vagus Nerve Stimulation",
+    "Musculoskeletal Diseases",
+    "Rheumatoid Arthritis",
+    "Anti-inflammatory Pathway"
+  ],
+  "summary": {
+    "problem": "筋骨格系疾患における難治性の慢性炎症および疼痛に対し、迷走神経の抗炎症・鎮痛作用を利用した迷走神経刺激（VNS）の有効性と最適な介入パラメータが確立されていない。",
+    "solution_and_method": "侵襲的植え込み型VNSおよび経皮的非侵襲性VNS（耳介・頸部）の臨床知見を概括し、関節リウマチ、シェーグレン症候群、全身性エリテマトーデス、線維筋痛症等における臨床効果と課題を整理した。",
+    "formula_block": "$$\\Delta \\text{Disease Activity} = f(\\text{VNS}(\\text{amplitude}, \\text{frequency}, \\text{pulse width}))$$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33548494</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.jbspin.2021.105149</text>\n</svg>",
+    "key_results": "RA患者において循環末梢血細胞の炎症反応減弱と疾患活動性の有意な低下が示され、自己免疫疾患の疲労感軽減や線維筋痛症・変形性関節症の疼痛軽減が小規模試験で確認された。一方、刺激設定や投与経路の最適化が課題として挙げられた。",
+    "discussion_and_implications": "迷走神経刺激はコリン作動性抗炎症経路等を介して筋骨格系疾患に対する有望な神経修飾治療となり得るが、大規模シャム対照RCTによる検証が不可欠である。",
+    "relevance_to_my_research": "非侵襲的VNSによる末梢自律神経変調を外部入力（u(t)）とし、心拍変動や中枢ダイナミクスを制御対象とする閉ループ非線形制御系の臨床応用基盤として重要である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 33548494</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.jbspin.2021.105149</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The vagus nerve is the main nerve of the parasympathetic autonomic nervous system. Beyond its vegetative functions, the vagus nerve possesses anti-inflammatory and analgesic properties. Initially developed in the treatment of refractory epilepsy, vagus nerve stimulation (VNS) is currently being evaluated in several musculoskeletal diseases. VNS can be invasive by placing an electrode around the cervical vagus nerve and connected to a generator implanted subcutaneously or non-invasive stimulating the cervical vagus nerve branch percutaneously (auricular or cervical). In rheumatoid arthritis (RA) patients, VNS has been shown to dampen the inflammatory response of circulatory peripheral cells. Several open-labeled small pilot studies have demonstrated that VNS, either invasive or transcutaneous, is associated with a significant decrease of RA disease activity. As well, other studies have shown that VNS could limit fatigue in Sjogren's syndrome and systemic lupus, or decrease pain in fibromyalgia as well as in erosive hand osteoarthritis. However, some questions remain, such as the settings of stimulation, the duration of treatment, or the optimal stimulation route. Finally, randomized controlled trials versus sham stimulation with large samples of patients are mandatory to definitively conclude about the efficacy of VNS.",
+            "ja": "迷走神経は副交感自律神経系の主要な神経である。その植物機能を超えて、迷走神経は抗炎症特性および鎮痛特性を有している。当初は難治性てんかんの治療法として開発されたが、迷走神経刺激（VNS）は現在、いくつかの筋骨格系疾患において評価されている。VNSは、頸部迷走神経の周囲に電極を配置し皮下に植え込まれた発生器に接続する侵襲的な方法、または頸部迷走神経枝を経皮的（耳介または頸部）に刺激する非侵襲的な方法を取り得る。関節リウマチ（RA）患者において、VNSは循環末梢細胞の炎症反応を減弱させることが示されている。いくつかの非盲検小規模パイロット研究では、侵襲的または経皮的VNSのいずれもが、RA疾患活動性の有意な低下と関連していることが実証されている。同様に他の研究では、VNSがシェーグレン症候群および全身性エリテマトーデスにおける疲労を抑えることや、線維筋痛症およびびらん性手指変形性関節症における疼痛を軽減することが示されている。しかしながら、刺激設定、治療期間、または最適な刺激経路など、いくつかの疑問が残されている。最終的に、VNSの有効性に関して決定的な結論を下すためには、大規模な患者サンプルを対象としたシャム（偽）刺激対照ランダム化比較試験が必須である。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "parasympathetic autonomic nervous system": {
+      "ipa": "/ˌpærəsɪmpəˈθɛtɪk ˌɔːtəˈnɒmɪk ˈnɜːrvəs ˈsɪstəm/",
+      "pos": "noun",
+      "ja": "副交感自律神経系",
+      "nuance": "生体の休息・消化・抗炎症反応を司る自律神経系の主要区分。"
+    },
+    "anti-inflammatory": {
+      "ipa": "/ˌænti ɪnˈflæmətɔːri/",
+      "pos": "adj",
+      "ja": "抗炎症性の",
+      "nuance": "炎症反応を抑制・減弱させる作用や性質を表す形容詞。"
+    },
+    "rheumatoid arthritis": {
+      "ipa": "/ˈruːmətɔɪd ɑːrˈθraɪtɪs/",
+      "pos": "noun",
+      "ja": "関節リウマチ",
+      "nuance": "関節滑膜の慢性炎症と関節破壊を特徴とする自己免疫疾患。"
+    },
+    "fibromyalgia": {
+      "ipa": "/ˌfaɪbroʊmaɪˈældʒə/",
+      "pos": "noun",
+      "ja": "線維筋痛症",
+      "nuance": "全身の広範な慢性疼痛と疲労・睡眠障害を主徴とする中枢感作性症候群。"
+    },
+    "sham stimulation": {
+      "ipa": "/ʃæm ˌstɪmjʊˈleɪʃən/",
+      "pos": "noun",
+      "ja": "シャム刺激 / 偽刺激",
+      "nuance": "臨床試験でプラセボ対照として用いられる、実際の治療刺激を与えない偽の対照刺激。"
+    }
+  }
+}

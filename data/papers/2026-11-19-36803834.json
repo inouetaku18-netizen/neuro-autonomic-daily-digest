@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-36803834",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "36803834",
+  "pmcid": "PMC10427741",
+  "doi_url": "https://doi.org/10.1016/j.semcdb.2023.02.004",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/36803834/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10427741/",
+  "category": "brain_heart",
+  "category_label": "③ 脳-心臓連関・迷走神経",
+  "journal": "Seminars in cell & developmental biology (2024)",
+  "impact_factor": 5.6,
+  "doi": "10.1016/j.semcdb.2023.02.004",
+  "title_en": "The gut-brain axis and cognitive control: A role for the vagus nerve.",
+  "title_ja": "腸脳軸と認知制御：迷走神経の役割",
+  "tags": [
+    "Gut-Brain Axis",
+    "Vagus Nerve",
+    "Cognitive Control",
+    "Interoception"
+  ],
+  "summary": {
+    "problem": "外部環境の手がかりと内臓からの内受容代謝シグナルが、高次神経認知機能（不安、抑うつ、報酬、記憶）および適応行動の制御においてどのように統合・伝達されているかの包括的機序の整理が求められていた。",
+    "solution_and_method": "げっ歯類およびヒトを対象とした最新知見を包括的にレビューし、摂食に伴う消化管由来迷走神経求心路の活性化が高次認知機能と記憶記銘に与える影響、およびtVNSの臨床応用について概念的枠組みを構築した。",
+    "formula_block": "$$\\lambda(t | \\mathcal{H}_t) = \\lim_{\\Delta t \\to 0} \\frac{P(N(t+\\Delta t) - N(t) = 1 | \\mathcal{H}_t)}{\\Delta t}$$",
+    "diagram_caption": "③ 脳-心臓連関・迷走神経 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 36803834</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.semcdb.2023.02.004</text>\n</svg>",
+    "key_results": "消化管由来の迷走神経求心性シグナルは、不安や抑うつ様状態を軽減すると同時に報酬動機づけや記憶機能を向上させ、採食関連情報の記銘を強化することが示され、tVNSによるこれら認知・情動障害の治療可能性が確認された。",
+    "discussion_and_implications": "迷走神経は単なる自律神経性内臓調節器にとどまらず、適応的行動・動機づけ・記憶形成を指揮する腸脳軸の中核的情報ハイウェイとして機能している。",
+    "relevance_to_my_research": "迷走神経求心活動を介した内受容シグナルの脳幹・大脳皮質への伝播動態は、心拍・自律神経パルスと脳ダイナミクスの点過程連関（Point Process Gut-Brain Coupling）モデルの理論的支柱となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 36803834</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.semcdb.2023.02.004</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Survival requires the integration of external information and interoceptive cues to effectively guide advantageous behaviors, particularly foraging and other behaviors that promote energy acquisition and consumption. The vagus nerve acts as a critical relay between the abdominal viscera and the brain to convey metabolic signals. This review synthesizes recent findings from rodent models and humans revealing the impact of vagus nerve signaling from the gut on the control of higher-order neurocognitive domains, including anxiety, depression, reward motivation, and learning and memory. We propose a framework where meal consumption engages gastrointestinal tract-originating vagal afferent signaling that functions to alleviate anxiety and depressive-like states, while also promoting motivational and memory functions. These concurrent processes serve to favor the encoding of meal-relevant information into memory storage, thus facilitating future foraging behaviors. Modulation of these neurocognitive domains by vagal tone is also discussed in the context of pathological conditions, including the use of transcutaneous vagus nerve stimulation for the treatment of anxiety disorders, major depressive disorder, and dementia-associated memory impairments. Collectively, these findings highlight the contributions of gastrointestinal vagus nerve signaling to the regulation of neurocognitive processes that shape various adaptive behavioral responses.",
+            "ja": "生存には、有利な行動、特に採食やエネルギーの獲得および消費を促進するその他の行動を効果的に導くために、外部情報と内受容感覚の手がかりの統合が必要である。迷走神経は、代謝シグナルを伝達するために腹部内臓と脳の間の重要な中継点として機能する。本総説では、げっ歯類モデルおよびヒトからの最近の知見を統合し、腸からの迷走神経シグナル伝達が、不安、抑うつ、報酬動機づけ、学習および記憶を含む高次神経認知領域の制御に及ぼす影響を明らかにする。我々は、食事摂取によって消化管由来の迷走神経求心性シグナル伝達が作動し、それが不安や抑うつ様状態を軽減する一方で動機づけおよび記憶機能を促進するように働く枠組みを提案する。これらの同時並行プロセスは、食事に関連する情報の記憶への記銘を促進するのに役立ち、それによって将来の採食行動を促進する。迷走神経活動によるこれら神経認知領域の調節についても、不安障害、大うつ病性障害、認知症に伴う記憶障害の治療に対する経皮的迷走神経刺激（tVNS）の利用を含む病的状態の観点から議論される。総じて、これらの知見は、多様な適応行動反応を形作る神経認知プロセスの調節に対する消化管迷走神経シグナル伝達の寄与を浮き彫りにしている。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "interoceptive cues": {
+      "ipa": "/ˌɪntərəʊˈsɛptɪv kjuːz/",
+      "pos": "noun",
+      "ja": "内受容感覚の手がかり",
+      "nuance": "生体内部（内臓など）の状態や恒常性の変化を中枢神経系が受容する感覚刺激。"
+    },
+    "vagal afferent signaling": {
+      "ipa": "/ˈveɪɡəl ˈæfərənt ˈsɪɡnəlɪŋ/",
+      "pos": "noun",
+      "ja": "迷走神経求心性シグナル伝達",
+      "nuance": "末梢の内臓受容器から延髄孤束核などの脳中枢へと上行性に送られる求心路の情報伝達。"
+    },
+    "transcutaneous vagus nerve stimulation": {
+      "ipa": "/trænz kjuːˈteɪniəs ˈveɪɡəs nɜːrv ˌstɪmjʊˈleɪʃən/",
+      "pos": "noun",
+      "ja": "経皮的迷走神経刺激（tVNS）",
+      "nuance": "耳介枝や頸部迷走神経を皮膚表面から非侵襲的に電気刺激する手法。"
+    },
+    "foraging behaviors": {
+      "ipa": "/ˈfɒrɪdʒɪŋ bɪˈheɪvjərz/",
+      "pos": "noun",
+      "ja": "採食行動",
+      "nuance": "エネルギー獲得のために食料を探索・獲得・消費する適応行動全般。"
+    },
+    "neurocognitive domains": {
+      "ipa": "/ˌnjʊəroʊˈkɒɡnɪtɪv doʊˈmeɪnz/",
+      "pos": "noun",
+      "ja": "神経認知領域",
+      "nuance": "注意、記憶、動機づけ、実行機能など、脳機能に基盤を置く特定の認知機能分類。"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-37549194",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "37549194",
+  "pmcid": "PMC10461857",
+  "doi_url": "https://doi.org/10.1371/journal.pcbi.1011315",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37549194/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10461857/",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "PLoS computational biology (2023)",
+  "impact_factor": 4.3,
+  "doi": "10.1371/journal.pcbi.1011315",
+  "title_en": "Geometry of population activity in spiking networks with low-rank structure.",
+  "title_ja": "低ランク構造を持つスパイキングネットワークにおける集団活動の幾何学",
+  "tags": [
+    "Spiking Neural Network",
+    "Low-rank Connectivity",
+    "Mean-field Theory",
+    "Neural Dynamics"
+  ],
+  "summary": {
+    "problem": "低ランク結合性に基づく発火率モデルは低次元ダイナミクスの幾何学的理解を可能にするが、連続発火率の抽象ユニットを用いており、離散的な活動電位を介する生物学的妥当性が欠如している。",
+    "solution_and_method": "ランダムな興奮性・抑制性結合ネットワークに低ランク構造を付加し、積分発火型スパイキングニューロン網と統計的に等価な低ランク発火率ネットワークの活動幾何学を体系的に比較・解析した。",
+    "formula_block": "$$\\mathbf{J} = \\mathbf{J}_{\\text{random}} + \\sum_{r=1}^{R} \\mathbf{u}_r \\mathbf{v}_r^T$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37549194</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1371/journal.pcbi.1011315</text>\n</svg>",
+    "key_results": "発火率ネットワークの平均場予測を用いることで、スパイキングネットワークにおける集団平均活動が一定の条件下での低次元ダイナミクス、逆位相振動、緩慢多様体などの新規な非線形活動レジームが同定され、非線形計算を行うスパイキング網の直接構築に成功した。",
+    "discussion_and_implications": "発火率モデルで得られた低ランク理論の知見はスパイキング神経網へ拡張可能であり、生物学的に妥当なパルス出力系における集団ダイナミクスと非線形計算機構の設計基盤となる。",
+    "relevance_to_my_research": "点過程に基づくスパイク時系列データから低次元多様体やKoopman作用素を介した線形化モデルを同定・制御する枠組み、およびリザーバコンピューティング（RC）の構造設計に直結する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37549194</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1371/journal.pcbi.1011315</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Recurrent network models are instrumental in investigating how behaviorally-relevant computations emerge from collective neural dynamics. A recently developed class of models based on low-rank connectivity provides an analytically tractable framework for understanding of how connectivity structure determines the geometry of low-dimensional dynamics and the ensuing computations. Such models however lack some fundamental biological constraints, and in particular represent individual neurons in terms of abstract units that communicate through continuous firing rates rather than discrete action potentials. Here we examine how far the theoretical insights obtained from low-rank rate networks transfer to more biologically plausible networks of spiking neurons. Adding a low-rank structure on top of random excitatory-inhibitory connectivity, we systematically compare the geometry of activity in networks of integrate-and-fire neurons to rate networks with statistically equivalent low-rank connectivity. We show that the mean-field predictions of rate networks allow us to identify low-dimensional dynamics at constant population-average activity in spiking networks, as well as novel non-linear regimes of activity such as out-of-phase oscillations and slow manifolds. We finally exploit these results to directly build spiking networks that perform nonlinear computations.",
+            "ja": "リカレントネットワークモデルは、行動に関連する計算が集団的な神経ダイナミクスからどのように生じるかを調べるのに役立つ。低ランク結合性に基づく最近開発されたモデル群は、結合構造が低次元ダイナミクスの幾何学およびそれに続く計算をどのように決定するかを理解するための、解析的に扱いやすい枠組みを提供する。しかしながら、このようなモデルにはいくつかの基本的な生物学的制約が欠けており、特に個々のニューロンが離散的な活動電位ではなく連続的な発火率を介して通信する抽象的なユニットとして表現されている。本研究では、低ランク発火率ネットワークから得られた理論的洞察が、より生物学的に妥当なスパイキングニューロンのネットワークにどこまで適用可能であるかを検討する。ランダムな興奮性・抑制性結合の上に低ランク構造を付加し、積分発火型（integrate-and-fire）ニューロンのネットワークにおける活動の幾何学を、統計的に等価な低ランク結合を持つ発火率ネットワークと体系的に比較した。その結果、発火率ネットワークの平均場予測により、スパイキングネットワークにおける一定の集団平均活動下での低次元ダイナミクスや、逆位相振動や緩慢多様体（slow manifolds）といった活動の新たな非線形レジームを同定できることが示された。最後に我々はこれらの結果を活用して、非線形計算を実行するスパイキングネットワークを直接構築した。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "low-rank connectivity": {
+      "ipa": "/loʊ ræŋk kəˌnɛkˈtɪvɪti/",
+      "pos": "noun",
+      "ja": "低ランク結合（性）",
+      "nuance": "行列の階数が小さい構造を持つシナプス結合様式を指し、低次元力学系の解析に多用される。"
+    },
+    "integrate-and-fire neurons": {
+      "ipa": "/ˈɪntɪˌɡreɪt ænd faɪər ˈnjʊərɒnz/",
+      "pos": "noun",
+      "ja": "積分発火型ニューロン",
+      "nuance": "膜電位の積分と閾値到達時の発火・リセットを記述する代表的なスパイキングニューロンモデル。"
+    },
+    "mean-field predictions": {
+      "ipa": "/miːn fiːld prɪˈdɪkʃənz/",
+      "pos": "noun",
+      "ja": "平均場（理論による）予測",
+      "nuance": "多数の素子の相互作用を統計的な平均場として近似して得られる巨視的振る舞いの予測。"
+    },
+    "slow manifolds": {
+      "ipa": "/sloʊ ˈmænɪfoʊldz/",
+      "pos": "noun",
+      "ja": "緩慢多様体 / 遅い多様体",
+      "nuance": "高次元状態空間内において、系が相対的に遅い時間スケールで推移する低次元不変多様体。"
+    },
+    "out-of-phase oscillations": {
+      "ipa": "/aʊt əv feɪz ˌɒsɪˈleɪʃənz/",
+      "pos": "noun",
+      "ja": "逆位相振動",
+      "nuance": "複数のニューロン集団または状態変数が位相差を持ってリズミカルに振動する現象。"
+    }
+  }
+}
