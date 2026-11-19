@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-38658218",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "38658218",
+  "pmcid": "",
+  "doi_url": "https://doi.org/10.1016/j.tics.2024.03.010",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38658218/",
+  "pmc_url": "",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "Trends in cognitive sciences (2024)",
+  "impact_factor": 16.7,
+  "doi": "10.1016/j.tics.2024.03.010",
+  "title_en": "Beta: bursts of cognition.",
+  "title_ja": "ベータ波：認知のバースト",
+  "tags": [
+    "Beta oscillations",
+    "Neural bursts",
+    "Cognitive control",
+    "Cortical processing"
+  ],
+  "summary": {
+    "problem": "ベータ振動は感覚情報処理や運動制御に関与することが知られているが、持続的現象ではなく断続的な高パワーバーストとして現れるという瞬間ごとの神経ダイナミクスやその非線形な皮質処理機構の解明が課題となっている。",
+    "solution_and_method": "近年の解析手法の進展を活用し、ベータバーストの多様性、全脳にわたる時空間パターン、および基礎となる神経回路活動モチーフを検討・体系化した。",
+    "formula_block": "$$P_{burst}(t, f) = |X(t, f)|^2 \\quad \\text{where } |X(t, f)|^2 > \\theta_{threshold}$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38658218</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tics.2024.03.010</text>\n</svg>",
+    "key_results": "ベータ振動は持続的ではなく適時な機能的抑制を媒介する断続的な高パワーバーストとして組織化されていることが示され、全脳規模の時空間的バーストパターンが多様な認知的操作および皮質処理の非線形な側面を反映していることが提唱された。",
+    "discussion_and_implications": "ベータバーストの時空間パターンを追うことで、感覚入力の選択的処理や抑制性認知操作が運動へ変換される動的過程を非線形ダイナミクスの観点から解明できる。",
+    "relevance_to_my_research": "点過程モデルを用いたバースト事象の点生起モデリングや、皮質ダイナミクスの非線形時系列をKoopman作用素やリザーバコンピューティングで捉える枠組みと高い親和性がある。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38658218</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tics.2024.03.010</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Beta oscillations are linked to the control of goal-directed processing of sensory information and the timing of motor output. Recent evidence demonstrates they are not sustained but organized into intermittent high-power bursts mediating timely functional inhibition. This implies there is a considerable moment-to-moment variation in the neural dynamics supporting cognition. Beta bursts thus offer new opportunities for studying how sensory inputs are selectively processed, reshaped by inhibitory cognitive operations and ultimately result in motor actions. Recent method advances reveal diversity in beta bursts that provide deeper insights into their function and the underlying neural circuit activity motifs. We propose that brain-wide, spatiotemporal patterns of beta bursting reflect various cognitive operations and that their dynamics reveal nonlinear aspects of cortical processing.",
+            "ja": "ベータ振動は、感覚情報の目標指向的処理の制御や運動出力のタイミングと関連している。最近のエビデンスは、これらが持続的なものではなく、適時な機能的抑制を仲介する断続的な高パワーのバーストへと組織化されていることを示している。このことは、認知を支える神経ダイナミクスに顕著な瞬間瞬間の変動が存在することを意味する。したがって、ベータバーストは、感覚入力がどのように選択的に処理され、抑制性の認知的操作によって再形成され、最終的に運動動作へと結びつくかを研究するための新たな機会を提供する。近年の手法の進歩により、ベータバーストの多様性が明らかになり、その機能や根底にある神経回路活動モチーフに対するより深い洞察がもたらされている。我々は、全脳にわたるベータバースティングの時空間パターンが多様な認知的操作を反映しており、そのダイナミクスが大脳皮質処理の非線形な側面を明らかにしていると提案する。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "oscillations": {
+      "ipa": "/ˌɒs.ɪˈleɪ.ʃənz/",
+      "pos": "noun",
+      "ja": "振動、振動現象",
+      "nuance": "神経細胞集団のリズミカルな電位活動の変動を指す。"
+    },
+    "bursts": {
+      "ipa": "/bɜːsts/",
+      "pos": "noun",
+      "ja": "バースト、突発的発振",
+      "nuance": "定常的ではなく、短時間かつ突発的に生じる高振幅な信号活動。"
+    },
+    "intermittent": {
+      "ipa": "/ˌɪn.təˈmɪt.ənt/",
+      "pos": "adj",
+      "ja": "断続的な、間欠的な",
+      "nuance": "連続せず途切れ途切れに発生する性質を表す。"
+    },
+    "motifs": {
+      "ipa": "/məʊˈtiːfs/",
+      "pos": "noun",
+      "ja": "モチーフ、特徴的パターン",
+      "nuance": "局所的な神経回路や発火活動における定型的な構成単位・パターン。"
+    },
+    "spatiotemporal": {
+      "ipa": "/ˌspeɪ.ʃi.əʊˈtem.pər.əl/",
+      "pos": "adj",
+      "ja": "時空間的な",
+      "nuance": "空間的配置と時間的推移の両方の軸に関わる現象を修飾する。"
+    }
+  }
+}

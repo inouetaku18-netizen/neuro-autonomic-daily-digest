@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-38615105",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "38615105",
+  "pmcid": "PMC11016062",
+  "doi_url": "https://doi.org/10.1038/s41598-024-59383-y",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38615105/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11016062/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Scientific reports (2024)",
+  "impact_factor": 3.8,
+  "doi": "10.1038/s41598-024-59383-y",
+  "title_en": "Effects of green tea and roasted green tea on human responses.",
+  "title_ja": "緑茶および焙じ茶がヒトの生体反応に及ぼす影響",
+  "tags": [
+    "Heart rate variability",
+    "Poincaré plot",
+    "Autonomic nervous system",
+    "Mental stress"
+  ],
+  "summary": {
+    "problem": "茶の摂取が人のリフレッシュやストレス軽減、作業成績にどのような多角的生理応答と関連して影響を与えるかが十分に解明されていなかった。",
+    "solution_and_method": "若年男性20名を対象に、温水・緑茶・焙じ茶摂取条件下で暗算課題中のR-R間隔、HRVスペクトル成分、ポアンカレプロット（SD1、SD2）、容積脈波、TBV/TBF、NIRSなど11の生理指標と主観的指標を測定・比較した。",
+    "formula_block": "$$\\text{SD1} = \\sqrt{\\frac{1}{2}\\text{Var}(RR_{i} - RR_{i+1})}, \\quad \\text{SD2} = \\sqrt{2\\text{Var}(RR_i) - \\frac{1}{2}\\text{Var}(RR_{i} - RR_{i+1})}$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38615105</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41598-024-59383-y</text>\n</svg>",
+    "key_results": "課題中は安静時に比べRR間隔、HRVスペクトル成分、ポアンカレ指標（SD1, SD2）、脈波振幅が低下傾向を示した。TBV、TBF、NIRS反応は温水条件に比べて茶条件で低かった。茶のアロマ刺激により課題成績向上、リフレッシュ促進、疲労軽減が短時間・少量でも確認された。",
+    "discussion_and_implications": "日本茶飲料の香気成分による刺激が自律神経系や組織循環動態に影響を与え、短時間で精神的作業負荷への耐性や疲労軽減をもたらすことが示唆された。",
+    "relevance_to_my_research": "ポアンカレプロット指標（SD1, SD2）やHRVスペクトル解析による自律神経機能評価法は、非線形心拍変動モデリングや点過程HRV解析の入力特徴量として直結する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38615105</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41598-024-59383-y</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Our objective was to elucidate the effects of tea consumption on refreshment and stress reduction/recovery through examining the multiple associations among factors such as various physiological responses and task performance. Participants included 20 healthy young men who performed a mental arithmetic task while 11 physiological responses were measured. The experiments were conducted twice under different beverage consumption conditions on separate days. The mental arithmetic task was executed six times in 1 day; participants ingested hot water, green tea, or roasted green tea (hojicha) before each task. Several subjective assessments: subjective fatigue, stress, mental workload, and flow were evaluated after each task. The R-R intervals, heart rate variability spectral components, the Poincaré plot indices (SD1 and SD2) and plethysmogram amplitude tended to decrease during task periods compared to resting periods. Tissue blood volume/flow (TBV, TBF) and near-infrared spectroscopy responses (NIRS) were lower in the tea condition than in the hot water condition. By scrutinizing various indicators, we found that aromatic stimulation of Japanese tea beverages has the potential to induce positive effects, enhance mental task performance, promote refreshment, and alleviate feelings of fatigue. These positive effects were observed even in small quantities and within a short duration, mirroring responses observed in daily consumption.",
+            "ja": "本研究の目的は、様々な生理的反応や作業成績などの要因間の多重な関連性を検討することにより、茶の摂取がリフレッシュやストレス軽減・回復に及ぼす影響を解明することであった。参加者は健常な若年男性20名であり、11種類の生理的反応が測定されるなかで暗算課題を実施した。実験は別々の日に異なる飲料摂取条件下で2回行われた。暗算課題は1日に6回実施され、参加者は各課題の前に温水、緑茶、または焙じ茶を摂取した。各課題後には、自覚的疲労感、ストレス、主観的作業負荷、フローという複数の主観的評価が測定された。R-R間隔、心拍変動のスペクトル成分、ポアンカレプロット指標（SD1およびSD2）、容積脈波振幅は、安静時と比較して課題期間中に低下する傾向を示した。組織血液量／血流（TBV、TBF）および近赤外分光法反応（NIRS）は、温水条件と比較して茶条件で低値であった。様々な指標を精査することにより、日本茶飲料のアロマ刺激は肯定的な影響を誘導し、精神的作業成績を向上させ、リフレッシュを促進し、疲労感を軽減する可能性があることが見出された。これらの好ましい効果は少量かつ短時間でも観察され、日常の摂取で観察される反応を反映していた。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "plethysmogram": {
+      "ipa": "/plɪˈθɪz.mə.ɡræm/",
+      "pos": "noun",
+      "ja": "容積脈波",
+      "nuance": "血管容量の脈動的変化を光学的・電気的に記録した波形信号。"
+    },
+    "poincaré plot": {
+      "ipa": "/pwæ̃.kɑːˈreɪ plɒt/",
+      "pos": "noun",
+      "ja": "ポアンカレプロット",
+      "nuance": "連続する心拍間隔（RR_i 対 RR_{i+1}）を2次元平面に散布させた非線形解析手法。"
+    },
+    "arithmetic": {
+      "ipa": "/əˈrɪθ.mə.tɪk/",
+      "pos": "adj",
+      "ja": "算術の、計算の",
+      "nuance": "実験で認知的ストレス負荷として用いられる暗算課題（mental arithmetic task）を指す。"
+    },
+    "spectroscopy": {
+      "ipa": "/spekˈtrɒs.kə.pi/",
+      "pos": "noun",
+      "ja": "分光法、分光計測",
+      "nuance": "近赤外線（NIRS）などを用い生体内ヘモグロビン動態等を計測する分析手法。"
+    },
+    "alleviate": {
+      "ipa": "/əˈliː.vi.eɪt/",
+      "pos": "verb",
+      "ja": "軽減する、緩和する",
+      "nuance": "疲労や苦痛などの好ましくない状態を和らげることを意味する動詞。"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-19-38885849",
+  "entry_type": "daily_paper",
+  "date": "2026-11-19",
+  "pmid": "38885849",
+  "pmcid": "",
+  "doi_url": "https://doi.org/10.1016/j.nbd.2024.106569",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38885849/",
+  "pmc_url": "",
+  "category": "brain_heart",
+  "category_label": "③ 脳-心臓連関・迷走神経",
+  "journal": "Neurobiology of disease (2024)",
+  "impact_factor": 5.8,
+  "doi": "10.1016/j.nbd.2024.106569",
+  "title_en": "The gut-brain vagal axis scales hippocampal memory processes and plasticity.",
+  "title_ja": "腸-脳迷走神経軸は海馬の記憶プロセスと可塑性を調節する",
+  "tags": [
+    "Gut-brain vagal axis",
+    "Interoception",
+    "Hippocampal plasticity",
+    "Long-term potentiation"
+  ],
+  "summary": {
+    "problem": "迷走神経は身体と脳を結ぶが、迷走神経と海馬を結ぶ機能的プロセスや学習・記憶ダイナミクスに果たす役割の全容は不明確であった。",
+    "solution_and_method": "行動、機能、細胞、分子レベルを網羅するマルチスケールアプローチを用いて、腸-脳迷走神経軸が海馬の長期認識記憶、シグナル伝達、遺伝子発現、スパイン密度、長期シナプス可塑性（LTP/LTD）に及ぼす影響を検討した。",
+    "formula_block": "$$\\Delta W_{syn} = f(\\text{Vagal Tone}, \\text{Pre}, \\text{Post}) \\implies \\text{LTP} / \\text{LTD}$$",
+    "diagram_caption": "③ 脳-心臓連関・迷走神経 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38885849</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.nbd.2024.106569</text>\n</svg>",
+    "key_results": "迷走神経軸の完全性は長期認識記憶に必須であり、迷走神経トーンは細胞内シグナル、遺伝子発現、樹状突起スパイン密度、LTDおよびLTPの調節に許容的役割を果たしていた。",
+    "discussion_and_implications": "腸-脳迷走神経軸が海馬神経集団の恒常性維持および可塑性を時間依存的に統御していることが示され、認知低下や神経変性疾患の治療介入ターゲットとして重要である。",
+    "relevance_to_my_research": "迷走神経トーン（心拍変動の高周波成分や自律神経指標）が海馬可塑性や中枢ダイナミクスと直結している証拠であり、脳-心臓連関点過程モデルの生体妥当性を補強する知見となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38885849</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.nbd.2024.106569</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The vagus nerve serves as an interoceptive relay between the body and the brain. Despite its well-established role in feeding behaviors, energy metabolism, and cognitive functions, the intricate functional processes linking the vagus nerve to the hippocampus and its contribution to learning and memory dynamics remain still elusive. Here, we investigated whether and how the gut-brain vagal axis contributes to hippocampal learning and memory processes at behavioral, functional, cellular, and molecular levels. Our results indicate that the integrity of the vagal axis is essential for long-term recognition memories, while sparing other forms of memory. In addition, by combing multi-scale approaches, our findings show that the gut-brain vagal tone exerts a permissive role in scaling intracellular signaling events, gene expressions, hippocampal dendritic spines density as well as functional long-term plasticities (LTD and LTP). These results highlight the critical role of the gut-brain vagal axis in maintaining the spontaneous and homeostatic functions of hippocampal ensembles and in regulating their learning and memory functions. In conclusion, our study provides comprehensive insights into the multifaceted involvement of the gut-brain vagal axis in shaping time-dependent hippocampal learning and memory dynamics. Understanding the mechanisms underlying this interoceptive body-brain neuronal communication may pave the way for novel therapeutic approaches in conditions associated with cognitive decline, including neurodegenerative disorders.",
+            "ja": "迷走神経は、身体と脳の間の内受容性の中継器として機能する。摂食行動、エネルギー代謝、および認知機能におけるその確立された役割にもかかわらず、迷走神経を海馬に結びつける複雑な機能的プロセスや、学習・記憶ダイナミクスへの寄与は依然として不明なままである。本研究では、腸-脳迷走神経軸が海馬の学習および記憶プロセスに寄与しているかどうか、また行動、機能、細胞、分子レベルでどのように寄与しているかを調査した。我々の結果は、迷走神経軸の完全性が長期認識記憶に必須である一方で、他の形態の記憶は保持されることを示している。さらに、マルチスケールアプローチを組み合わせることにより、腸-脳迷走神経トーンが細胞内シグナル伝達イベント、遺伝子発現、海馬樹状突起棘密度、ならびに機能的長期可塑性（LTDおよびLTP）の調節において許容的な役割を果たすことが示された。これらの結果は、海馬集団の自発的かつ恒常的な機能を維持し、その学習および記憶機能を調節する上で腸-脳迷走神経軸が極めて重要な役割を果たしていることを浮き彫りにしている。結論として、我々の研究は、腸-脳迷走神経軸が時間依存的な海馬の学習および記憶ダイナミクスを形作る上での多面的な関与に関する包括的な洞察を提供する。この内受容性の身体-脳神経伝達の根底にあるメカニズムを理解することは、神経変性疾患を含む認知機能低下に関連する病態における新たな治療アプローチへの道を開く可能性がある。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "interoceptive": {
+      "ipa": "/ˌɪn.tə.roʊˈsep.tɪv/",
+      "pos": "adj",
+      "ja": "内受容（性）の",
+      "nuance": "内臓や自律神経系など身体内部の状態を感知・伝達する生理機構を指す。"
+    },
+    "plasticity": {
+      "ipa": "/plæsˈtɪs.ə.ti/",
+      "pos": "noun",
+      "ja": "可塑性",
+      "nuance": "神経シナプス結合強度や構造が活動履歴に応じて持続的に変化する能力。"
+    },
+    "permissive": {
+      "ipa": "/pəˈmɪs.ɪv/",
+      "pos": "adj",
+      "ja": "許容的な",
+      "nuance": "それ自体が直接駆動するだけでなく、他の反応やシグナル伝達が生じるための前提環境を整える役割。"
+    },
+    "spines": {
+      "ipa": "/spaɪnz/",
+      "pos": "noun",
+      "ja": "（樹状突起）棘、スパイン",
+      "nuance": "神経細胞の樹状突起から突き出た小突起で、シナプス入力の主たる受容部。"
+    },
+    "ensembles": {
+      "ipa": "/ɒnˈsɒm.bəlz/",
+      "pos": "noun",
+      "ja": "アンサンブル、神経細胞集団",
+      "nuance": "協調して活動する多数の神経細胞群の集合的ダイナミクスを指す。"
+    }
+  }
+}
