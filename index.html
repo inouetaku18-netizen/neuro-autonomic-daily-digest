@@ -2730,6 +2730,108 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       // =========================================================================
+      // 共通：省コスト・思考オフ（thinkingBudget: 0）Gemini API 呼び出しヘルパー
+      // =========================================================================
+      const LOW_COST_MODELS = [
+        'gemini-3.8-flash-lite',
+        'gemini-2.5-flash-lite',
+        'gemini-3.8-flash',
+        'gemini-3.5-flash'
+      ];
+
+      async function callGeminiLowCostJson(apiKey, prompt, { timeoutMs = 45000, maxOutputTokens = 8192, temperature = 0.15, useWebSearch = false } = {}) {
+        let lastErr = '';
+        for (const modelName of LOW_COST_MODELS) {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+          try {
+            const genConfig = {
+              temperature,
+              maxOutputTokens,
+              thinkingConfig: { thinkingBudget: 0 }
+            };
+            if (!useWebSearch) {
+              genConfig.responseMimeType = 'application/json';
+            }
+
+            const bodyObj = {
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: genConfig
+            };
+            if (useWebSearch) {
+              bodyObj.tools = [{ google_search: {} }];
+            }
+
+            const res = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
+                body: JSON.stringify(bodyObj)
+              }
+            );
+            clearTimeout(timer);
+
+            if (res.ok) {
+              const json = await res.json();
+              let rawText = json.candidates?.[0]?.content?.parts?.map(pt => pt.text || '').join('') || '{}';
+              rawText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+              const firstBrace = rawText.indexOf('{');
+              const lastBrace = rawText.lastIndexOf('}');
+              if (firstBrace !== -1 && lastBrace !== -1) {
+                rawText = rawText.slice(firstBrace, lastBrace + 1);
+              }
+              const parsed = JSON.parse(rawText);
+              return Array.isArray(parsed) ? (parsed[0] || {}) : (parsed || {});
+            } else {
+              const errData = await res.json().catch(() => ({}));
+              lastErr = errData.error?.message || `HTTP ${res.status}`;
+              // thinkingConfig非対応モデルの400エラー時はthinkingConfigを外して同モデルで再試行
+              if (res.status === 400 && /thinking/i.test(lastErr)) {
+                delete bodyObj.generationConfig.thinkingConfig;
+                const retryRes = await fetch(
+                  `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyObj)
+                  }
+                );
+                if (retryRes.ok) {
+                  const rJson = await retryRes.json();
+                  let rText = rJson.candidates?.[0]?.content?.parts?.map(pt => pt.text || '').join('') || '{}';
+                  rText = rText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+                  const fb = rText.indexOf('{');
+                  const lb = rText.lastIndexOf('}');
+                  if (fb !== -1 && lb !== -1) rText = rText.slice(fb, lb + 1);
+                  const rParsed = JSON.parse(rText);
+                  return Array.isArray(rParsed) ? (rParsed[0] || {}) : (rParsed || {});
+                }
+              }
+              if ([404, 429, 500, 503].includes(res.status)) {
+                await new Promise(r => setTimeout(r, 600));
+                continue;
+              }
+              throw new Error(lastErr);
+            }
+          } catch (e) {
+            clearTimeout(timer);
+            if (e.name === 'AbortError') {
+              lastErr = `${modelName} がタイムアウトしました`;
+              continue;
+            }
+            if (/JSON/i.test(e.message)) {
+              lastErr = e.message;
+              continue;
+            }
+            throw e;
+          }
+        }
+        throw new Error(lastErr || 'APIリクエストに失敗しました。APIキーや利用上限をご確認ください。');
+      }
+
+      // =========================================================================
       // 点線下線語（学術英単語辞書ハイライト＆ポップアップ登録）の完全実装
       // =========================================================================
       window.annotateEnglishWithVocab = function(enText) {
@@ -3080,7 +3182,6 @@
             alert('URLをクリアしました。');
             return;
           }
-          // 現在ローカルにある解読済みPDFとノートをDriveへ全件アップロードしてから双方向復元
           const decodedPapers = items.filter(i => i && (i.isCustomPdf || i.pdfDecoded));
           for (const p of decodedPapers) {
             await window.syncPaperToGoogleDrive(p);
@@ -3321,77 +3422,32 @@
           document.getElementById('sec-exp-body').innerHTML = `
             <div class="rounded-xl bg-indigo-50/70 border border-indigo-100 p-4 text-indigo-900 font-semibold flex items-center gap-2">
               <span class="animate-spin inline-block">⏳</span>
-              <span>「${escapeHtmlSafe(selectedText)}」の意味とこの論文での役割を解説中（約2〜3秒）...</span>
+              <span>「${escapeHtmlSafe(selectedText)}」の解説を生成中...</span>
             </div>
           `;
 
           const prompt = `
-あなたは生体医工学・神経科学・統計解析・非線形制御工学の専門研究者兼教育者です。
-論文精読中のユーザーが以下の【選択された単語・専門用語・手法名】を選択しました。
-前後の文脈と論文テーマを踏まえ、大学院生や異分野の研究者にも直感的にスッと腹落ちするように分かりやすく解説してください。
+生体医工学・神経科学・統計解析・非線形制御工学の専門研究者として、選択語句を簡潔に解説してください。
+【選択語句】${selectedText}
+【文脈】${contextSentence || 'なし'}
+【論文】${currentPaper ? currentPaper.title_en : ''}
 
-【選択された語句・手法】
-${selectedText}
-
-【登場した文脈（英文）】
-${contextSentence || '（文脈なし）'}
-
-【論文タイトル】
-${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
-
-以下のJSON形式のみを出力してください。
+以下のJSONのみ出力:
 {
-  "category": "分類ラベル（例: 解析手法 / 生理学用語 / 統計指標 / 学術英語表現）",
-  "ipa": "英語の場合は発音記号（例: /ˌbæroʊˈriːflɛks/）、日本語の場合は空文字",
-  "short_meaning": "一言でいうと何か（簡潔な日本語訳・定義）",
-  "context_role": "この文脈・論文の中で、何のために・どのような仕組みで使われているのかの分かりやすい解説（日本語・3〜4文）",
-  "intuitive_tip": "直感的なイメージ・類似手法との違い・論文を読む際の着眼点（日本語・2〜3文）"
+  "category": "分類（解析手法/生理学用語/統計指標/学術表現）",
+  "ipa": "英語発音記号（日本語は空文字）",
+  "short_meaning": "簡潔な日本語訳・定義",
+  "context_role": "この文脈・論文での役割と仕組み（2〜3文）",
+  "intuitive_tip": "直感的イメージ・注意点（1〜2文）"
 }
 `;
 
           try {
-            const models = ['gemini-3.8-flash-lite', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview'];
-            let parsed = null;
-            let lastErr = '';
-
-            for (const m of models) {
-              const controller = new AbortController();
-              const timer = setTimeout(() => controller.abort(), 25000);
-              try {
-                const res = await fetch(
-                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    signal: controller.signal,
-                    body: JSON.stringify({
-                      contents: [{ parts: [{ text: prompt }] }],
-                      generationConfig: {
-                        responseMimeType: 'application/json',
-                        temperature: 0.2
-                      }
-                    })
-                  }
-                );
-                clearTimeout(timer);
-                if (res.ok) {
-                  const json = await res.json();
-                  const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
-                  parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
-                  break;
-                } else {
-                  const errData = await res.json().catch(() => ({}));
-                  lastErr = errData.error?.message || `HTTP ${res.status}`;
-                }
-              } catch (err) {
-                clearTimeout(timer);
-                lastErr = err.message;
-              }
-            }
-
-            if (!parsed) {
-              throw new Error(lastErr || '解説サーバーが混雑しています。再度お試しください。');
-            }
+            const parsed = await callGeminiLowCostJson(apiKey, prompt, {
+              timeoutMs: 25000,
+              maxOutputTokens: 1024,
+              temperature: 0.2
+            });
 
             window.selectionTermCache[cacheKey] = parsed;
             try {
@@ -3412,7 +3468,7 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
       }
 
       // =========================================================================
-      // ✍️ 英語論文執筆・推敲サポートスタジオ
+      // ✍️ 英語論文執筆・推敲サポートスタジオ（英文評論＋推敲理由＋3段階生成）
       // =========================================================================
       function setupAcademicWritingUI() {
         if (document.getElementById('open-academic-writing-btn')) return;
@@ -3435,7 +3491,7 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
                 <h3 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
                   <span>✍️ 学術英語論文 執筆・推敲アシスタント</span>
                 </h3>
-                <p class="text-[11px] text-emerald-200">日本語下書き・粗い英文から、セクション適切な時制・ヘッジングを備えたトップジャーナル英文を生成します</p>
+                <p class="text-[11px] text-emerald-200">現在の英文の評論（論理構造・明確さ・簡潔さ）＋ 具体的な推敲理由 ＋ 3段階の学術英文を生成します</p>
               </div>
               <button id="close-academic-writing-modal" class="text-slate-300 hover:text-white text-2xl leading-none px-2 cursor-pointer">&times;</button>
             </div>
@@ -3466,11 +3522,11 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
                 </div>
 
                 <div>
-                  <label class="block text-xs font-extrabold text-slate-700 mb-1">3. 日本語の下書き、または推敲したい英文を入力</label>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">3. 推敲したい現在の英文、または日本語の下書きを入力</label>
                   <textarea
                     id="aw-input-text"
                     rows="7"
-                    placeholder="日本語でも英語でも入力できます..."
+                    placeholder="推敲したい英語原稿（または日本語メモ）を入力してください。"
                     class="w-full p-3 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-emerald-600"
                   ></textarea>
                 </div>
@@ -3490,16 +3546,16 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
                   id="aw-generate-btn"
                   class="w-full py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>✨ 学術英文を生成・推敲する（3パターン＋ニュアンス解説）</span>
+                  <span>✨ 現在の英文を評論＆推敲する（評論・理由・3パターン）</span>
                 </button>
               </div>
 
               <div id="aw-output-container" class="lg:col-span-7 p-5 space-y-4 bg-white overflow-y-auto">
                 <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-12 px-4">
                   <div class="text-4xl mb-3">📝</div>
-                  <p class="text-sm font-bold text-slate-600 mb-1">左側に日本語メモまたは英文を入力して生成ボタンを押してください</p>
+                  <p class="text-sm font-bold text-slate-600 mb-1">左側に推敲したい英文（または日本語下書き）を入力してください</p>
                   <p class="text-xs leading-relaxed max-w-md">
-                    「① 標準・明快」「② トップジャーナル向け洗練表現」「③ 文字数削減版」の3パターンに加え、<strong>逆翻訳チェック</strong>と<strong>文法・ニュアンス解説</strong>を提示します。
+                    <strong>① 現在の文章の評論（論理構造・明確さ・簡潔さ）</strong>と<strong>② 具体的な推敲箇所と理由</strong>、さらに用途別の<strong>3パターンの学術英文</strong>を生成します。
                   </p>
                 </div>
               </div>
@@ -3564,7 +3620,7 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
         document.getElementById('aw-generate-btn').onclick = async () => {
           const rawInput = document.getElementById('aw-input-text').value.trim();
           if (!rawInput) {
-            alert('執筆または推敲したいテキストを入力してください。');
+            alert('推敲または執筆したいテキストを入力してください。');
             return;
           }
 
@@ -3584,105 +3640,101 @@ ${currentPaper ? `${currentPaper.title_en} (${currentPaper.title_ja})` : ''}
           outEl.innerHTML = `
             <div class="h-full flex flex-col items-center justify-center py-12 text-emerald-900">
               <div class="text-3xl animate-spin mb-3">⏳</div>
-              <p class="text-sm font-extrabold">学術英語3パターンとニュアンス解説を生成中（約4〜8秒）...</p>
+              <p class="text-sm font-extrabold">現在の文章を評論し、推敲理由と3パターンの学術英文を生成中...</p>
             </div>
           `;
 
           const savedNotes = (useNotes && Array.isArray(window.englishStudyNotes))
-            ? window.englishStudyNotes.slice(0, 12).map(n => `- ${n.pattern}: ${n.en}`).join('\n')
+            ? window.englishStudyNotes.slice(0, 8).map(n => `- ${n.pattern}: ${n.en}`).join('\n')
             : '';
           const currentPaper = (usePaperCtx && Array.isArray(items)) ? items.find(i => i.id === selectedItemId) : null;
-          const paperHint = currentPaper
-            ? `参照中の論文: ${currentPaper.title_en} / キーワード: ${(currentPaper.tags || []).join(', ')}`
-            : '';
+          const paperHint = currentPaper ? `参照論文: ${currentPaper.title_en}` : '';
 
           const prompt = `
-あなたはNature, IEEE Transactions, Royal Society Open Science等の査読者・ネイティブエディターを務める生体医工学・神経科学・制御工学の専門研究者です。
-ユーザーが入力した【下書き（日本語または英語）】を、指定された【論文セクション】に最適な学術英語へ変換・推敲してください。
+あなたはトップジャーナルの査読者・ネイティブエディターです。入力テキストを評論し、推敲理由と3パターンの学術英文（${sectionLabel}向け）を簡潔に出力してください。
+【入力】${rawInput}
+${paperHint ? `【文脈】${paperHint}` : ''}
+${savedNotes ? `【好み表現】\n${savedNotes}` : ''}
 
-【対象セクション】
-${sectionLabel}
-
-【ユーザー入力テキスト】
-${rawInput}
-
-${paperHint ? `【分野・用語コンテキスト】\n${paperHint}\n` : ''}
-${savedNotes ? `【ユーザーが学習ノートに保存している好みの学術表現（文脈に合えば自然に活用すること）】\n${savedNotes}\n` : ''}
-
-以下の単一JSONオブジェクトのみを出力してください。
+以下の単一JSONのみ出力:
 {
+  "current_text_critique": {
+    "logical_flow": "論理構造の評価（日本語・2文）",
+    "clarity_and_precision": "明確さ・正確さの評価（日本語・2文）",
+    "conciseness": "簡潔さの評価（日本語・2文）",
+    "overall_verdict": "総合評論・改善の核心（日本語・2文）"
+  },
+  "revision_reasons": [
+    { "before_after": "変更前 → 変更後", "reason": "推敲理由（日本語）" }
+  ],
   "variants": [
-    {
-      "label": "① Standard Academic（明快・標準）",
-      "en": "英語文1",
-      "back_translation_ja": "英語のニュアンスを忠実に反映した確認用日本語訳",
-      "nuance_note": "時制（現在形/過去形）や助動詞・構文選択の理由（日本語）"
-    },
-    {
-      "label": "② Top-Journal Polish（洗練・ネイティブ調）",
-      "en": "英語文2",
-      "back_translation_ja": "確認用日本語訳",
-      "nuance_note": "より洗練された表現にしたポイント（日本語）"
-    },
-    {
-      "label": "③ Concise（簡潔・語数削減版）",
-      "en": "英語文3",
-      "back_translation_ja": "確認用日本語訳",
-      "nuance_note": "語数を圧縮した工夫（日本語）"
-    }
+    { "label": "① Standard Academic（明快・標準）", "en": "英文1", "back_translation_ja": "確認用日本語訳", "nuance_note": "推敲ポイント" },
+    { "label": "② Top-Journal Polish（洗練・ネイティブ調）", "en": "英文2", "back_translation_ja": "確認用日本語訳", "nuance_note": "推敲ポイント" },
+    { "label": "③ Concise（簡潔・語数削減版）", "en": "英文3", "back_translation_ja": "確認用日本語訳", "nuance_note": "推敲ポイント" }
   ],
   "key_vocabulary_tips": [
-    {
-      "phrase": "採用した学術表現・コロケーション",
-      "explanation": "なぜこの単語が適切か・類似表現とのニュアンスの違い（日本語）"
-    }
+    { "phrase": "重要表現", "explanation": "解説（日本語）" }
   ]
 }
 `;
 
           try {
-            const models = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash-lite'];
-            let parsed = null;
-            let lastErr = '';
-
-            for (const m of models) {
-              const controller = new AbortController();
-              const timer = setTimeout(() => controller.abort(), 35000);
-              try {
-                const res = await fetch(
-                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    signal: controller.signal,
-                    body: JSON.stringify({
-                      contents: [{ parts: [{ text: prompt }] }],
-                      generationConfig: {
-                        responseMimeType: 'application/json',
-                        temperature: 0.25
-                      }
-                    })
-                  }
-                );
-                clearTimeout(timer);
-                if (res.ok) {
-                  const json = await res.json();
-                  const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
-                  parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
-                  break;
-                } else {
-                  const errData = await res.json().catch(() => ({}));
-                  lastErr = errData.error?.message || `HTTP ${res.status}`;
-                }
-              } catch (e) {
-                clearTimeout(timer);
-                lastErr = e.message;
-              }
-            }
+            const parsed = await callGeminiLowCostJson(apiKey, prompt, {
+              timeoutMs: 35000,
+              maxOutputTokens: 3072,
+              temperature: 0.25
+            });
 
             if (!parsed || !Array.isArray(parsed.variants)) {
-              throw new Error(lastErr || '生成に失敗しました。再度お試しください。');
+              throw new Error('生成に失敗しました。再度お試しください。');
             }
+
+            const crit = parsed.current_text_critique || {};
+            const critiqueHTML = (crit.logical_flow || crit.overall_verdict) ? `
+              <div class="rounded-2xl border-2 border-slate-300 bg-gradient-to-br from-slate-50 via-blue-50/40 to-white p-4 space-y-3 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span class="text-xs sm:text-sm font-extrabold text-slate-900">🧐 現在の文章の評論（査読者・エディター視点）</span>
+                </div>
+                ${crit.overall_verdict ? `
+                  <div class="bg-white rounded-xl border border-blue-200/80 p-3 text-xs text-slate-800 leading-relaxed">
+                    <span class="font-extrabold text-blue-900">📌 総合評価・改善の核心：</span>${escapeHtmlSafe(crit.overall_verdict)}
+                  </div>
+                ` : ''}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                  <div class="bg-white rounded-xl border border-slate-200 p-3">
+                    <div class="font-extrabold text-indigo-900 mb-1">🔗 論理構造・流れ</div>
+                    <p class="text-slate-700 leading-relaxed">${escapeHtmlSafe(crit.logical_flow || '')}</p>
+                  </div>
+                  <div class="bg-white rounded-xl border border-slate-200 p-3">
+                    <div class="font-extrabold text-emerald-900 mb-1">🎯 明確さ・学術的正確さ</div>
+                    <p class="text-slate-700 leading-relaxed">${escapeHtmlSafe(crit.clarity_and_precision || '')}</p>
+                  </div>
+                  <div class="bg-white rounded-xl border border-slate-200 p-3">
+                    <div class="font-extrabold text-amber-900 mb-1">✂️ 簡潔さ・情報密度</div>
+                    <p class="text-slate-700 leading-relaxed">${escapeHtmlSafe(crit.conciseness || '')}</p>
+                  </div>
+                </div>
+              </div>
+            ` : '';
+
+            const reasons = Array.isArray(parsed.revision_reasons) ? parsed.revision_reasons : [];
+            const reasonsHTML = reasons.length > 0 ? `
+              <div class="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-4 space-y-2.5">
+                <div class="text-xs sm:text-sm font-extrabold text-indigo-950">🛠️ 主な推敲箇所と変更理由</div>
+                <div class="space-y-2">
+                  ${reasons.map((r, idx) => `
+                    <div class="bg-white rounded-xl border border-indigo-100 p-3 text-xs space-y-1">
+                      <div class="font-mono font-bold text-indigo-800 bg-indigo-50/80 px-2.5 py-1 rounded border border-indigo-100/80">
+                        ${idx + 1}. ${escapeHtmlSafe(r.before_after || '')}
+                      </div>
+                      <p class="text-slate-700 leading-relaxed pl-1">
+                        <span class="font-bold text-slate-800">理由：</span>${escapeHtmlSafe(r.reason || '')}
+                      </p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : '';
 
             const variantsHTML = parsed.variants.map((v, idx) => {
               const badgeStyle = idx === 1
@@ -3699,33 +3751,14 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
                       <span class="text-[11px] font-mono text-slate-500">${wordCount} words</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <button
-                        onclick="speakWritingVariant('${encodeURIComponent(v.en || '')}')"
-                        class="px-2 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer"
-                        title="音声で確認"
-                      >🔊</button>
-                      <button
-                        onclick="copyWritingVariant(this, '${encodeURIComponent(v.en || '')}')"
-                        class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-white cursor-pointer"
-                      >📋 コピー</button>
-                      <button
-                        onclick="saveWritingVariantToNote(this, '${encodeURIComponent(sectionLabel + ' / ' + (v.label || ''))}', '${encodeURIComponent(v.en || '')}', '${encodeURIComponent(v.back_translation_ja || '')}', '${encodeURIComponent(v.nuance_note || '')}')"
-                        class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
-                      >📓 ノート保存</button>
+                      <button onclick="speakWritingVariant('${encodeURIComponent(v.en || '')}')" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 cursor-pointer">🔊</button>
+                      <button onclick="copyWritingVariant(this, '${encodeURIComponent(v.en || '')}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-white cursor-pointer">📋 コピー</button>
+                      <button onclick="saveWritingVariantToNote(this, '${encodeURIComponent(sectionLabel + ' / ' + (v.label || ''))}', '${encodeURIComponent(v.en || '')}', '${encodeURIComponent(v.back_translation_ja || '')}', '${encodeURIComponent(v.nuance_note || '')}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">📓 ノート保存</button>
                     </div>
                   </div>
-
-                  <div class="bg-white rounded-xl border border-slate-200/90 p-3.5 text-sm text-slate-950 font-sans leading-relaxed select-all">
-                    ${escapeHtmlSafe(v.en)}
-                  </div>
-
-                  <div class="text-xs text-slate-600 bg-white/80 rounded-lg px-3 py-2 border border-slate-100">
-                    <span class="font-bold text-slate-700">🔄 逆翻訳チェック：</span>${escapeHtmlSafe(v.back_translation_ja)}
-                  </div>
-
-                  <div class="text-xs text-indigo-950 bg-indigo-50/70 rounded-lg px-3 py-2 border border-indigo-100/80 leading-relaxed">
-                    <span class="font-extrabold text-indigo-800">💡 表現・時制のポイント：</span>${escapeHtmlSafe(v.nuance_note)}
-                  </div>
+                  <div class="bg-white rounded-xl border border-slate-200/90 p-3.5 text-sm text-slate-950 font-sans leading-relaxed select-all">${escapeHtmlSafe(v.en)}</div>
+                  <div class="text-xs text-slate-600 bg-white/80 rounded-lg px-3 py-2 border border-slate-100"><span class="font-bold text-slate-700">🔄 逆翻訳チェック：</span>${escapeHtmlSafe(v.back_translation_ja)}</div>
+                  <div class="text-xs text-indigo-950 bg-indigo-50/70 rounded-lg px-3 py-2 border border-indigo-100/80 leading-relaxed"><span class="font-extrabold text-indigo-800">💡 推敲の狙い：</span>${escapeHtmlSafe(v.nuance_note)}</div>
                 </div>
               `;
             }).join('');
@@ -3745,7 +3778,7 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
               </div>
             ` : '';
 
-            outEl.innerHTML = variantsHTML + tipsHTML;
+            outEl.innerHTML = critiqueHTML + reasonsHTML + variantsHTML + tipsHTML;
           } catch (err) {
             outEl.innerHTML = `
               <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
@@ -3757,7 +3790,7 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
       }
 
       // =========================================================================
-      // 学術英語表現ノート（保存・管理・PDF出力）システム（Drive自動同期対応）
+      // 学術英語表現ノート（保存・管理・PDF出力）システム
       // =========================================================================
       window.englishStudyNotes = JSON.parse(localStorage.getItem('ACADEMIC_ENGLISH_NOTES') || '[]');
 
@@ -3879,85 +3912,19 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
             <title>学術英語表現・構文学習ノート (${today})</title>
             <style>
               @page { size: A4; margin: 16mm; }
-              body {
-                font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-                color: #1e293b;
-                line-height: 1.6;
-                margin: 0;
-                padding: 0;
-              }
-              .doc-header {
-                border-bottom: 2px solid #1e3a8a;
-                padding-bottom: 10px;
-                margin-bottom: 18px;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-end;
-              }
+              body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; color: #1e293b; line-height: 1.6; margin: 0; padding: 0; }
+              .doc-header { border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
               .doc-title { font-size: 18px; font-weight: bold; color: #0f172a; margin: 0; }
               .doc-sub { font-size: 11px; color: #64748b; }
-              .note-card {
-                border: 1px solid #cbd5e1;
-                border-radius: 8px;
-                padding: 12px 14px;
-                margin-bottom: 14px;
-                break-inside: avoid;
-                page-break-inside: avoid;
-                background: #ffffff;
-              }
-              .note-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 6px;
-                font-size: 10px;
-              }
-              .badge {
-                background: #e0e7ff;
-                color: #1e3a8a;
-                font-weight: bold;
-                padding: 2px 8px;
-                border-radius: 4px;
-              }
+              .note-card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; break-inside: avoid; page-break-inside: avoid; background: #ffffff; }
+              .note-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 10px; }
+              .badge { background: #e0e7ff; color: #1e3a8a; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
               .meta { color: #64748b; }
-              .pattern {
-                font-family: Consolas, Monaco, monospace;
-                font-size: 12px;
-                font-weight: bold;
-                color: #312e81;
-                background: #f8fafc;
-                padding: 4px 8px;
-                border-left: 3px solid #4f46e5;
-                margin-bottom: 6px;
-              }
-              .en-box {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 12px;
-                color: #0f172a;
-                font-weight: 500;
-                margin-bottom: 4px;
-              }
-              .ja-box {
-                font-size: 11px;
-                color: #475569;
-                margin-bottom: 6px;
-              }
-              .analysis-box {
-                font-size: 11px;
-                background: #f1f5f9;
-                padding: 8px 10px;
-                border-radius: 6px;
-                color: #334155;
-              }
-              .memo-box {
-                font-size: 11px;
-                background: #fefce8;
-                border: 1px solid #fde047;
-                padding: 6px 10px;
-                border-radius: 6px;
-                margin-top: 6px;
-                color: #713f12;
-              }
+              .pattern { font-family: Consolas, Monaco, monospace; font-size: 12px; font-weight: bold; color: #312e81; background: #f8fafc; padding: 4px 8px; border-left: 3px solid #4f46e5; margin-bottom: 6px; }
+              .en-box { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #0f172a; font-weight: 500; margin-bottom: 4px; }
+              .ja-box { font-size: 11px; color: #475569; margin-bottom: 6px; }
+              .analysis-box { font-size: 11px; background: #f1f5f9; padding: 8px 10px; border-radius: 6px; color: #334155; }
+              .memo-box { font-size: 11px; background: #fefce8; border: 1px solid #fde047; padding: 6px 10px; border-radius: 6px; margin-top: 6px; color: #713f12; }
             </style>
           </head>
           <body>
@@ -3969,11 +3936,7 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
               <div class="doc-sub">出力日: ${today} / 全 ${notes.length} 件</div>
             </div>
             ${cardsHtml}
-            <script>
-              window.onload = function() {
-                setTimeout(function() { window.print(); }, 250);
-              };
-            <\/script>
+            <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); };<\/script>
           </body>
           </html>
         `);
@@ -4141,7 +4104,7 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
       }
 
       // =========================================================================
-      // 1文ごとの学術英語ニュアンス・時制・助動詞・構文分解エンジン
+      // 1文ごとの学術英語ニュアンス・時制・助動詞・構文分解エンジン（省コスト版）
       // =========================================================================
       window.sentenceGrammarCache = JSON.parse(localStorage.getItem('SENTENCE_GRAMMAR_CACHE') || '{}');
 
@@ -4245,89 +4208,38 @@ ${savedNotes ? `【ユーザーが学習ノートに保存している好みの�
         panel.innerHTML = `
           <div class="rounded-xl border border-indigo-200 bg-indigo-50/70 p-3 text-xs text-indigo-900 font-semibold flex items-center gap-2">
             <span class="animate-spin inline-block">⏳</span>
-            <span>この1文の時制・助動詞（ヘッジング）・構文・学術ニュアンスを解析中（約2〜3秒）...</span>
+            <span>構文・時制・ヘッジングを解析中...</span>
           </div>
         `;
 
         const prompt = `
-あなたは英語論文執筆指導を専門とする応用言語学者・生体医工学研究者です。
-以下の学術論文の1文について、日本人研究者・大学院生が「なぜこの時制・助動詞・構文が選ばれているのか」を深く理解できるように精密に分解・解説してください。
+学術英文の1文を日本人研究者向けに簡潔に構文・ニュアンス分析してください。
+【英文】${enText}
+【和訳】${jaText}
 
-【対象英文】
-${enText}
-
-【参考日本語訳】
-${jaText}
-
-【解説の必須観点】
-1. claim_strength: この文の断定レベルを表す短いラベル（例：「確立された一般事実（現在形）」「本研究での観察結果（過去形）」「可能性の示唆・ヘッジング（may）」など）
-2. chunk_breakdown: 英文を英語の語順のまま意味のカタマリ（主部・述部・修飾句・分詞構文など）3〜6個に分割した配列
-3. tense_voice_nuance: 主節・従属節の動詞の時制（現在形＝一般論/確立事実、過去形＝個別実験の観察結果、現在完了＝研究の蓄積）や能動態・受動態の選択理由を具体的に解説
-4. hedging_modality: 助動詞（may, can, could, might, should）や推量動詞（suggest, indicate, appear to）、副詞（potentially, predominantly）などが主張の強さをどう調整しているか解説（該当語がない場合も、なぜ助動詞を使わず断定しているのかを解説）
-5. japanese_learner_tips: 日本人が誤解しやすい冠詞（a/the）、単数・複数、関係詞、学術コロケーション、または自分の論文で応用する際の書き換え表現を解説
-
-以下のJSON形式のみを出力してください。
+以下のJSONのみ出力:
 {
-  "claim_strength": "短いラベル",
+  "claim_strength": "断定レベル（例: 一般事実(現在形) / 実験観察(過去形) / 示唆(may)）",
   "chunk_breakdown": [
     { "en_chunk": "英語チャンク", "role_and_ja": "[役割] 日本語訳" }
   ],
-  "tense_voice_nuance": "時制・態の解説（日本語）",
-  "hedging_modality": "助動詞・ヘッジングの解説（日本語）",
-  "japanese_learner_tips": "日本人向け英語ニュアンス・執筆応用ポイント（日本語）"
+  "tense_voice_nuance": "時制・態の選択理由（2文）",
+  "hedging_modality": "助動詞・ヘッジングの解説（2文）",
+  "japanese_learner_tips": "英語ニュアンス・執筆応用ポイント（2文）"
 }
 `;
 
         try {
-          const models = ['gemini-3.8-flash-lite', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview'];
-          let parsed = null;
-          let lastErr = '';
-
-          for (const m of models) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 25000);
-            try {
-              const res = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  signal: controller.signal,
-                  body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                      responseMimeType: 'application/json',
-                      temperature: 0.2
-                    }
-                  })
-                }
-              );
-              clearTimeout(timer);
-              if (res.ok) {
-                const json = await res.json();
-                const rawObj = JSON.parse(json.candidates[0].content.parts[0].text);
-                parsed = Array.isArray(rawObj) ? (rawObj[0] || {}) : (rawObj || {});
-                break;
-              } else {
-                const errData = await res.json().catch(() => ({}));
-                lastErr = errData.error?.message || `HTTP ${res.status}`;
-              }
-            } catch (e) {
-              clearTimeout(timer);
-              lastErr = e.message;
-            }
-          }
-
-          if (!parsed) {
-            throw new Error(lastErr || '解析サーバーが混雑しています。再度お試しください。');
-          }
+          const parsed = await callGeminiLowCostJson(apiKey, prompt, {
+            timeoutMs: 25000,
+            maxOutputTokens: 1200,
+            temperature: 0.2
+          });
 
           window.sentenceGrammarCache[enText] = parsed;
           try {
             const keys = Object.keys(window.sentenceGrammarCache);
-            if (keys.length > 60) {
-              delete window.sentenceGrammarCache[keys[0]];
-            }
+            if (keys.length > 60) delete window.sentenceGrammarCache[keys[0]];
             localStorage.setItem('SENTENCE_GRAMMAR_CACHE', JSON.stringify(window.sentenceGrammarCache));
             syncStudyDataToGoogleDrive();
           } catch (_) {}
@@ -4447,8 +4359,22 @@ ${jaText}
       }
 
       // =========================================================================
-      // 1文ごとの分割・アライメント補助関数
+      // クライアント側高速英文センテンス分割（AIに英語を再出力させないため）
       // =========================================================================
+      function splitEnglishTextIntoSentences(rawEn) {
+        const cleaned = String(rawEn || '').replace(/\s+/g, ' ').trim();
+        if (!cleaned) return [];
+
+        const protectedEn = cleaned
+          .replace(/\b(et al|Fig|Figs|Eq|Eqs|Ref|Refs|vs|Dr|Prof|Mr|Ms|i\.e|e\.g|cf|approx|ca|no|vol|pp)\./gi, '$1__DOT__')
+          .replace(/(\d)\.(\d)/g, '$1__DOT__$2');
+
+        return protectedEn
+          .split(/(?<=[.!?])\s+(?=[A-Z0-9"“(\[])/)
+          .map(s => s.replace(/__DOT__/g, '.').trim())
+          .filter(Boolean);
+      }
+
       function splitIntoAlignedSentences(pair) {
         if (Array.isArray(pair.sentences) && pair.sentences.length > 0) {
           return pair.sentences;
@@ -4457,14 +4383,7 @@ ${jaText}
         const jaText = (pair.ja || '').trim();
         if (!enText) return [];
 
-        const protectedEn = enText
-          .replace(/\b(et al|Fig|Figs|Eq|Eqs|Ref|Refs|vs|Dr|Prof|Mr|Ms|i\.e|e\.g|cf|approx|ca)\./gi, '$1__DOT__')
-          .replace(/(\d)\.(\d)/g, '$1__DOT__$2');
-        const enSentences = protectedEn
-          .split(/(?<=[.!?])\s+(?=[A-Z0-9"“(\[])/)
-          .map(s => s.replace(/__DOT__/g, '.').trim())
-          .filter(Boolean);
-
+        const enSentences = splitEnglishTextIntoSentences(enText);
         const jaSentences = jaText
           .split(/(?<=。)\s*/)
           .map(s => s.trim())
@@ -4473,18 +4392,13 @@ ${jaText}
         if (enSentences.length > 1 && enSentences.length === jaSentences.length) {
           return enSentences.map((en, i) => ({ en, ja: jaSentences[i] }));
         }
-
         if (enSentences.length > 1 && jaSentences.length > 1) {
           return enSentences.map((en, i) => {
             const startIdx = Math.floor((i * jaSentences.length) / enSentences.length);
             const endIdx = Math.max(startIdx + 1, Math.floor(((i + 1) * jaSentences.length) / enSentences.length));
-            return {
-              en,
-              ja: jaSentences.slice(startIdx, endIdx).join('')
-            };
+            return { en, ja: jaSentences.slice(startIdx, endIdx).join('') };
           });
         }
-
         return [{ en: enText, ja: jaText }];
       }
 
@@ -4890,7 +4804,6 @@ ${jaText}
             }, 250);
           }
 
-          // Google Drive が設定されている場合はクラウド側から最新の保存データを自動復元
           if (getDriveWebhookUrl()) {
             await window.restoreAllFromGoogleDrive(true);
           }
@@ -4900,10 +4813,463 @@ ${jaText}
       }
 
       // =========================================================================
-      // PDFアップロード＆省リクエスト・100%全文AI解読エンジン（API消費最適化版）
+      // 🧭 「3. アーカイブ横断」統合型・研究戦略＆世界課題解決AIエージェント（省コスト版）
       // =========================================================================
-      window.dailyQuotaExhaustedModels = new Set();
+      function getArchiveItemsSafe() {
+        if (typeof items !== 'undefined' && Array.isArray(items) && items.length > 0) {
+          return items;
+        }
+        if (Array.isArray(window.items) && window.items.length > 0) {
+          return window.items;
+        }
+        const fallback = [];
+        try {
+          const customRaw = localStorage.getItem('CUSTOM_IMPORTED_PAPERS');
+          if (customRaw) {
+            const parsedCustom = JSON.parse(customRaw);
+            if (Array.isArray(parsedCustom)) fallback.push(...parsedCustom);
+          }
+        } catch (_) {}
+        return fallback;
+      }
 
+      window.renderArchivePaperChecklist = function() {
+        const listEl = document.getElementById('sa-archive-paper-checklist');
+        if (!listEl) return;
+
+        const prevChecked = new Set(
+          Array.from(listEl.querySelectorAll('.sa-paper-cb:checked')).map(cb => cb.value)
+        );
+        const hasPrevState = listEl.querySelectorAll('.sa-paper-cb').length > 0;
+
+        const archiveItems = getArchiveItemsSafe();
+        if (archiveItems.length === 0) {
+          listEl.innerHTML = '<div class="text-slate-400 text-[11px] py-3 text-center">アーカイブ論文を読み込み中です。「🔄 再読込」を押してください。</div>';
+          return;
+        }
+
+        listEl.innerHTML = archiveItems.map((p, idx) => {
+          const idStr = String(p.id || `item-${idx}`);
+          const isChecked = hasPrevState ? prevChecked.has(idStr) : (idx < 8);
+          const badge = p.isCustomPdf ? '📄PDF' : (p.type === 'review' ? '📚総説' : '📰論文');
+          return `
+            <label class="flex items-start gap-2 cursor-pointer hover:bg-indigo-50/70 p-1.5 rounded-lg transition select-none">
+              <input type="checkbox" class="sa-paper-cb mt-0.5 rounded text-indigo-600 cursor-pointer" value="${escapeHtmlSafe(idStr)}" ${isChecked ? 'checked' : ''} />
+              <span class="text-[11px] text-slate-700 leading-snug">
+                <strong class="text-indigo-900">[${escapeHtmlSafe(p.date || '')} ${badge}]</strong> ${escapeHtmlSafe(p.title_ja || p.title_en || '無題の論文')}
+              </span>
+            </label>
+          `;
+        }).join('');
+      };
+
+      function setupResearchStrategyAgentUI() {
+        const allButtons = Array.from(document.querySelectorAll('button, a'));
+        const tab3Btn = allButtons.find(el =>
+          /3\.\s*アーカイブ横断/.test(el.textContent || '') ||
+          (el.getAttribute('onclick') || '').includes('synthesis')
+        );
+        const otherTabBtns = allButtons.filter(el =>
+          /^[12]\.\s*/.test((el.textContent || '').trim())
+        );
+
+        if (tab3Btn) {
+          tab3Btn.innerHTML = '3. 🧭 研究戦略・課題解決AI';
+        }
+
+        let agentPanel = document.getElementById('strategy-agent-embedded-view');
+        if (!agentPanel) {
+          agentPanel = document.createElement('section');
+          agentPanel.id = 'strategy-agent-embedded-view';
+          agentPanel.className = 'hidden max-w-7xl mx-auto px-4 sm:px-6 py-6';
+          agentPanel.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+              <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white">
+                <div>
+                  <h2 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+                    <span>🧭 研究戦略・世界課題解決 AIエージェント（アーカイブ横断統合）</span>
+                  </h2>
+                  <p class="text-xs text-indigo-200 mt-0.5">アーカイブ内の蓄積論文 × 最新の世界課題検索を自律統合し、研究の方向性・社会的意義・実行計画を立案します</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button id="sa-export-pdf-btn" class="hidden px-3.5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition cursor-pointer">
+                    🖨️ 計画書をPDF出力
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                <div class="lg:col-span-5 p-5 space-y-4 bg-slate-50/80">
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">1. ターゲットとする世界・社会課題の領域</label>
+                    <select id="sa-domain-select" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white font-semibold text-slate-800">
+                      <option value="global_brain_heart">脳神経疾患・認知症の急増と早期バイオマーカー開発</option>
+                      <option value="preventive_cardio">超高齢社会における循環器・自律神経失調の非侵襲予見</option>
+                      <option value="closed_loop_neuromod">次世代クローズドループ神経制御・ニューロモジュレーション</option>
+                      <option value="global_health_equity">医療リソース不足地域でも使える低コスト・カフレス生体計測</option>
+                      <option value="custom">自由記述で課題・テーマを指定する</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">2. あなたのコア技術・研究リソース（編集可）</label>
+                    <textarea
+                      id="sa-core-assets"
+                      rows="4"
+                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
+                    >・脳波(EEG)と心拍変動(HRV)の脳-心臓連関（Brain-Heart Interactions）解析
+・非線形ダイナミクス（Fast Sample Entropy、サロゲートデータ検定、ポアンカレプロット）
+・リザバー計算（RC）とKoopman作用素理論を組み合わせた非線形状態空間の線形化・制御
+・光電容積脈波（PPG）・脈波伝播時間（PAT）を用いた非侵襲・カフレス血圧推定、起立負荷試験・GABA介入実験</textarea>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <label class="text-xs font-extrabold text-slate-700">3. 根拠として統合するアーカイブ論文（選択可）</label>
+                      <div class="flex items-center gap-2">
+                        <button type="button" id="sa-reload-papers" class="text-[11px] font-bold text-slate-600 hover:text-indigo-700 cursor-pointer">🔄 再読込</button>
+                        <button type="button" id="sa-toggle-all-papers" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer">すべて選択/解除</button>
+                      </div>
+                    </div>
+                    <div id="sa-archive-paper-checklist" class="max-h-44 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2 space-y-1 text-xs"></div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">4. 重点的に解決したい問い・制約条件（任意）</label>
+                    <textarea
+                      id="sa-focus-prompt"
+                      rows="2"
+                      placeholder="例：今後2年間で国際トップジャーナル論文と科研費申請書につながる、社会実装性の高い計画を立ててほしい。"
+                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
+                    ></textarea>
+                  </div>
+
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                      <input id="sa-use-web-search" type="checkbox" checked class="rounded text-indigo-600" />
+                      <span>🌐 Google検索で最新の世界課題・国際動向をリアルタイム調査する</span>
+                    </label>
+                  </div>
+
+                  <button
+                    id="sa-run-agent-btn"
+                    class="w-full py-3 px-4 rounded-xl bg-indigo-700 hover:bg-indigo-600 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>🚀 自律エージェントを起動して研究計画を立案</span>
+                  </button>
+                </div>
+
+                <div id="sa-output-area" class="lg:col-span-7 p-5 sm:p-6 bg-white space-y-5">
+                  <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-14 px-4">
+                    <div class="text-4xl mb-3">🧭</div>
+                    <p class="text-sm font-bold text-slate-700 mb-1">アーカイブ横断の論文知見 × 最新の世界課題から研究戦略を設計します</p>
+                    <p class="text-xs leading-relaxed max-w-lg">
+                      左側の論文リストとターゲット課題を確認して「🚀 自律エージェントを起動」を押すと、<strong>①世界課題の定義と解決アーキテクチャ、②研究の学術的・社会的意義、③フェーズ別実行計画</strong>を自動生成します。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          const mainHost = document.querySelector('main') || document.body;
+          mainHost.appendChild(agentPanel);
+        }
+
+        window.renderArchivePaperChecklist();
+
+        document.getElementById('sa-reload-papers').onclick = () => {
+          window.renderArchivePaperChecklist();
+        };
+
+        document.getElementById('sa-toggle-all-papers').onclick = () => {
+          const cbs = Array.from(document.querySelectorAll('.sa-paper-cb'));
+          const anyUnchecked = cbs.some(cb => !cb.checked);
+          cbs.forEach(cb => { cb.checked = anyUnchecked; });
+        };
+
+        function getLegacySynthesisContainers() {
+          return Array.from(document.querySelectorAll('[id*="synth" i], [id*="archive" i], [id*="cross" i]'))
+            .filter(el => el.id !== 'strategy-agent-embedded-view' && el.id !== 'sa-archive-paper-checklist' && el.tagName !== 'BUTTON');
+        }
+
+        function showEmbeddedStrategyAgent() {
+          window.renderArchivePaperChecklist();
+          const feedEl = document.getElementById('feedAndClinicalContainer');
+          const readerEl = document.getElementById('fullTextReaderContainer');
+          if (feedEl) feedEl.classList.add('hidden');
+          if (readerEl) readerEl.classList.add('hidden');
+          getLegacySynthesisContainers().forEach(el => el.classList.add('hidden'));
+          agentPanel.classList.remove('hidden');
+        }
+
+        function hideEmbeddedStrategyAgent() {
+          agentPanel.classList.add('hidden');
+        }
+
+        if (typeof window.switchView === 'function' && !window._strategySwitchWrapped) {
+          const origSwitchView = window.switchView;
+          window.switchView = function(viewName) {
+            origSwitchView.apply(this, arguments);
+            if (viewName === 'synthesis') {
+              showEmbeddedStrategyAgent();
+            } else {
+              hideEmbeddedStrategyAgent();
+            }
+          };
+          window._strategySwitchWrapped = true;
+        }
+
+        if (tab3Btn) {
+          tab3Btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            otherTabBtns.forEach(b => {
+              b.classList.remove('bg-indigo-600', 'text-white', 'bg-slate-900');
+            });
+            tab3Btn.classList.add('bg-indigo-600', 'text-white');
+            showEmbeddedStrategyAgent();
+          }, true);
+        }
+
+        otherTabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (tab3Btn) tab3Btn.classList.remove('bg-indigo-600', 'text-white');
+            hideEmbeddedStrategyAgent();
+          }, true);
+        });
+
+        let latestStrategyPlan = null;
+
+        document.getElementById('sa-export-pdf-btn').onclick = () => {
+          if (!latestStrategyPlan) return;
+          const p = latestStrategyPlan;
+          const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+          const today = new Date().toISOString().slice(0, 10);
+
+          const win = window.open('', '_blank', 'width=920,height=780');
+          if (!win) {
+            alert('ポップアップがブロックされました。許可してから再度お試しください。');
+            return;
+          }
+          win.document.write(`
+            <!DOCTYPE html>
+            <html lang="ja">
+            <head>
+              <meta charset="UTF-8" />
+              <title>研究戦略・世界課題解決プロポーザル (${today})</title>
+              <style>
+                @page { size: A4; margin: 16mm; }
+                body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; color: #1e293b; line-height: 1.65; font-size: 11.5px; }
+                h1 { font-size: 18px; color: #0f172a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; }
+                h2 { font-size: 13.5px; color: #1e3a8a; background: #eff6ff; padding: 5px 10px; border-left: 4px solid #2563eb; margin-top: 16px; }
+                .box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; break-inside: avoid; }
+                .en-grant { font-family: Arial, sans-serif; background: #f8fafc; border-left: 3px solid #059669; padding: 8px 10px; font-size: 11px; margin-top: 6px; }
+              </style>
+            </head>
+            <body>
+              <h1>🧭 研究戦略・世界課題解決プロポーザル（${today}）</h1>
+              <div class="box"><strong>研究ビジョン：</strong>${esc(p.vision_title)}<br><strong>ターゲット課題：</strong>${esc(p.global_challenge_analysis)}</div>
+              <h2>1. 研究の学術的意義と社会的インパクト</h2>
+              <div class="box">${esc(p.scientific_and_social_significance)}
+                ${p.english_grant_abstract ? `<div class="en-grant"><strong>[English Proposal Summary]</strong><br>${esc(p.english_grant_abstract)}</div>` : ''}
+              </div>
+              <h2>2. 世界課題を解決する技術アーキテクチャ（3つの解決策）</h2>
+              ${(p.solution_pillars || []).map((s, i) => `
+                <div class="box"><strong>解決策 ${i + 1}: ${esc(s.title)}</strong><br>${esc(s.mechanism)}<br><em>期待される社会効果：</em>${esc(s.impact)}</div>
+              `).join('')}
+              <h2>3. 段階的研究実行計画（ロードマップ）</h2>
+              ${(p.research_roadmap || []).map(r => `
+                <div class="box"><strong>${esc(r.phase)}（${esc(r.duration)}）: ${esc(r.objective)}</strong><br>
+                ・具体的タスク: ${esc(r.tasks)}<br>
+                ・到達目標 / 論文・成果物: ${esc(r.deliverable)}</div>
+              `).join('')}
+              <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); };<\/script>
+            </body>
+            </html>
+          `);
+          win.document.close();
+        };
+
+        window.saveStrategyAbstractToNotes = function(btnEl) {
+          if (!latestStrategyPlan || typeof window.addEnglishStudyNote !== 'function') return;
+          window.addEnglishStudyNote({
+            category: 'ライティング表現',
+            pattern: `研究戦略・グラント要旨: ${latestStrategyPlan.vision_title || ''}`,
+            en: latestStrategyPlan.english_grant_abstract || '',
+            ja: latestStrategyPlan.scientific_and_social_significance || '',
+            analysis: `【ターゲット世界課題】\n${latestStrategyPlan.global_challenge_analysis || ''}`
+          });
+          btnEl.textContent = '✓ ノート保存済';
+        };
+
+        document.getElementById('sa-run-agent-btn').onclick = async () => {
+          const apiKey = (localStorage.getItem('USER_GEMINI_API_KEY') || '').trim();
+          if (!apiKey) {
+            alert('先にGemini APIキーを設定してください（右下の「📄 任意PDFをアーカイブに追加・解読」から入力できます）。');
+            document.getElementById('pdf-decoder-modal')?.classList.remove('hidden');
+            return;
+          }
+
+          const domainEl = document.getElementById('sa-domain-select');
+          const domainLabel = domainEl.options[domainEl.selectedIndex].text;
+          const coreAssets = document.getElementById('sa-core-assets').value.trim();
+          const focusPrompt = document.getElementById('sa-focus-prompt').value.trim();
+          const useWebSearch = document.getElementById('sa-use-web-search').checked;
+          const outEl = document.getElementById('sa-output-area');
+
+          const checkedIds = new Set(
+            Array.from(document.querySelectorAll('.sa-paper-cb:checked')).map(cb => cb.value)
+          );
+          const archiveItems = getArchiveItemsSafe();
+          const selectedPapers = archiveItems.filter(p => checkedIds.has(String(p.id)));
+
+          const archiveSummary = selectedPapers.map((p, idx) =>
+            `[${idx + 1}] ${p.title_en} (${p.journal}): 課題=${(p.problem || '').slice(0, 120)} / 手法=${(p.method || '').slice(0, 120)}`
+          ).join('\n');
+
+          outEl.innerHTML = `
+            <div class="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-6 space-y-3">
+              <div class="flex items-center gap-2.5 text-indigo-950 font-extrabold text-sm">
+                <span class="animate-spin inline-block text-lg">⚙️</span>
+                <span>選択されたアーカイブ論文（${selectedPapers.length}本）と世界課題を統合分析中...</span>
+              </div>
+              <div class="text-xs text-slate-600 leading-relaxed">
+                ${useWebSearch ? '・Google検索グラウンディングで最新の国際課題を調査しています<br>' : ''}
+                ・コア技術と先行研究のギャップを統合し、研究ロードマップを設計しています...
+              </div>
+            </div>
+          `;
+
+          const agentPrompt = `
+生体医工学・神経科学・非線形制御工学の研究戦略ディレクターとして、以下の情報から世界課題を解決する研究計画を策定してください。
+【課題領域】${domainLabel}
+【コア技術】${coreAssets}
+${focusPrompt ? `【追加要望】${focusPrompt}` : ''}
+${archiveSummary ? `【根拠論文】\n${archiveSummary}` : ''}
+
+以下の単一JSONのみ出力:
+{
+  "vision_title": "研究ビジョンタイトル（日本語・35字以内）",
+  "global_challenge_analysis": "世界課題の現状と研究の必然性（日本語・3〜4文）",
+  "scientific_and_social_significance": "学術的意義と社会的インパクト（日本語・4〜5文）",
+  "english_grant_abstract": "English grant summary (100-130 words)",
+  "solution_pillars": [
+    { "title": "解決策1", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
+    { "title": "解決策2", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
+    { "title": "解決策3", "mechanism": "技術的仕組み", "impact": "社会的インパクト" }
+  ],
+  "research_roadmap": [
+    { "phase": "Phase 1: 基礎数理・アルゴリズム確立", "duration": "1〜6ヶ月目", "objective": "到達目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
+    { "phase": "Phase 2: 生理実験・データ実証", "duration": "7〜14ヶ月目", "objective": "到達目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
+    { "phase": "Phase 3: 臨床応用・社会実装", "duration": "15〜24ヶ月目", "objective": "到達目標", "tasks": "具体タスク", "deliverable": "論文・成果物" }
+  ],
+  "potential_risks_and_mitigations": [
+    { "risk": "想定リスク", "mitigation": "具体的対策" }
+  ]
+}
+`;
+
+          try {
+            const parsed = await callGeminiLowCostJson(apiKey, agentPrompt, {
+              timeoutMs: 45000,
+              maxOutputTokens: 4096,
+              temperature: 0.3,
+              useWebSearch: useWebSearch
+            });
+
+            if (!parsed || !parsed.vision_title) {
+              throw new Error('研究計画の生成に失敗しました。再度お試しください。');
+            }
+
+            latestStrategyPlan = parsed;
+            document.getElementById('sa-export-pdf-btn').classList.remove('hidden');
+
+            const pillarsHTML = (parsed.solution_pillars || []).map((s, idx) => `
+              <div class="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 space-y-1.5">
+                <div class="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px]">解決策 ${idx + 1}</span>
+                  <span>${escapeHtmlSafe(s.title)}</span>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed"><strong>技術メカニズム：</strong>${escapeHtmlSafe(s.mechanism)}</p>
+                <p class="text-xs text-teal-900 bg-teal-50/80 px-2.5 py-1.5 rounded-lg border border-teal-100"><strong>期待される社会効果：</strong>${escapeHtmlSafe(s.impact)}</p>
+              </div>
+            `).join('');
+
+            const roadmapHTML = (parsed.research_roadmap || []).map((r) => `
+              <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs sm:text-sm font-extrabold text-slate-900">${escapeHtmlSafe(r.phase)}</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900">${escapeHtmlSafe(r.duration)}</span>
+                </div>
+                <div class="text-xs font-bold text-indigo-800">🎯 到達目標：${escapeHtmlSafe(r.objective)}</div>
+                <p class="text-xs text-slate-700 leading-relaxed"><strong>具体タスク：</strong>${escapeHtmlSafe(r.tasks)}</p>
+                <div class="text-xs text-emerald-900 bg-emerald-50/80 px-2.5 py-1 rounded border border-emerald-100">
+                  <strong>📄 成果物・論文アウトプット：</strong>${escapeHtmlSafe(r.deliverable)}
+                </div>
+              </div>
+            `).join('');
+
+            const risksHTML = (parsed.potential_risks_and_mitigations || []).map(rk => `
+              <div class="text-xs bg-amber-50/70 border border-amber-200/80 rounded-lg p-2.5">
+                <span class="font-bold text-amber-950">⚠️ ${escapeHtmlSafe(rk.risk)}：</span>
+                <span class="text-slate-700">${escapeHtmlSafe(rk.mitigation)}</span>
+              </div>
+            `).join('');
+
+            outEl.innerHTML = `
+              <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 space-y-2 shadow-md">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Strategic Research Vision</div>
+                <h4 class="text-base sm:text-lg font-extrabold leading-snug">${escapeHtmlSafe(parsed.vision_title)}</h4>
+                <p class="text-xs text-slate-200 leading-relaxed pt-1">${escapeHtmlSafe(parsed.global_challenge_analysis)}</p>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🏛️ 研究の学術的意義と社会的インパクト</h5>
+                  <button onclick="saveStrategyAbstractToNotes(this)" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">
+                    📓 英語要旨をノート保存
+                  </button>
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed">${escapeHtmlSafe(parsed.scientific_and_social_significance)}</p>
+                ${parsed.english_grant_abstract ? `
+                  <div class="bg-white rounded-xl border border-slate-200 p-3 text-xs font-sans text-slate-900 leading-relaxed">
+                    <div class="text-[10px] font-bold text-indigo-600 mb-1">ENGLISH GRANT / PAPER SUMMARY</div>
+                    ${escapeHtmlSafe(parsed.english_grant_abstract)}
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="space-y-2.5">
+                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">💡 世界課題を解決する3つの技術アプローチ</h5>
+                <div class="grid grid-cols-1 gap-3">${pillarsHTML}</div>
+              </div>
+
+              <div class="space-y-2.5">
+                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🗓️ 段階的研究実行計画（ロードマップ）</h5>
+                <div class="space-y-3">${roadmapHTML}</div>
+              </div>
+
+              ${risksHTML ? `
+                <div class="space-y-2">
+                  <h5 class="text-xs font-extrabold text-slate-700">🛡️ 想定される技術的リスクと回避策</h5>
+                  <div class="space-y-1.5">${risksHTML}</div>
+                </div>
+              ` : ''}
+            `;
+          } catch (err) {
+            outEl.innerHTML = `
+              <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+                ❌ エージェント実行エラー: ${escapeHtmlSafe(err.message)}
+              </div>
+            `;
+          }
+        };
+      }
+
+      // =========================================================================
+      // 📄 超省コスト・高速 PDF全文解読エンジン（日本語のみ出力＋思考オフ＋並列処理）
+      // =========================================================================
       function setupPdfDecoderUI() {
         if (!window.pdfjsLib) {
           const sc = document.createElement('script');
@@ -4927,11 +5293,11 @@ ${jaText}
         modal.innerHTML = `
           <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-200 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-3">
-              <h3 class="text-lg font-bold text-slate-900">📄 任意論文PDF アーカイブ追加・全文解読</h3>
+              <h3 class="text-lg font-bold text-slate-900">📄 任意論文PDF アーカイブ追加・全文解読（省コスト高速版）</h3>
               <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none cursor-pointer">&times;</button>
             </div>
             <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-              論文PDFをドロップすると、<strong>Scientific Reports等の無題Introductionも含め全セクションを1段落も省略せずバッチ抽出（API消費最小化）</strong>し、Google Drive 連携済みの場合は自動保存します。
+              英文分割をブラウザ側で行い、AIには<strong>日本語訳のみを出力させる省コスト設計（従来比 約1/10以下のトークン消費・約1分で完了）</strong>で全文・図表を抽出します。
             </p>
             <div class="mb-3">
               <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini APIキー（ブラウザ内のみに保存・外部送信なし）</label>
@@ -4994,7 +5360,6 @@ ${jaText}
         keyInput.value = localStorage.getItem('USER_GEMINI_API_KEY') || '';
         keyInput.addEventListener('change', () => {
           localStorage.setItem('USER_GEMINI_API_KEY', keyInput.value.trim());
-          window.dailyQuotaExhaustedModels.clear();
         });
 
         btn.onclick = () => {
@@ -5070,7 +5435,7 @@ ${jaText}
             }
 
             if (pageHits.length > 0 && Object.keys(extractedFigures).length < 16) {
-              const renderScale = 1.65;
+              const renderScale = 1.4;
               const hiViewport = page.getViewport({ scale: renderScale });
               const fullCanvas = document.createElement('canvas');
               fullCanvas.width = hiViewport.width;
@@ -5109,7 +5474,7 @@ ${jaText}
                 extractedFigures[hit.label] = {
                   label: hit.label,
                   page: i,
-                  imageUrl: cropCanvas.toDataURL('image/jpeg', 0.82)
+                  imageUrl: cropCanvas.toDataURL('image/jpeg', 0.78)
                 };
               }
             }
@@ -5126,108 +5491,6 @@ ${jaText}
           }
 
           return { fullText: fullText.trim(), extractedFigures };
-        }
-
-        async function fetchWithTimeout(url, options, timeoutMs = 75000) {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), timeoutMs);
-          try {
-            return await fetch(url, { ...options, signal: controller.signal });
-          } finally {
-            clearTimeout(timer);
-          }
-        }
-
-        async function getAvailableGeminiModels(apiKey) {
-          // 無料枠の1日リクエスト上限が高い flash-lite 系を最優先し、RPD枯渇を防ぐ
-          const preferred = [
-            'gemini-3.8-flash-lite',
-            'gemini-3.8-flash',
-            'gemini-3.5-flash',
-            'gemini-3-flash-preview',
-            'gemini-3.0-flash'
-          ];
-          try {
-            const res = await fetchWithTimeout(
-              `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
-              {},
-              10000
-            );
-            if (!res.ok) return preferred;
-            const data = await res.json();
-            const available = (data.models || [])
-              .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-              .map(m => m.name.replace('models/', ''))
-              .filter(n => n.includes('gemini') && !n.includes('2.0') && !n.includes('2.5') && !n.includes('embedding') && !n.includes('imagen'));
-
-            const ordered = preferred.filter(m => available.includes(m));
-            for (const m of available.sort().reverse()) {
-              if (!ordered.includes(m) && !m.includes('pro')) ordered.push(m);
-            }
-            const active = ordered.filter(m => !window.dailyQuotaExhaustedModels.has(m));
-            return active.length > 0 ? active : (ordered.length > 0 ? ordered : preferred);
-          } catch (_) {
-            return preferred;
-          }
-        }
-
-        async function callGeminiJsonWithFallback(apiKey, models, prompt, timeoutMs = 75000) {
-          let lastErr = '';
-          const candidateList = models.filter(m => !window.dailyQuotaExhaustedModels.has(m));
-          const tryList = candidateList.length > 0 ? candidateList : models;
-
-          for (const modelName of tryList) {
-            try {
-              const apiRes = await fetchWithTimeout(
-                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                      responseMimeType: 'application/json',
-                      temperature: 0.1,
-                      maxOutputTokens: 32768
-                    }
-                  })
-                },
-                timeoutMs
-              );
-
-              if (apiRes.ok) {
-                const resJson = await apiRes.json();
-                const text = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                const parsed = JSON.parse(text);
-                return Array.isArray(parsed) ? (parsed[0] || {}) : (parsed || {});
-              } else {
-                const errJson = await apiRes.json().catch(() => ({}));
-                lastErr = errJson.error?.message || `API Error: ${apiRes.status}`;
-                if (apiRes.status === 429) {
-                  // 1日あたりの上限（PerDay / limit: 20）の場合はそのモデルを即座にスキップリストへ登録
-                  if (/PerDay|per day|limit:\s*20/i.test(lastErr)) {
-                    window.dailyQuotaExhaustedModels.add(modelName);
-                    continue;
-                  }
-                  // 分間レート制限（RPM）の場合は4秒待機してリトライ
-                  await new Promise(r => setTimeout(r, 4000));
-                  continue;
-                }
-                if ([404, 500, 503].includes(apiRes.status)) {
-                  await new Promise(r => setTimeout(r, 800));
-                  continue;
-                }
-                throw new Error(lastErr);
-              }
-            } catch (e) {
-              if (e.name === 'AbortError') {
-                lastErr = `${modelName} がタイムアウトしました`;
-                continue;
-              }
-              throw e;
-            }
-          }
-          throw new Error(lastErr || 'APIの無料枠上限に達しました。Google AI Studioで請求設定を有効にするか、別プロジェクトのAPIキーをお試しください。');
         }
 
         function findAnchorPosition(fullText, anchorStr, fallbackHeading, searchFromIdx = 0) {
@@ -5265,7 +5528,7 @@ ${jaText}
           localStorage.setItem('USER_GEMINI_API_KEY', apiKey);
 
           statusBox.classList.remove('hidden');
-          statusBox.textContent = '1/3 PDFから全ページの本文テキストと図（Fig.）・表（Table）を抽出しています...';
+          statusBox.textContent = '1/3 PDFから本文と図表を抽出中...';
 
           try {
             const { fullText: rawPdfText, extractedFigures } = await extractTextAndFiguresFromPdf(file);
@@ -5273,54 +5536,47 @@ ${jaText}
               throw new Error('PDFからテキストを抽出できませんでした（スキャン画像PDFの可能性があります）。');
             }
 
-            const candidateModels = await getAvailableGeminiModels(apiKey);
             const detectedFigLabels = Object.keys(extractedFigures);
 
             // =================================================================
-            // STEP 1: 全セクション目次マップ生成（1リクエスト）
+            // STEP 1: メタデータ・要約・セクション見出しマップを取得（思考オフ・省トークン）
             // =================================================================
-            statusBox.textContent = '2/3 論文全体の構造マップと要約を解析中...';
+            statusBox.textContent = '2/3 論文構造マップと要約を解析中（省コストモード）...';
 
             const outlinePrompt = `
-あなたは生体医工学・神経科学・非線形制御工学の専門研究者です。
-以下は査読済み論文PDFから抽出した全文テキストです。
+査読済み論文の全文テキストから、メタデータ・要約・全セクション目次マップを抽出してください。
+【注意】Scientific Reports / Nature 等の論文で「Introduction」見出しがなくアブストラクト直後から導入本文が始まる場合は、必ず "title_en": "Introduction"（"title_ja": "1. 序論（導入部）"）を先頭に入れ、"start_anchor" に導入第1文の冒頭6〜8単語を原文そのまま入れてください。
 
-【タスク】
-1. 論文のタイトル・ジャーナル・DOI・4項目要約・重要用語辞書を作成してください。
-2. **この論文に存在する「すべてのセクションおよびサブセクション」を、先頭から出現順に1つも抜かさずリストアップしてください（ReferencesやEthics等の末尾事務欄は除く）。**
-   - **Scientific Reports / Nature 等の論文で「Introduction」見出しがなくアブストラクト直後から導入本文が始まる場合は、必ず "title_en": "Introduction"（"title_ja": "1. 序論（導入部）"）を先頭に追加し、"start_anchor" に導入部第1文の冒頭6〜8単語をPDF原文そのまま入れてください。**
-   - 各項目の "start_anchor" には、そのセクションの冒頭6〜8単語をPDF原文から一字一句そのままコピーして入れてください。
-
-以下の単一JSONオブジェクトのみを出力してください。
+以下の単一JSONのみ出力:
 {
   "title_en": "英語タイトル",
   "title_ja": "日本語タイトル",
   "journal": "ジャーナル名・年",
-  "doi": "DOI（あれば）",
-  "tags": ["タグ1", "タグ2", "タグ3", "タグ4"],
-  "problem": "従来研究の課題と本研究の目的（日本語）",
-  "solution_and_method": "提案手法・実験プロトコル・数理モデル（日本語）",
-  "formula_block": "$$主要な数式（LaTeX）$$",
-  "key_results": "PDF本文に記載された定量的結果・統計値（日本語）",
-  "discussion_and_implications": "考察と意義（日本語）",
-  "relevance_to_my_research": "脳心臓点過程モデル・非線形HRV・RC+Koopman制御への応用ヒント（日本語）",
+  "doi": "DOI",
+  "tags": ["タグ1", "タグ2", "タグ3"],
+  "problem": "課題と目的（日本語・2〜3文）",
+  "solution_and_method": "提案手法・実験プロトコル（日本語・2〜3文）",
+  "formula_block": "$$主要数式(LaTeX)$$",
+  "key_results": "定量的結果・統計値（日本語・2〜3文）",
+  "discussion_and_implications": "考察と意義（日本語・2〜3文）",
+  "relevance_to_my_research": "脳心臓連関・非線形HRV・RC+Koopman制御への応用（日本語・2文）",
   "section_outline": [
-    {
-      "title_en": "元の英語セクション見出し",
-      "title_ja": "その日本語訳",
-      "start_anchor": "PDF原文の冒頭6〜8単語"
-    }
+    { "title_en": "見出し", "title_ja": "見出し日本語訳", "start_anchor": "原文冒頭6〜8単語" }
   ],
   "vocabulary": {
-    "term_lowercase": { "ipa": "/.../", "pos": "noun", "ja": "日本語訳", "meaning": "日本語訳", "nuance": "用法解説" }
+    "term_lowercase": { "ipa": "/.../", "pos": "noun", "ja": "訳", "meaning": "訳", "nuance": "解説" }
   }
 }
 
-【PDF全文テキスト】
-${rawPdfText.slice(0, 90000)}
+【PDFテキスト】
+${rawPdfText.slice(0, 75000)}
 `;
 
-            const metaParsed = await callGeminiJsonWithFallback(apiKey, candidateModels, outlinePrompt, 65000);
+            const metaParsed = await callGeminiLowCostJson(apiKey, outlinePrompt, {
+              timeoutMs: 40000,
+              maxOutputTokens: 3072,
+              temperature: 0.1
+            });
 
             if (metaParsed.vocabulary && typeof ACADEMIC_GLOSSARY !== 'undefined') {
               Object.entries(metaParsed.vocabulary).forEach(([k, v]) => {
@@ -5379,7 +5635,7 @@ ${rawPdfText.slice(0, 90000)}
                 }
               }
             } else {
-              const chunkSize = 13500;
+              const chunkSize = 14000;
               const cleanBody = rawPdfText.slice(0, bodyEndPos);
               let part = 1;
               for (let pos = 0; pos < cleanBody.length; pos += chunkSize) {
@@ -5394,165 +5650,176 @@ ${rawPdfText.slice(0, 90000)}
             }
 
             // =================================================================
-            // 短いセクションを約14,000文字単位のバッチに束ねてAPI呼び出し回数を最小化（約2〜3回）
+            // STEP 2: ブラウザ側で英文を番号付き1文配列へ事前分割し、AIには「日本語訳のみ」を並列生成させる
             // =================================================================
-            const MAX_BATCH_CHARS = 14000;
-            const batches = [];
-            let currentBatch = [];
-            let currentBatchLen = 0;
+            const preparedSections = sectionSlices.map(sec => {
+              const enSents = splitEnglishTextIntoSentences(sec.rawText);
+              return {
+                ...sec,
+                enSentences: enSents.length > 0 ? enSents : [sec.rawText]
+              };
+            });
 
-            for (const sec of sectionSlices) {
-              if (sec.rawText.length > MAX_BATCH_CHARS) {
-                if (currentBatch.length > 0) {
-                  batches.push(currentBatch);
-                  currentBatch = [];
-                  currentBatchLen = 0;
-                }
-                for (let p = 0; p < sec.rawText.length; p += MAX_BATCH_CHARS) {
-                  batches.push([{
-                    id: sec.id,
-                    title_en: sec.title_en,
-                    title_ja: sec.title_ja,
-                    rawText: sec.rawText.slice(p, p + MAX_BATCH_CHARS)
-                  }]);
-                }
-              } else if (currentBatchLen + sec.rawText.length > MAX_BATCH_CHARS && currentBatch.length > 0) {
-                batches.push(currentBatch);
-                currentBatch = [sec];
-                currentBatchLen = sec.rawText.length;
-              } else {
-                currentBatch.push(sec);
-                currentBatchLen += sec.rawText.length;
+            // 1バッチあたり最大75文（約11,000〜14,000文字）にまとめてタスク化
+            const MAX_SENTS_PER_CALL = 75;
+            const translationTasks = [];
+
+            for (const sec of preparedSections) {
+              for (let startIdx = 0; startIdx < sec.enSentences.length; startIdx += MAX_SENTS_PER_CALL) {
+                const sliceSents = sec.enSentences.slice(startIdx, startIdx + MAX_SENTS_PER_CALL);
+                translationTasks.push({
+                  secId: sec.id,
+                  titleEn: sec.title_en,
+                  startIdx,
+                  enList: sliceSents,
+                  isFirstChunkOfSec: startIdx === 0
+                });
               }
             }
-            if (currentBatch.length > 0) batches.push(currentBatch);
 
-            // =================================================================
-            // STEP 2: バッチ単位で全セクションの1文ごと対訳を生成（全文網羅＋最小リクエスト数）
-            // =================================================================
-            const sectionMap = new Map();
-            for (const sec of sectionSlices) {
-              sectionMap.set(sec.id, {
+            statusBox.textContent = `3/3 全 ${preparedSections.length} セクションの日本語対訳を省コスト並列生成中（計 ${translationTasks.length} バッチ）...`;
+
+            const figHintText = detectedFigLabels.length > 0
+              ? `検出済み図表: ${detectedFigLabels.join(', ')}`
+              : '図表なし';
+
+            // 最大3並列で高速処理（英語を再出力させないため1バッチあたりわずか1,500〜2,500出力トークン）
+            const taskResults = new Array(translationTasks.length);
+            let completedTasks = 0;
+
+            async function runTask(tIdx) {
+              const task = translationTasks[tIdx];
+              const numberedLines = task.enList.map((s, i) => `[${i + 1}] ${s}`).join('\n');
+
+              const jaOnlyPrompt = `
+生体医工学・神経科学の専門家として、以下の番号付き英文 [1]〜[${task.enList.length}] をすべて1文も省略せずに忠実な学術日本語へ翻訳してください。
+【重要】コスト削減のため、英語原文は絶対に出力せず、日本語訳の配列 "ja_list"（要素数 ${task.enList.length} 個、順番厳守）だけを出力してください。
+
+以下の単一JSONのみ出力:
+{
+  "ja_list": [
+    "[1]の日本語訳",
+    "[2]の日本語訳"
+  ],
+  "figure_refs": [
+    { "label": "Fig. 1", "caption_ja": "図の簡潔な日本語説明" }
+  ],
+  "takeaways": [
+    "このセクションの要点1",
+    "このセクションの要点2"
+  ],
+  "writing_expressions": [
+    { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
+  ]
+}
+
+【セクション: ${task.titleEn}】
+${figHintText}
+${numberedLines}
+`;
+              const resObj = await callGeminiLowCostJson(apiKey, jaOnlyPrompt, {
+                timeoutMs: 45000,
+                maxOutputTokens: 6144,
+                temperature: 0.1
+              });
+              taskResults[tIdx] = resObj;
+              completedTasks++;
+              statusBox.textContent = `3/3 全文対訳を生成中 (${completedTasks}/${translationTasks.length} バッチ完了)...`;
+            }
+
+            const CONCURRENCY = 3;
+            let nextTaskIdx = 0;
+            const workers = Array.from({ length: Math.min(CONCURRENCY, translationTasks.length) }, async () => {
+              while (nextTaskIdx < translationTasks.length) {
+                const currentIdx = nextTaskIdx++;
+                await runTask(currentIdx);
+              }
+            });
+            await Promise.all(workers);
+
+            // 結果をセクションごとに組み立て（5文ごとに1段落ブロックへ整理して読みやすく表示）
+            const sectionResultMap = new Map();
+            for (const sec of preparedSections) {
+              sectionResultMap.set(sec.id, {
                 id: sec.id,
                 title_en: sec.title_en,
                 title_ja: sec.title_ja,
-                paragraphs: [],
-                figures: [],
+                jaSentences: new Array(sec.enSentences.length).fill(''),
+                enSentences: sec.enSentences,
+                figRefs: [],
                 takeaways: [],
-                writing_expressions: [],
+                writing_expressions: []
+              });
+            }
+
+            translationTasks.forEach((task, tIdx) => {
+              const secObj = sectionResultMap.get(task.secId);
+              const res = taskResults[tIdx] || {};
+              const jaArr = Array.isArray(res.ja_list) ? res.ja_list : [];
+
+              for (let i = 0; i < task.enList.length; i++) {
+                const cleanJa = String(jaArr[i] || '').replace(/^\[\d+\]\s*/, '').trim();
+                secObj.jaSentences[task.startIdx + i] = cleanJa || '（※翻訳取得漏れ）';
+              }
+              if (Array.isArray(res.figure_refs)) secObj.figRefs.push(...res.figure_refs);
+              if (Array.isArray(res.takeaways)) secObj.takeaways.push(...res.takeaways);
+              if (Array.isArray(res.writing_expressions)) secObj.writing_expressions.push(...res.writing_expressions);
+            });
+
+            const normalizedSections = [];
+            const usedLabels = new Set();
+
+            for (const secObj of sectionResultMap.values()) {
+              const SENTS_PER_PARA = 5;
+              const paragraphs = [];
+              for (let i = 0; i < secObj.enSentences.length; i += SENTS_PER_PARA) {
+                const chunkSents = [];
+                for (let j = i; j < Math.min(i + SENTS_PER_PARA, secObj.enSentences.length); j++) {
+                  chunkSents.push({
+                    en: secObj.enSentences[j],
+                    ja: secObj.jaSentences[j]
+                  });
+                }
+                paragraphs.push({
+                  en: chunkSents.map(s => s.en).join(' '),
+                  ja: chunkSents.map(s => s.ja).join(''),
+                  sentences: chunkSents
+                });
+              }
+
+              const figs = [];
+              for (const ref of secObj.figRefs) {
+                const rawLabel = String(ref?.label || '');
+                const numMatch = rawLabel.match(/(\d+)/);
+                const isTable = /table/i.test(rawLabel);
+                const normLabel = numMatch
+                  ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
+                  : rawLabel;
+
+                const imgObj = extractedFigures[normLabel];
+                if (imgObj && !usedLabels.has(normLabel)) {
+                  usedLabels.add(normLabel);
+                  figs.push({
+                    label: normLabel,
+                    page: imgObj.page,
+                    imageUrl: imgObj.imageUrl,
+                    captionJa: ref?.caption_ja || ''
+                  });
+                }
+              }
+
+              normalizedSections.push({
+                id: secObj.id,
+                title_en: secObj.title_en,
+                title_ja: secObj.title_ja,
+                paragraphs,
+                figures: figs,
+                takeaways: secObj.takeaways.length > 0 ? secObj.takeaways.slice(0, 5) : [`${secObj.title_ja} の全文対訳です。`],
+                writing_expressions: secObj.writing_expressions.slice(0, 3),
                 diagram_svg: '',
                 section_svg: ''
               });
             }
-
-            const usedLabels = new Set();
-            const figHintText = detectedFigLabels.length > 0
-              ? `検出済み図表ラベル一覧: ${detectedFigLabels.join(', ')}`
-              : '図表ラベル未検出';
-
-            for (let bIdx = 0; bIdx < batches.length; bIdx++) {
-              const batch = batches[bIdx];
-              const batchNames = batch.map(s => s.title_en).join(' / ');
-              statusBox.textContent = `3/3 全文精読データをバッチ生成中 (${bIdx + 1}/${batches.length}: ${batchNames})...`;
-
-              const combinedInput = batch.map(s =>
-                `=== SECTION_ID: ${s.id} | TITLE: ${s.title_en} ===\n${s.rawText}`
-              ).join('\n\n');
-
-              const batchPrompt = `
-あなたは生体医工学・神経科学・非線形制御工学の専門研究者兼バイリンガル翻訳者です。
-以下は論文の複数セクションをまとめた実際の英文テキストです。
-
-【絶対厳守ルール（1文たりとも省略・要約・スキップ禁止）】
-1. **入力に含まれるすべての SECTION_ID について、それぞれの原文に含まれるすべての段落・すべての文を最初から最後まで1文も飛ばさずに順番通り翻訳してください。**
-   - 要約したり途中の文を省いたりすることは厳禁です。
-   - "sentences" 配列には、各段落の英文を**1文ずつ**切り分けた "en"（原文そのまま）と "ja"（忠実な学術日本語訳）を1対1で入れてください。
-2. 各セクション内で言及されている図や表（${figHintText}）があれば "figure_refs" にラベルと日本語解説を入れてください。
-3. 各セクションの重要ポイント（"takeaways"：3〜4個）と、学術英語表現（"writing_expressions"：1〜2個）も出力してください。
-
-以下の単一JSONオブジェクトのみを出力してください。
-{
-  "sections": [
-    {
-      "id": "入力で指定されたSECTION_ID（例: sec-1）",
-      "paragraphs": [
-        {
-          "sentences": [
-            { "en": "第1文の英語原文そのまま.", "ja": "第1文の正確な日本語訳。" }
-          ]
-        }
-      ],
-      "figure_refs": [
-        { "label": "Fig. 1", "caption_ja": "図1の日本語解説" }
-      ],
-      "takeaways": [
-        "このセクションの重要ポイント1",
-        "このセクションの重要ポイント2"
-      ],
-      "writing_expressions": [
-        { "pattern": "英語構文パターン", "example": "本文中の例文", "note": "日本語解説" }
-      ]
-    }
-  ]
-}
-
-【対象セクション原文】
-${combinedInput}
-`;
-              const batchResult = await callGeminiJsonWithFallback(apiKey, candidateModels, batchPrompt, 75000);
-              const returnedSecs = Array.isArray(batchResult.sections) ? batchResult.sections : [];
-
-              for (const rSec of returnedSecs) {
-                const target = sectionMap.get(rSec.id) || sectionMap.get(batch[0]?.id);
-                if (!target) continue;
-
-                if (Array.isArray(rSec.paragraphs)) {
-                  for (const para of rSec.paragraphs) {
-                    const sents = Array.isArray(para.sentences)
-                      ? para.sentences.filter(s => s && (s.en || s.ja))
-                      : ((para.en || para.ja) ? [{ en: para.en || '', ja: para.ja || '' }] : []);
-                    if (sents.length > 0) {
-                      target.paragraphs.push({
-                        en: sents.map(s => s.en).join(' '),
-                        ja: sents.map(s => s.ja).join(''),
-                        sentences: sents
-                      });
-                    }
-                  }
-                }
-                if (Array.isArray(rSec.takeaways)) {
-                  target.takeaways.push(...rSec.takeaways);
-                }
-                if (Array.isArray(rSec.writing_expressions)) {
-                  target.writing_expressions.push(...rSec.writing_expressions);
-                }
-                if (Array.isArray(rSec.figure_refs)) {
-                  for (const ref of rSec.figure_refs) {
-                    const rawLabel = String(ref?.label || '');
-                    const numMatch = rawLabel.match(/(\d+)/);
-                    const isTable = /table/i.test(rawLabel);
-                    const normLabel = numMatch
-                      ? (isTable ? `Table ${numMatch[1]}` : `Fig. ${numMatch[1]}`)
-                      : rawLabel;
-                    const imgObj = extractedFigures[normLabel];
-                    if (imgObj && !usedLabels.has(normLabel)) {
-                      usedLabels.add(normLabel);
-                      target.figures.push({
-                        label: normLabel,
-                        page: imgObj.page,
-                        imageUrl: imgObj.imageUrl,
-                        captionJa: ref?.caption_ja || ''
-                      });
-                    }
-                  }
-                }
-              }
-            }
-
-            const normalizedSections = Array.from(sectionMap.values()).map(sec => ({
-              ...sec,
-              takeaways: sec.takeaways.length > 0 ? sec.takeaways : [`${sec.title_ja} の全文対訳です。`]
-            }));
 
             const remainingFigs = Object.values(extractedFigures).filter(f => !usedLabels.has(f.label));
             if (remainingFigs.length > 0 && normalizedSections.length > 0) {
@@ -5674,6 +5941,9 @@ ${combinedInput}
             if (savedPaperObj) {
               syncPaperToGoogleDrive(savedPaperObj);
             }
+            if (typeof window.renderArchivePaperChecklist === 'function') {
+              window.renderArchivePaperChecklist();
+            }
             if (typeof ensureValidSelection === 'function') ensureValidSelection();
             if (typeof renderAll === 'function') renderAll();
             setTimeout(() => {
@@ -5684,7 +5954,7 @@ ${combinedInput}
               (acc, s) => acc + s.paragraphs.reduce((a, p) => a + (p.sentences?.length || 0), 0),
               0
             );
-            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を抽出しました（API消費: 計 ${batches.length + 1} 回）`;
+            statusBox.textContent = `✅ 完了！全 ${normalizedSections.length} セクション / 計 ${totalSents} 文を省コスト抽出しました`;
             setTimeout(() => {
               modal.classList.add('hidden');
               statusBox.classList.add('hidden');
@@ -5695,490 +5965,6 @@ ${combinedInput}
         }
       }
 
-      // =========================================================================
-      // 🧭 「3. アーカイブ横断」統合型・研究戦略＆世界課題解決AIエージェント
-      // =========================================================================
-      function setupResearchStrategyAgentUI() {
-        // 1. ナビゲーションの「3. アーカイブ横断」タブを特定してラベルを更新
-        const allButtons = Array.from(document.querySelectorAll('button, a'));
-        const tab3Btn = allButtons.find(el =>
-          /3\.\s*アーカイブ横断/.test(el.textContent || '') ||
-          (el.getAttribute('onclick') || '').includes('synthesis')
-        );
-        const otherTabBtns = allButtons.filter(el =>
-          /^[12]\.\s*/.test((el.textContent || '').trim())
-        );
-
-        if (tab3Btn) {
-          tab3Btn.innerHTML = '3. 🧭 研究戦略・課題解決AI';
-        }
-
-        // 2. メイン画面内に専用ワークスペースコンテナを作成
-        let agentPanel = document.getElementById('strategy-agent-embedded-view');
-        if (!agentPanel) {
-          agentPanel = document.createElement('section');
-          agentPanel.id = 'strategy-agent-embedded-view';
-          agentPanel.className = 'hidden max-w-7xl mx-auto px-4 sm:px-6 py-6';
-          agentPanel.innerHTML = `
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-              <!-- ヘッダー -->
-              <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white">
-                <div>
-                  <h2 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
-                    <span>🧭 研究戦略・世界課題解決 AIエージェント（アーカイブ横断統合）</span>
-                  </h2>
-                  <p class="text-xs text-indigo-200 mt-0.5">アーカイブ内の蓄積論文 × 最新の世界課題検索を自律統合し、研究の方向性・社会的意義・実行計画を立案します</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button id="sa-export-pdf-btn" class="hidden px-3.5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition cursor-pointer">
-                    🖨️ 計画書をPDF出力
-                  </button>
-                </div>
-              </div>
-
-              <!-- 2ペイン本体 -->
-              <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-                <!-- 左カラム：入力・アーカイブ選択 -->
-                <div class="lg:col-span-5 p-5 space-y-4 bg-slate-50/80">
-                  <div>
-                    <label class="block text-xs font-extrabold text-slate-700 mb-1">1. ターゲットとする世界・社会課題の領域</label>
-                    <select id="sa-domain-select" class="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl bg-white font-semibold text-slate-800">
-                      <option value="global_brain_heart">脳神経疾患・認知症の急増と早期バイオマーカー開発</option>
-                      <option value="preventive_cardio">超高齢社会における循環器・自律神経失調の非侵襲予見</option>
-                      <option value="closed_loop_neuromod">次世代クローズドループ神経制御・ニューロモジュレーション</option>
-                      <option value="global_health_equity">医療リソース不足地域でも使える低コスト・カフレス生体計測</option>
-                      <option value="custom">自由記述で課題・テーマを指定する</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-extrabold text-slate-700 mb-1">2. あなたのコア技術・研究リソース（編集可）</label>
-                    <textarea
-                      id="sa-core-assets"
-                      rows="4"
-                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
-                    >・脳波(EEG)と心拍変動(HRV)の脳-心臓連関（Brain-Heart Interactions）解析
-・非線形ダイナミクス（Fast Sample Entropy、サロゲートデータ検定、ポアンカレプロット）
-・リザバー計算（RC）とKoopman作用素理論を組み合わせた非線形状態空間の線形化・制御
-・光電容積脈波（PPG）・脈波伝播時間（PAT）を用いた非侵襲・カフレス血圧推定、起立負荷試験・GABA介入実験</textarea>
-                  </div>
-
-                  <div>
-                    <div class="flex items-center justify-between mb-1">
-                      <label class="text-xs font-extrabold text-slate-700">3. 根拠として統合するアーカイブ論文（選択可）</label>
-                      <button type="button" id="sa-toggle-all-papers" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer">すべて選択/解除</button>
-                    </div>
-                    <div id="sa-archive-paper-checklist" class="max-h-36 overflow-y-auto bg-white border border-slate-200 rounded-xl p-2.5 space-y-1.5 text-xs"></div>
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-extrabold text-slate-700 mb-1">4. 重点的に解決したい問い・制約条件（任意）</label>
-                    <textarea
-                      id="sa-focus-prompt"
-                      rows="2"
-                      placeholder="例：今後2年間で国際トップジャーナル論文と科研費申請書につながる、社会実装性の高い計画を立ててほしい。"
-                      class="w-full p-2.5 text-xs border border-slate-300 rounded-xl bg-white leading-relaxed focus:outline-none focus:border-indigo-600"
-                    ></textarea>
-                  </div>
-
-                  <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs">
-                    <label class="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
-                      <input id="sa-use-web-search" type="checkbox" checked class="rounded text-indigo-600" />
-                      <span>🌐 Google検索で最新の世界課題・国際動向をリアルタイム調査する</span>
-                    </label>
-                  </div>
-
-                  <button
-                    id="sa-run-agent-btn"
-                    class="w-full py-3 px-4 rounded-xl bg-indigo-700 hover:bg-indigo-600 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>🚀 自律エージェントを起動して研究計画を立案</span>
-                  </button>
-                </div>
-
-                <!-- 右カラム：出力結果 -->
-                <div id="sa-output-area" class="lg:col-span-7 p-5 sm:p-6 bg-white space-y-5">
-                  <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 py-14 px-4">
-                    <div class="text-4xl mb-3">🧭</div>
-                    <p class="text-sm font-bold text-slate-700 mb-1">アーカイブ横断の論文知見 × 最新の世界課題から研究戦略を設計します</p>
-                    <p class="text-xs leading-relaxed max-w-lg">
-                      左側の論文リストとターゲット課題を確認して「🚀 自律エージェントを起動」を押すと、<strong>①世界課題の定義と解決アーキテクチャ、②研究の学術的・社会的意義、③フェーズ別実行計画</strong>を自動生成します。
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-
-          // メインコンテンツ領域の適切な位置に挿入
-          const mainHost = document.querySelector('main') || document.body;
-          mainHost.appendChild(agentPanel);
-        }
-
-        // アーカイブ内の論文一覧をチェックリストに描画する関数
-        function renderArchivePaperChecklist() {
-          const listEl = document.getElementById('sa-archive-paper-checklist');
-          if (!listEl || !Array.isArray(items)) return;
-          if (items.length === 0) {
-            listEl.innerHTML = '<div class="text-slate-400 text-[11px] py-2 text-center">アーカイブに論文がありません</div>';
-            return;
-          }
-          listEl.innerHTML = items.map((p, idx) => `
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded">
-              <input type="checkbox" class="sa-paper-cb mt-0.5 rounded text-indigo-600" value="${escapeHtmlSafe(p.id)}" ${idx < 8 ? 'checked' : ''} />
-              <span class="text-[11px] text-slate-700 leading-snug line-clamp-2">
-                <strong class="text-indigo-900">[${escapeHtmlSafe(p.date || '')}]</strong> ${escapeHtmlSafe(p.title_ja || p.title_en)}
-              </span>
-            </label>
-          `).join('');
-        }
-
-        document.getElementById('sa-toggle-all-papers').onclick = () => {
-          const cbs = Array.from(document.querySelectorAll('.sa-paper-cb'));
-          const anyUnchecked = cbs.some(cb => !cb.checked);
-          cbs.forEach(cb => { cb.checked = anyUnchecked; });
-        };
-
-        // 従来の「アーカイブ横断」用コンテナ（もし存在すれば）を特定
-        function getLegacySynthesisContainers() {
-          return Array.from(document.querySelectorAll('[id*="synth" i], [id*="archive" i], [id*="cross" i]'))
-            .filter(el => el.id !== 'strategy-agent-embedded-view' && el.tagName !== 'BUTTON');
-        }
-
-        function showEmbeddedStrategyAgent() {
-          renderArchivePaperChecklist();
-          // 既存のメインビュー要素を一時非表示にしてエージェント画面を表示
-          const feedEl = document.getElementById('feedAndClinicalContainer');
-          const readerEl = document.getElementById('fullTextReaderContainer');
-          if (feedEl) feedEl.classList.add('hidden');
-          if (readerEl) readerEl.classList.add('hidden');
-          getLegacySynthesisContainers().forEach(el => el.classList.add('hidden'));
-          agentPanel.classList.remove('hidden');
-        }
-
-        function hideEmbeddedStrategyAgent() {
-          agentPanel.classList.add('hidden');
-        }
-
-        if (tab3Btn) {
-          tab3Btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // タブのアクティブ見た目も切り替え
-            otherTabBtns.forEach(b => {
-              b.classList.remove('bg-indigo-600', 'text-white', 'bg-slate-900');
-            });
-            tab3Btn.classList.add('bg-indigo-600', 'text-white');
-            showEmbeddedStrategyAgent();
-          }, true);
-        }
-
-        otherTabBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            if (tab3Btn) tab3Btn.classList.remove('bg-indigo-600', 'text-white');
-            hideEmbeddedStrategyAgent();
-          }, true);
-        });
-
-        let latestStrategyPlan = null;
-
-        document.getElementById('sa-export-pdf-btn').onclick = () => {
-          if (!latestStrategyPlan) return;
-          const p = latestStrategyPlan;
-          const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-          const today = new Date().toISOString().slice(0, 10);
-
-          const win = window.open('', '_blank', 'width=920,height=780');
-          if (!win) {
-            alert('ポップアップがブロックされました。許可してから再度お試しください。');
-            return;
-          }
-          win.document.write(`
-            <!DOCTYPE html>
-            <html lang="ja">
-            <head>
-              <meta charset="UTF-8" />
-              <title>研究戦略・世界課題解決プロポーザル (${today})</title>
-              <style>
-                @page { size: A4; margin: 16mm; }
-                body { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; color: #1e293b; line-height: 1.65; font-size: 11.5px; }
-                h1 { font-size: 18px; color: #0f172a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 14px; }
-                h2 { font-size: 13.5px; color: #1e3a8a; background: #eff6ff; padding: 5px 10px; border-left: 4px solid #2563eb; margin-top: 16px; }
-                .box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; break-inside: avoid; }
-                .en-grant { font-family: Arial, sans-serif; background: #f8fafc; border-left: 3px solid #059669; padding: 8px 10px; font-size: 11px; margin-top: 6px; }
-              </style>
-            </head>
-            <body>
-              <h1>🧭 研究戦略・世界課題解決プロポーザル（${today}）</h1>
-              <div class="box"><strong>研究ビジョン：</strong>${esc(p.vision_title)}<br><strong>ターゲット課題：</strong>${esc(p.global_challenge_analysis)}</div>
-              <h2>1. 研究の学術的意義と社会的インパクト</h2>
-              <div class="box">${esc(p.scientific_and_social_significance)}
-                ${p.english_grant_abstract ? `<div class="en-grant"><strong>[English Proposal Summary]</strong><br>${esc(p.english_grant_abstract)}</div>` : ''}
-              </div>
-              <h2>2. 世界課題を解決する技術アーキテクチャ（3つの解決策）</h2>
-              ${(p.solution_pillars || []).map((s, i) => `
-                <div class="box"><strong>解決策 ${i + 1}: ${esc(s.title)}</strong><br>${esc(s.mechanism)}<br><em>期待される社会効果：</em>${esc(s.impact)}</div>
-              `).join('')}
-              <h2>3. 段階的研究実行計画（ロードマップ）</h2>
-              ${(p.research_roadmap || []).map(r => `
-                <div class="box"><strong>${esc(r.phase)}（${esc(r.duration)}）: ${esc(r.objective)}</strong><br>
-                ・具体的タスク: ${esc(r.tasks)}<br>
-                ・到達目標 / 論文・成果物: ${esc(r.deliverable)}</div>
-              `).join('')}
-              <script>window.onload = function() { setTimeout(function() { window.print(); }, 250); };<\/script>
-            </body>
-            </html>
-          `);
-          win.document.close();
-        };
-
-        window.saveStrategyAbstractToNotes = function(btnEl) {
-          if (!latestStrategyPlan || typeof window.addEnglishStudyNote !== 'function') return;
-          window.addEnglishStudyNote({
-            category: 'ライティング表現',
-            pattern: `研究戦略・グラント要旨: ${latestStrategyPlan.vision_title || ''}`,
-            en: latestStrategyPlan.english_grant_abstract || '',
-            ja: latestStrategyPlan.scientific_and_social_significance || '',
-            analysis: `【ターゲット世界課題】\n${latestStrategyPlan.global_challenge_analysis || ''}`
-          });
-          btnEl.textContent = '✓ ノート保存済';
-        };
-
-        document.getElementById('sa-run-agent-btn').onclick = async () => {
-          const apiKey = (localStorage.getItem('USER_GEMINI_API_KEY') || '').trim();
-          if (!apiKey) {
-            alert('先にGemini APIキーを設定してください（右下の「📄 任意PDFをアーカイブに追加・解読」から入力できます）。');
-            document.getElementById('pdf-decoder-modal')?.classList.remove('hidden');
-            return;
-          }
-
-          const domainEl = document.getElementById('sa-domain-select');
-          const domainLabel = domainEl.options[domainEl.selectedIndex].text;
-          const coreAssets = document.getElementById('sa-core-assets').value.trim();
-          const focusPrompt = document.getElementById('sa-focus-prompt').value.trim();
-          const useWebSearch = document.getElementById('sa-use-web-search').checked;
-          const outEl = document.getElementById('sa-output-area');
-
-          const checkedIds = new Set(
-            Array.from(document.querySelectorAll('.sa-paper-cb:checked')).map(cb => cb.value)
-          );
-          const selectedPapers = Array.isArray(items)
-            ? items.filter(p => checkedIds.has(p.id))
-            : [];
-
-          const archiveSummary = selectedPapers.map((p, idx) =>
-            `[${idx + 1}] ${p.title_en} (${p.journal}): 課題=${(p.problem || '').slice(0, 140)} / 手法=${(p.method || '').slice(0, 140)} / 結果=${(p.results || '').slice(0, 140)}`
-          ).join('\n');
-
-          outEl.innerHTML = `
-            <div class="rounded-2xl border border-indigo-200 bg-indigo-50/60 p-6 space-y-3">
-              <div class="flex items-center gap-2.5 text-indigo-950 font-extrabold text-sm">
-                <span class="animate-spin inline-block text-lg">⚙️</span>
-                <span>選択されたアーカイブ論文（${selectedPapers.length}本）と世界規模の未解決課題を統合分析中...</span>
-              </div>
-              <div class="text-xs text-slate-600 leading-relaxed">
-                ${useWebSearch ? '・Google検索グラウンディングで最新の国際医療・ニューロテック課題を調査しています<br>' : ''}
-                ・あなたのコア技術と先行研究のギャップを統合し、実行可能な研究ロードマップを設計しています（約10〜20秒）...
-              </div>
-            </div>
-          `;
-
-          const agentPrompt = `
-あなたは世界トップクラスの研究戦略ディレクター（PI）・科学技術政策アドバイザー兼、生体医工学・神経科学・非線形制御工学の専門家です。
-以下の【研究者のコア技術】【選択されたアーカイブ論文群】【ターゲット世界課題】を自律的に統合分析し、世界が現在抱えている重要課題を解決するための研究戦略・社会的意義・段階的実行計画を策定してください。
-
-【ターゲットとする世界・社会課題領域】
-${domainLabel}
-
-【研究者のコア技術・実験資産】
-${coreAssets}
-
-${focusPrompt ? `【追加の重点テーマ・要望】\n${focusPrompt}\n` : ''}
-${archiveSummary ? `【アーカイブから選択された根拠論文群】\n${archiveSummary}\n` : ''}
-
-【策定すべき内容（すべて具体的・論理的かつ実践的に記述すること）】
-1. vision_title: この研究が目指す核心的ビジョンを表すタイトル（日本語・35字以内）
-2. global_challenge_analysis: 世界が現在直面している具体的課題の現状（疫学・医療負荷・既存技術の限界）と、なぜ今この研究が必要なのかの分析（日本語・4〜6文）
-3. scientific_and_social_significance: 学術的な新規性（ブレイクスルー）と、医療・社会への波及効果（科研費や国際グラントの「研究目的・意義」にそのまま使える水準の日本語・5〜7文）
-4. english_grant_abstract: 上記の研究ビジョンと意義をまとめた、国際グラント・トップジャーナル向けの洗練された英語サマリー（120〜160語）
-5. solution_pillars: 世界課題を解決するための具体的な技術アプローチ・解決策（必ず3つ）
-   - title: 解決策の名称
-   - mechanism: コア技術（非線形解析・状態空間モデル・生体フォトニクス等）や選択論文の知見をどう組み合わせて解決するかの技術的仕組み
-   - impact: 実現した際の定量的・社会的インパクト
-6. research_roadmap: 実現に向けた段階的な研究計画（必ず3フェーズ：Phase 1 基礎数理・アルゴリズム確立、Phase 2 生理実験・データ実証、Phase 3 臨床応用・社会実装）
-   - phase: フェーズ名
-   - duration: 想定期間（例: 1〜6ヶ月目）
-   - objective: 到達目標
-   - tasks: 具体的な実験・解析・検証タスク
-   - deliverable: 期待される成果物（投稿論文テーマ・オープンソースツール・プロトタイプ等）
-7. potential_risks_and_mitigations: 研究遂行上の技術的リスク（個人差・アーチファクト・サンプルサイズ等）とその回避策（2〜3点）
-
-以下の単一JSONオブジェクトのみを出力してください（Markdownのコードブロック記号は不要です）。
-{
-  "vision_title": "研究ビジョンタイトル",
-  "global_challenge_analysis": "世界課題の現状と必然性",
-  "scientific_and_social_significance": "学術的意義と社会的インパクト",
-  "english_grant_abstract": "English summary of vision and significance...",
-  "solution_pillars": [
-    { "title": "解決策1", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
-    { "title": "解決策2", "mechanism": "技術的仕組み", "impact": "社会的インパクト" },
-    { "title": "解決策3", "mechanism": "技術的仕組み", "impact": "社会的インパクト" }
-  ],
-  "research_roadmap": [
-    { "phase": "Phase 1: ...", "duration": "1〜6ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
-    { "phase": "Phase 2: ...", "duration": "7〜14ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" },
-    { "phase": "Phase 3: ...", "duration": "15〜24ヶ月目", "objective": "目標", "tasks": "具体タスク", "deliverable": "論文・成果物" }
-  ],
-  "potential_risks_and_mitigations": [
-    { "risk": "想定リスク", "mitigation": "具体的対策" }
-  ]
-}
-`;
-
-          try {
-            const models = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3-flash-preview', 'gemini-3.8-flash-lite'];
-            let parsed = null;
-            let lastErr = '';
-
-            for (const m of models) {
-              const controller = new AbortController();
-              const timer = setTimeout(() => controller.abort(), 50000);
-              try {
-                const bodyObj = {
-                  contents: [{ parts: [{ text: agentPrompt }] }],
-                  generationConfig: {
-                    temperature: 0.3,
-                    maxOutputTokens: 16384
-                  }
-                };
-                if (useWebSearch) {
-                  bodyObj.tools = [{ google_search: {} }];
-                } else {
-                  bodyObj.generationConfig.responseMimeType = 'application/json';
-                }
-
-                const res = await fetch(
-                  `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(apiKey)}`,
-                  {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    signal: controller.signal,
-                    body: JSON.stringify(bodyObj)
-                  }
-                );
-                clearTimeout(timer);
-
-                if (res.ok) {
-                  const json = await res.json();
-                  let rawText = json.candidates?.[0]?.content?.parts?.map(pt => pt.text || '').join('') || '';
-                  rawText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-                  const firstBrace = rawText.indexOf('{');
-                  const lastBrace = rawText.lastIndexOf('}');
-                  if (firstBrace !== -1 && lastBrace !== -1) {
-                    rawText = rawText.slice(firstBrace, lastBrace + 1);
-                  }
-                  const obj = JSON.parse(rawText);
-                  parsed = Array.isArray(obj) ? obj[0] : obj;
-                  break;
-                } else {
-                  const errData = await res.json().catch(() => ({}));
-                  lastErr = errData.error?.message || `HTTP ${res.status}`;
-                }
-              } catch (e) {
-                clearTimeout(timer);
-                lastErr = e.message;
-              }
-            }
-
-            if (!parsed || !parsed.vision_title) {
-              throw new Error(lastErr || '研究計画の生成に失敗しました。再度お試しください。');
-            }
-
-            latestStrategyPlan = parsed;
-            document.getElementById('sa-export-pdf-btn').classList.remove('hidden');
-
-            const pillarsHTML = (parsed.solution_pillars || []).map((s, idx) => `
-              <div class="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 space-y-1.5">
-                <div class="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px]">解決策 ${idx + 1}</span>
-                  <span>${escapeHtmlSafe(s.title)}</span>
-                </div>
-                <p class="text-xs text-slate-700 leading-relaxed"><strong>技術メカニズム：</strong>${escapeHtmlSafe(s.mechanism)}</p>
-                <p class="text-xs text-teal-900 bg-teal-50/80 px-2.5 py-1.5 rounded-lg border border-teal-100"><strong>期待される社会効果：</strong>${escapeHtmlSafe(s.impact)}</p>
-              </div>
-            `).join('');
-
-            const roadmapHTML = (parsed.research_roadmap || []).map((r) => `
-              <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs space-y-1.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span class="text-xs sm:text-sm font-extrabold text-slate-900">${escapeHtmlSafe(r.phase)}</span>
-                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900">${escapeHtmlSafe(r.duration)}</span>
-                </div>
-                <div class="text-xs font-bold text-indigo-800">🎯 到達目標：${escapeHtmlSafe(r.objective)}</div>
-                <p class="text-xs text-slate-700 leading-relaxed"><strong>具体タスク：</strong>${escapeHtmlSafe(r.tasks)}</p>
-                <div class="text-xs text-emerald-900 bg-emerald-50/80 px-2.5 py-1 rounded border border-emerald-100">
-                  <strong>📄 成果物・論文アウトプット：</strong>${escapeHtmlSafe(r.deliverable)}
-                </div>
-              </div>
-            `).join('');
-
-            const risksHTML = (parsed.potential_risks_and_mitigations || []).map(rk => `
-              <div class="text-xs bg-amber-50/70 border border-amber-200/80 rounded-lg p-2.5">
-                <span class="font-bold text-amber-950">⚠️ ${escapeHtmlSafe(rk.risk)}：</span>
-                <span class="text-slate-700">${escapeHtmlSafe(rk.mitigation)}</span>
-              </div>
-            `).join('');
-
-            outEl.innerHTML = `
-              <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 space-y-2 shadow-md">
-                <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Strategic Research Vision</div>
-                <h4 class="text-base sm:text-lg font-extrabold leading-snug">${escapeHtmlSafe(parsed.vision_title)}</h4>
-                <p class="text-xs text-slate-200 leading-relaxed pt-1">${escapeHtmlSafe(parsed.global_challenge_analysis)}</p>
-              </div>
-
-              <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-2.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🏛️ 研究の学術的意義と社会的インパクト</h5>
-                  <button onclick="saveStrategyAbstractToNotes(this)" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">
-                    📓 英語要旨をノート保存
-                  </button>
-                </div>
-                <p class="text-xs text-slate-700 leading-relaxed">${escapeHtmlSafe(parsed.scientific_and_social_significance)}</p>
-                ${parsed.english_grant_abstract ? `
-                  <div class="bg-white rounded-xl border border-slate-200 p-3 text-xs font-sans text-slate-900 leading-relaxed">
-                    <div class="text-[10px] font-bold text-indigo-600 mb-1">ENGLISH GRANT / PAPER SUMMARY</div>
-                    ${escapeHtmlSafe(parsed.english_grant_abstract)}
-                  </div>
-                ` : ''}
-              </div>
-
-              <div class="space-y-2.5">
-                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">💡 世界課題を解決する3つの技術アプローチ</h5>
-                <div class="grid grid-cols-1 gap-3">${pillarsHTML}</div>
-              </div>
-
-              <div class="space-y-2.5">
-                <h5 class="text-xs sm:text-sm font-extrabold text-slate-900">🗓️ 段階的研究実行計画（ロードマップ）</h5>
-                <div class="space-y-3">${roadmapHTML}</div>
-              </div>
-
-              ${risksHTML ? `
-                <div class="space-y-2">
-                  <h5 class="text-xs font-extrabold text-slate-700">🛡️ 想定される技術的リスクと回避策</h5>
-                  <div class="space-y-1.5">${risksHTML}</div>
-                </div>
-              ` : ''}
-            `;
-          } catch (err) {
-            outEl.innerHTML = `
-              <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
-                ❌ エージェント実行エラー: ${escapeHtmlSafe(err.message)}
-              </div>
-            `;
-          }
-        };
-      }
-
       initApp();
       setupVocabPopup();
       setupSelectionExplainerUI();
@@ -6187,8 +5973,17 @@ ${archiveSummary ? `【アーカイブから選択された根拠論文群】\n$
       setupGoogleDriveSyncUI();
       setupResearchStrategyAgentUI();
       setupPdfDecoderUI();
-      loadRemoteManifest();
-      setTimeout(() => renderMathInTarget(document.body), 350);
+      loadRemoteManifest().then(() => {
+        if (typeof window.renderArchivePaperChecklist === 'function') {
+          window.renderArchivePaperChecklist();
+        }
+      });
+      setTimeout(() => {
+        renderMathInTarget(document.body);
+        if (typeof window.renderArchivePaperChecklist === 'function') {
+          window.renderArchivePaperChecklist();
+        }
+      }, 600);
     });
   </script>
 </body>
