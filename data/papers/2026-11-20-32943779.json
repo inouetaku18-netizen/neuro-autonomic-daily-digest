@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-20-32943779",
+  "entry_type": "daily_paper",
+  "date": "2026-11-20",
+  "pmid": "32943779",
+  "pmcid": "PMC8991985",
+  "doi_url": "https://doi.org/10.1038/s41583-020-0360-9",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/32943779/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8991985/",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "Nature reviews. Neuroscience (2020)",
+  "impact_factor": 33.7,
+  "doi": "10.1038/s41583-020-0360-9",
+  "title_en": "Locus coeruleus: a new look at the blue spot.",
+  "title_ja": "青斑核：青い斑点への新たな視点",
+  "tags": [
+    "Locus Coeruleus",
+    "Noradrenaline",
+    "Autonomic Arousal",
+    "Neural Circuits"
+  ],
+  "summary": {
+    "problem": "脳幹深部に位置する青斑核（LC）は脳機能に重大な影響を持つにもかかわらず、その小ささと複雑さから60年以上にわたり詳細な組織構成や機能的解明が困難であったこと。",
+    "solution_and_method": "最新の先端神経科学ツール（オプトジェネティクスや新規トレーシング技術等）によって得られた青斑核の解剖学的構造、投射パターン、神経活動に関する知見を統合してレビューした。",
+    "formula_block": "$$\\text{LC}_{\\text{out}} = g\\left(\\sum W_{\\text{arousal}} \\cdot X_{\\text{brainstem}} + \\sum W_{\\text{cognitive}} \\cdot X_{\\text{forebrain}}\\right)$$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 32943779</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41583-020-0360-9</text>\n</svg>",
+    "key_results": "全LCニューロンが自律神経性覚醒（autonomic arousal）入力を受け取る一方で、特定のニューロン亜集団が前脳からの入力により固有の認知プロセスを符号化していること、また投射パターンと受容体分布の不均一性により標的特異的な制御を行っていることが示された。",
+    "discussion_and_implications": "青斑核は単一の均一な全体覚醒スイッチではなく、標的ネットワークごとに高度に特異的な修飾を行う構造であり、認知および自律神経調節の統合的理解に不可欠である。",
+    "relevance_to_my_research": "青斑核が自律神経性覚醒信号の受容と特異的認知制御の双方を担うという知見は、瞳孔径・心拍変動と中枢認知状態を結ぶ脳-心臓連関モデリングにおいて中核となる神経基盤情報である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 32943779</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1038/s41583-020-0360-9</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "The locus coeruleus (LC), or 'blue spot', is a small nucleus located deep in the brainstem that provides the far-reaching noradrenergic neurotransmitter system of the brain. This phylogenetically conserved nucleus has proved relatively intractable to full characterization, despite more than 60 years of concerted efforts by investigators. Recently, an array of powerful new neuroscience tools have provided unprecedented access to this elusive nucleus, revealing new levels of organization and function. We are currently at the threshold of major discoveries regarding how this tiny brainstem structure exerts such varied and significant influences over brain function and behaviour. All LC neurons receive inputs related to autonomic arousal, but distinct subpopulations of those neurons can encode specific cognitive processes, presumably through more specific inputs from the forebrain areas. This ability, combined with specific patterns of innervation of target areas and heterogeneity in receptor distributions, suggests that activation of the LC has more specific influences on target networks than had initially been imagined.",
+            "ja": "青斑核（LC）、別名「青い斑点（blue spot）」は、脳幹の深部に位置する小さな神経核であり、脳内の広範に及ぶノルアドレナリン作動性神経伝達物質システムを供給している。この系統発生学的に保存された核は、研究者たちによる60年以上にわたる協調的な努力にもかかわらず、完全な特性評価が比較的困難であることが判明していた。近年、一連の強力な新しい神経科学ツールにより、この捉えどころのない核への前例のないアクセスが可能となり、新たなレベルの組織化と機能が明らかになってきた。我々は現在、この極小の脳幹構造が脳機能および行動に対してどのように多様で重大な影響を及ぼしているかに関する、主要な発見の閾値に立っている。すべてのLCニューロンは自律神経性覚醒に関連する入力を受け取るが、それらのニューロンの個別の亜集団は、おそらく前脳領域からのより特異的な入力を介して、特定の認知プロセスをコードすることができる。この能力は、標的領域への特異的な投射パターンおよび受容体分布の不均一性と相まって、LCの活性化が標的ネットワークに対して当初想定されていたよりも特異的な影響を及ぼしていることを示唆している。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "locus coeruleus": {
+      "ipa": "/ˈloʊkəs sɪˈruːliəs/",
+      "pos": "noun",
+      "ja": "青斑核",
+      "nuance": "脳幹橋背側に位置し、全脳にノルアドレナリンを投射する中核的な自律神経・覚醒調節核。"
+    },
+    "noradrenergic": {
+      "ipa": "/ˌnɔːrædrəˈnɜːdʒɪk/",
+      "pos": "adjective",
+      "ja": "ノルアドレナリン作動性の",
+      "nuance": "ノルアドレナリン（ノルエピネフリン）を神経伝達物質として産生・放出・作用することに関連する性質。"
+    },
+    "phylogenetically": {
+      "ipa": "/ˌfaɪloʊdʒəˈnɛtɪkli/",
+      "pos": "adverb",
+      "ja": "系統発生学的に",
+      "nuance": "生物種の進化や系統樹上の歴史的発展に関連して。"
+    },
+    "innervation": {
+      "ipa": "/ˌɪnɜːˈveɪʃən/",
+      "pos": "noun",
+      "ja": "神経支配、神経投射",
+      "nuance": "神経線維が特定の組織・器官・標的脳領域に分布・連絡すること。"
+    },
+    "heterogeneity": {
+      "ipa": "/ˌhɛtərəʊdʒəˈneɪəti/",
+      "pos": "noun",
+      "ja": "不均一性、異質性",
+      "nuance": "一見均一に見える神経細胞集団や受容体分布において、特性や構成が多様であること。"
+    }
+  }
+}

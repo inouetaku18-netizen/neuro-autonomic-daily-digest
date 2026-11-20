@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-20-40016003",
+  "entry_type": "daily_paper",
+  "date": "2026-11-20",
+  "pmid": "40016003",
+  "pmcid": "PMC12058390",
+  "doi_url": "https://doi.org/10.1016/j.tics.2025.02.001",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40016003/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12058390/",
+  "category": "ai_control",
+  "category_label": "④ AI・数理神経制御",
+  "journal": "Trends in cognitive sciences (2025)",
+  "impact_factor": 11.2,
+  "doi": "10.1016/j.tics.2025.02.001",
+  "title_en": "The devilish details affecting TDRL models in dopamine research.",
+  "title_ja": "ドーパミン研究における時間差分強化学習モデルに影響を与える細部の問題",
+  "tags": [
+    "Temporal Difference Learning",
+    "Dopamine",
+    "Reinforcement Learning",
+    "Neural Modeling"
+  ],
+  "summary": {
+    "problem": "ドーパミンの神経活動を説明する時間差分強化学習（TDRL）モデルに対し、その妥当性を疑問視する研究が増加しているが、アルゴリズムの実装詳細や状態空間の設計差異が十分に区別されていないこと。",
+    "solution_and_method": "TDRLアルゴリズム群の実装・予測の多様性を踏まえ、行動表現や神経回路の複雑性を捉える状態空間およびモデル構造の重要性を示す具体的事例を理論的に検討・論述した。",
+    "formula_block": "$$\\delta_t = r_{t+1} + \\gamma V(s_{t+1}) - V(s_t)$$",
+    "diagram_caption": "④ AI・数理神経制御 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40016003</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tics.2025.02.001</text>\n</svg>",
+    "key_results": "TDRLは広範なアルゴリズムの総称であり、単一のモデルとして批判・評価するのではなく、状態空間の表現法やアーキテクチャの細部を神経系の実態に合わせて同定することの重要性が具体例を通じて示された。",
+    "discussion_and_implications": "ドーパミン機能の計算論的モデリングにおいては、生物学的な神経回路や行動表現の複雑性を適切に反映した状態空間の設計と、検証対象のアルゴリズム実装の特定が不可欠である。",
+    "relevance_to_my_research": "状態空間表現や動的アーキテクチャの定式化は、脳状態から自律神経活動を制御するリザバーコンピューティング（RC）やクープマン作用素を用いた神経系逆ダイナミクス推定に必須の数学的基盤を提供する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40016003</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tics.2025.02.001</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Over recent decades, temporal difference reinforcement learning (TDRL) models have successfully explained much dopamine (DA) activity. This success has invited heightened scrutiny of late, with many studies challenging the validity of TDRL models of DA function. Yet, when evaluating the validity of these models, the devil is truly in the details. TDRL is a broad class of algorithms sharing core ideas but differing greatly in implementation and predictions. Thus, it is important to identify the defining aspects of the TDRL framework being tested and to use state spaces and model architectures that capture the known complexity of the behavioral representations and neural systems involved. Here, we discuss several examples that illustrate the importance of these considerations.",
+            "ja": "過去数十年にわたり、時間差分強化学習（TDRL）モデルはドーパミン（DA）活性の多くを首尾よく説明してきた。この成功は近年、精査の高まりを招いており、多くの研究がDA機能のTDRLモデルの妥当性に異議を唱えている。しかしながら、これらのモデルの妥当性を評価する際、「神（あるいは悪魔）は細部に宿る（the devil is truly in the details）」。TDRLは中核となる概念を共有する広範なアルゴリズムクラスであるが、実装や予測においては大きく異なる。したがって、テストされているTDRLフレームワークの決定的な側面を特定し、関与する行動表現および神経システムの既知の複雑性を捉える状態空間およびモデルアーキテクチャを使用することが重要である。ここでは、これらの考慮事項の重要性を説明するいくつかの例を論じる。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "temporal difference reinforcement learning": {
+      "ipa": "/ˈtɛmpərəl ˈdɪfərəns ˌriːɪnˈfɔːsmənt ˈlɜːnɪŋ/",
+      "pos": "noun",
+      "ja": "時間差分強化学習（TDRL）",
+      "nuance": "将来の報酬予測値の連続する時間ステップ間の差分（TD誤差）を基に学習を進める強化学習手法群。"
+    },
+    "dopamine": {
+      "ipa": "/ˈdoʊpəmiːn/",
+      "pos": "noun",
+      "ja": "ドーパミン",
+      "nuance": "中枢神経系において報酬予測誤差信号などを伝達する主要なモノアミン神経伝達物質。"
+    },
+    "scrutiny": {
+      "ipa": "/ˈskruːtəni/",
+      "pos": "noun",
+      "ja": "綿密な調査、精査",
+      "nuance": "学説やモデルの妥当性を厳しく検証・批判的に検討すること。"
+    },
+    "state space": {
+      "ipa": "/steɪt speɪs/",
+      "pos": "noun",
+      "ja": "状態空間",
+      "nuance": "強化学習や制御理論において、エージェントや物理システムが取り得る全状態を表現する多次元集合。"
+    },
+    "architecture": {
+      "ipa": "/ˈɑːkɪtɛktʃə/",
+      "pos": "noun",
+      "ja": "アーキテクチャ、構造",
+      "nuance": "計算モデルやニューラルネットワークの接続構成や数理的枠組みの設計仕様。"
+    }
+  }
+}

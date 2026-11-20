@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-20-35418839",
+  "entry_type": "daily_paper",
+  "date": "2026-11-20",
+  "pmid": "35418839",
+  "pmcid": "PMC8995790",
+  "doi_url": "https://doi.org/10.3389/fncir.2022.630621",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/35418839/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8995790/",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "Frontiers in neural circuits (2022)",
+  "impact_factor": 3.4,
+  "doi": "10.3389/fncir.2022.630621",
+  "title_en": "Altered Brain Criticality in Schizophrenia: New Insights From Magnetoencephalography.",
+  "title_ja": "統合失調症における脳の臨界性の変容：脳磁図からの新たな知見",
+  "tags": [
+    "Magnetoencephalography",
+    "Brain Criticality",
+    "Multifractality",
+    "Schizophrenia"
+  ],
+  "summary": {
+    "problem": "統合失調症における中核的なバイオマーカーが依然として不足しており、患者集団における非線形神経ダイナミクスの変容様態の理解が欠如していること。",
+    "solution_and_method": "統合失調症患者と健常対照群の安静時脳磁図（MEG）信号に対し臨界性の枠組みを適用し、自己相似性とマルチフラクタル性を評価した。また、これらを特徴量としたロジスティック回帰による教師あり機械学習を用いて群間判別を行った。",
+    "formula_block": "$$D(h) = \\min_{q} \\left( q h - \\tau(q) + 1 \\right)$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 35418839</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fncir.2022.630621</text>\n</svg>",
+    "key_results": "統合失調症患者では前頭側頭領域で自己相似性の値が有意に高く（規則性と記憶の増加）、頭頂・後頭領域ではマルチフラクタル性が対照群より低かった（特異点の多様性減少および変動性低下）。ロジスティック回帰機械学習により両群の判別に成功した。",
+    "discussion_and_implications": "安静時脳活動における臨界性特性の変化を特定することで、統合失調症患者のベースライン認知機能の評価に新たな視点を提供し、非線形動力学指標がバイオマーカーとして有用であることを示唆している。",
+    "relevance_to_my_research": "脳磁図のマルチフラクタル性や自己相似性（スケール不変性）の指標は、非線形神経ダイナミクスと心拍変動（HRV）のフラクタル解析（DFA等）との脳心臓連関モデリングにおいて、神経系側の臨界状態ダイナミクスを定量化する有力な特徴量となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 35418839</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fncir.2022.630621</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Schizophrenia has a complex etiology and symptomatology that is difficult to untangle. After decades of research, important advancements toward a central biomarker are still lacking. One of the missing pieces is a better understanding of how non-linear neural dynamics are altered in this patient population. In this study, the resting-state neuromagnetic signals of schizophrenia patients and healthy controls were analyzed in the framework of criticality. When biological systems like the brain are in a state of criticality, they are thought to be functioning at maximum efficiency (e.g., optimal communication and storage of information) and with maximum adaptability to incoming information. Here, we assessed the self-similarity and multifractality of resting-state brain signals recorded with magnetoencephalography in patients with schizophrenia patients and in matched controls. Schizophrenia patients had similar, although attenuated, patterns of self-similarity and multifractality values. Statistical tests showed that patients had higher values of self-similarity than controls in fronto-temporal regions, indicative of more regularity and memory in the signal. In contrast, patients had less multifractality than controls in the parietal and occipital regions, indicative of less diverse singularities and reduced variability in the signal. In addition, supervised machine-learning, based on logistic regression, successfully discriminated the two groups using measures of self-similarity and multifractality as features. Our results provide new insights into the baseline cognitive functioning of schizophrenia patients by identifying key alterations of criticality properties in their resting-state brain data.",
+            "ja": "統合失調症は解明が困難な複雑な病因と症候学を有している。数十年にわたる研究を経てもなお、中核となるバイオマーカーに向けた重要な進展は依然として不足している。欠落している知見の一つは、この患者集団において非線形神経ダイナミクスがどのように変化しているかについてのより深い理解である。本研究では、統合失調症患者および健常対照群の安静時神経磁気信号を臨界性の枠組みの中で解析した。脳のような生体システムが臨界状態にあるとき、それらは最大効率（例：最適な情報伝達および情報保存）かつ入力情報に対する最大の適応性をもって機能していると考えられている。本研究では、統合失調症患者および対応する対照群において脳磁図で記録された安静時脳信号の自己相似性とマルチフラクタル性を評価した。統合失調症患者は、減衰してはいたものの、類似した自己相似性およびマルチフラクタル性の値のパターンを示した。統計的検定により、患者は前頭側頭領域において対照群よりも高い自己相似性の値を示し、これは信号における規則性と記憶の増大を示唆していた。対照的に、患者は頭頂および後頭領域において対照群よりも低いマルチフラクタル性を示し、これは特異点の多様性の減少と信号における変動性の低下を示唆していた。さらに、ロジスティック回帰に基づく教師あり機械学習は、自己相似性およびマルチフラクタル性の指標を特徴量として用いることで、これら2つのグループの判別に成功した。本研究の結果は、安静時脳データにおける臨界性特性の主要な変化を特定することにより、統合失調症患者のベースラインの認知機能に関する新たな知見を提供する。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "criticality": {
+      "ipa": "/krɪtɪˈkæləti/",
+      "pos": "noun",
+      "ja": "臨界性",
+      "nuance": "システムが秩序と無秩序の境界（相転移点）で動作し、情報処理や適応性が最大化される状態を指す物理・神経科学用語。"
+    },
+    "magnetoencephalography": {
+      "ipa": "/mæɡˌniːtoʊɛnˌsɛfəˈlɒɡrəfi/",
+      "pos": "noun",
+      "ja": "脳磁図（MEG）",
+      "nuance": "大脳皮質の神経細胞群から生じる微弱な磁場変化を高い時間分解能で非侵襲的に計測する手法。"
+    },
+    "self-similarity": {
+      "ipa": "/ˌsɛlf sɪmɪˈlærəti/",
+      "pos": "noun",
+      "ja": "自己相似性",
+      "nuance": "異なる時間または空間スケールにおいて、全体と部分が幾何学的・統計的に同等な構造を保つフラクタル特性。"
+    },
+    "multifractality": {
+      "ipa": "/ˌmʌlti frækˈtæləti/",
+      "pos": "noun",
+      "ja": "マルチフラクタル性",
+      "nuance": "単一のスケーリング指数ではなく、局所ごとに異なる複数のスケーリング指数の連続的スペクトルで記述される非線形複雑性。"
+    },
+    "singularity": {
+      "ipa": "/ˌsɪŋɡjʊˈlærəti/",
+      "pos": "noun",
+      "ja": "特異点",
+      "nuance": "信号の局所的な急峻さや微分不可能性を示す指標であり、局所ヘルダー指数などに対応する。"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-20-40973603",
+  "entry_type": "daily_paper",
+  "date": "2026-11-20",
+  "pmid": "40973603",
+  "pmcid": "PMC12506644",
+  "doi_url": "https://doi.org/10.1016/j.tins.2025.08.003",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/40973603/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12506644/",
+  "category": "brain_heart",
+  "category_label": "③ 脳-心臓連関・迷走神経",
+  "journal": "Trends in neurosciences (2025)",
+  "impact_factor": 10.5,
+  "doi": "10.1016/j.tins.2025.08.003",
+  "title_en": "Sensory signals for nausea.",
+  "title_ja": "悪心を引き起こす感覚信号",
+  "tags": [
+    "Nausea",
+    "Interoception",
+    "Neural Pathways",
+    "Molecular Mechanisms"
+  ],
+  "summary": {
+    "problem": "悪心は防御応答であると同時に多様な疾患の苦痛要因であるが、その神経経路や分子メカニズム、特に倦怠状態における詳細が未解明であったこと。",
+    "solution_and_method": "げっ歯類などの非嘔吐性動物モデルおよびフェレット、トガリネズミ、イヌなどの嘔吐性動物モデルを用いた近年の分子神経科学的知見を網羅的にレビューし、内受容感覚原理を整理した。",
+    "formula_block": "$$\\Delta I_{\\text{sensory}} \\propto f(\\text{GI}, \\text{Endo}, \\text{Immune})$$",
+    "diagram_caption": "③ 脳-心臓連関・迷走神経 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40973603</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tins.2025.08.003</text>\n</svg>",
+    "key_results": "悪心には消化器系・内分泌系・免疫系と内受容性神経経路との複雑な相互作用が関与していることが整理され、モデル動物間での分子メカニズムの差異と共通性が示された。",
+    "discussion_and_implications": "悪心発生の一般的感覚原理を明らかにすることで、従来の現象観察的な研究手法から、生体メカニズムに立脚したボトムアップな治療介入開発へのパラダイムシフトが促進される。",
+    "relevance_to_my_research": "内受容性神経経路（求心性迷走神経等）と内分泌・免疫・消化器の相互作用は、脳心臓連関における求心性シグナル伝達や自律神経系状態推定の生理的基盤の理解に応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 40973603</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">③ 脳-心臓連関・迷走神経</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.tins.2025.08.003</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Nausea serves as a protective response against harmful ingested stimuli but can also be experienced as a discomforting aspect of various conditions. Recent insights have emerged regarding neural pathways and molecular mechanisms linked to this sensation. This often involves complex interactions of interoceptive neural pathways with the digestive, endocrine, and immune systems. This review summarizes recent findings using non-emetic (e.g., rodents) and emetic (e.g., ferrets, shrews, dogs) mammalian models to explore the molecular mechanisms of nausea, particularly in understudied malaise states. By investigating how nausea is triggered across different contexts, we aim to clarify the general sensory principles governing this response and to promote a shift in therapeutic research - from a top-down, observational paradigm to a bottom-up, mechanism-driven approach.",
+            "ja": "悪心は有害な摂取刺激に対する防御反応として機能するが、様々な病態における不快な側面としても経験され得る。この感覚に関連する神経経路および分子メカニズムに関して、近年新たな知見が得られている。これには、内受容性神経経路と消化器系、内分泌系、免疫系との間の複雑な相互作用がしばしば関与している。本総説では、非嘔吐性哺乳類モデル（例：げっ歯類）および嘔吐性哺乳類モデル（例：フェレット、トガリネズミ、イヌ）を用いた最近の知見を要約し、特に研究が不十分であった倦怠状態における悪心の分子メカニズムを探究する。多様な文脈で悪心がどのように引き起こされるかを調査することにより、我々はこの応答を支配する一般的な感覚原理を解明し、トップダウンの観察型パラダイムからボトムアップのメカニズム主導型アプローチへと治療研究を転換させることを目指している。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "nausea": {
+      "ipa": "/ˈnɔːziə/",
+      "pos": "noun",
+      "ja": "悪心（嘔気）",
+      "nuance": "嘔吐の前駆症状として自覚される心窩部から咽頭にかけての不快な内受容感覚。"
+    },
+    "interoceptive": {
+      "ipa": "/ˌɪntərəʊˈsɛptɪv/",
+      "pos": "adjective",
+      "ja": "内受容性の",
+      "nuance": "内臓や体内環境の生理状態（血圧、消化管運動、免疫状態など）を中枢神経系が感知する機能に関連すること。"
+    },
+    "non-emetic": {
+      "ipa": "/nɒn ɪˈmɛtɪk/",
+      "pos": "adjective",
+      "ja": "非嘔吐性の",
+      "nuance": "解剖学的・生理学的に嘔吐反射を起こさない特性（マウスやラットなどのげっ歯類に見られる）。"
+    },
+    "malaise": {
+      "ipa": "/mæˈleɪz/",
+      "pos": "noun",
+      "ja": "倦怠感、不快感",
+      "nuance": "全身性の漠然とした体調不良や不快な状態を表す病態生理学的用語。"
+    },
+    "paradigm": {
+      "ipa": "/ˈpærədaɪm/",
+      "pos": "noun",
+      "ja": "パラダイム（枠組み）",
+      "nuance": "特定の学問領域において支配的な認識枠組みや研究アプローチの方法論。"
+    }
+  }
+}

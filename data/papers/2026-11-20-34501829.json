@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-20-34501829",
+  "entry_type": "daily_paper",
+  "date": "2026-11-20",
+  "pmid": "34501829",
+  "pmcid": "PMC8430549",
+  "doi_url": "https://doi.org/10.3390/ijerph18179229",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/34501829/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8430549/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "International journal of environmental research and public health (2021)",
+  "impact_factor": 4.6,
+  "doi": "10.3390/ijerph18179229",
+  "title_en": "Biosignal-Based Digital Biomarkers for Prediction of Ventilator Weaning Success.",
+  "title_ja": "人工呼吸器離脱成功予測のための生体信号ベースのデジタルバイオマーカー",
+  "tags": [
+    "Heart Rate Variability",
+    "Sample Entropy",
+    "Detrended Fluctuation Analysis",
+    "Ventilator Weaning"
+  ],
+  "summary": {
+    "problem": "集中治療室における人工呼吸器離脱（抜管）の成否を高精度に予測するための客観的かつ生理学的なデジタルバイオマーカーの確立。",
+    "solution_and_method": "自発呼吸試験（SBT）中の89例からECG、PPG、呼吸インピーダンス、動脈圧、人工呼吸器データを取得。ポアンカレプロット標準偏差比（SD1/SD2）、サンプルエントロピー、DFA α値を抽出し、機械学習モデルを構築してブートストラップ法で評価。",
+    "formula_block": "$$\\text{SampEn}(m, r, N) = -\\ln \\left( \\frac{A^m(r)}{B^m(r)} \\right)$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 34501829</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3390/ijerph18179229</text>\n</svg>",
+    "key_results": "離脱成功群と失敗群の間で、ポアンカレプロットの長短標準偏差比、ECGおよびPPGのサンプルエントロピー、ECGおよび呼吸インピーダンスのDFA α値に有意差を確認。機械学習モデルのAUCは0.81（95% CI: 0.70-0.92）を達成。",
+    "discussion_and_implications": "SBT中の自律神経系・心肺変動性の非線形動態指標を組み合わせることで、臨床における抜管時期の最適決定を支援する有望な予測ツールとなり得る。",
+    "relevance_to_my_research": "ECG/PPGの非線形指標（ポアンカレプロット、SampEn、DFA）と呼吸信号の連関解析は、自律神経反射を考慮した脳心臓点過程モデルや呼吸・心拍相互作用の非線形状態推定アルゴリズムに直結する知見である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 34501829</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3390/ijerph18179229</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "We evaluated new features from biosignals comprising diverse physiological response information to predict the outcome of weaning from mechanical ventilation (MV). We enrolled 89 patients who were candidates for weaning from MV in the intensive care unit and collected continuous biosignal data: electrocardiogram (ECG), respiratory impedance, photoplethysmogram (PPG), arterial blood pressure, and ventilator parameters during a spontaneous breathing trial (SBT). We compared the collected biosignal data's variability between patients who successfully discontinued MV (n = 67) and patients who did not (n = 22). To evaluate the usefulness of the identified factors for predicting weaning success, we developed a machine learning model and evaluated its performance by bootstrapping. The following markers were different between the weaning success and failure groups: the ratio of standard deviations between the short-term and long-term heart rate variability in a Poincaré plot, sample entropy of ECG and PPG, α values of ECG, and respiratory impedance in the detrended fluctuation analysis. The area under the receiver operating characteristic curve of the model was 0.81 (95% confidence interval: 0.70-0.92). This combination of the biosignal data-based markers obtained during SBTs provides a promising tool to assist clinicians in determining the optimal extubation time.",
+            "ja": "我々は、人工呼吸器（MV）からの離脱結果を予測するために、多様な生理学的応答情報を含む生体信号から新たな特徴量を評価した。集中治療室において人工呼吸器からの離脱候補となった89名の患者を登録し、自発呼吸試験（SBT）中に心電図（ECG）、呼吸インピーダンス、光電脈波（PPG）、動脈血圧、人工呼吸器パラメータの連続的な生体信号データを収集した。人工呼吸器の離脱に成功した患者（n = 67）と成功しなかった患者（n = 22）の間で、収集された生体信号データの変動性を比較した。離脱成功を予測するための特定された因子の有用性を評価するため、機械学習モデルを構築し、ブートストラップ法によりその性能を評価した。離脱成功群と失敗群の間で以下のマーカーに差が認められた：ポアンカレプロットにおける短期および長期心拍変動の標準偏差の比、ECGおよびPPGのサンプルエントロピー、トレンド除去変動解析（DFA）におけるECGのα値および呼吸インピーダンス。モデルの受信者動作特性曲線下面積（AUC）は0.81（95%信頼区間: 0.70-0.92）であった。SBT中に得られたこれらの生体信号データに基づくマーカーの組み合わせは、臨床医が最適な抜管時期を決定するのを支援する有望なツールを提供する。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "mechanical ventilation": {
+      "ipa": "/mɪˈkænɪkəl ˌvɛntɪˈleɪʃən/",
+      "pos": "noun",
+      "ja": "機械的人工換気",
+      "nuance": "呼吸不全患者に対し人工呼吸器を用いて呼吸運動を補助または代替する治療法。"
+    },
+    "spontaneous breathing trial": {
+      "ipa": "/spɒnˈteɪniəs ˈbriːðɪŋ ˈtraɪəl/",
+      "pos": "noun",
+      "ja": "自発呼吸試験（SBT）",
+      "nuance": "人工呼吸器からの離脱可能性を評価するために、人工呼吸補助を最小限にして患者の自発呼吸能力を試す試験。"
+    },
+    "poincaré plot": {
+      "ipa": "/pwɛ̃kɑːˈreɪ plɒt/",
+      "pos": "noun",
+      "ja": "ポアンカレプロット",
+      "nuance": "連続する心拍間隔（RR間隔）を直交座標系にプロットし、非線形・自律神経変動性を視覚化および定量化する手法。"
+    },
+    "sample entropy": {
+      "ipa": "/ˈsɑːmpəl ˈɛntrəpi/",
+      "pos": "noun",
+      "ja": "サンプルエントロピー",
+      "nuance": "時系列信号の規則性・複雑性を評価する尺度で、自己一致を除外して近似エントロピーの偏りを改善した非線形解析法。"
+    },
+    "detrended fluctuation analysis": {
+      "ipa": "/diːˈtrɛndɪd ˌflʌktʃuˈeɪʃən əˈnæləsɪs/",
+      "pos": "noun",
+      "ja": "トレンド除去変動解析（DFA）",
+      "nuance": "非定常時系列データの長期相関やフラクタルスケーリング指数（α値）を算出するための統計解析手法。"
+    }
+  }
+}
