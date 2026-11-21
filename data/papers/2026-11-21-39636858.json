@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-21-39636858",
+  "entry_type": "daily_paper",
+  "date": "2026-11-21",
+  "pmid": "39636858",
+  "pmcid": "PMC11648644",
+  "doi_url": "https://doi.org/10.1073/pnas.2312831121",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/39636858/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11648644/",
+  "category": "ai_control",
+  "category_label": "④ AI・数理神経制御",
+  "journal": "Proceedings of the National Academy of Sciences of the United States of America (2024)",
+  "impact_factor": 9.4,
+  "doi": "10.1073/pnas.2312831121",
+  "title_en": "Representation of a perceptual bias in the prefrontal cortex.",
+  "title_ja": "前頭前皮質における知覚バイアスの表現",
+  "tags": [
+    "前頭前皮質",
+    "知覚バイアス",
+    "状態空間軌跡",
+    "ベイズ推定量"
+  ],
+  "summary": {
+    "problem": "事前知識や文脈が感覚情報の認知を歪める「知覚バイアス」について、それを生み出す前頭前皮質（PFC）の細胞レベル・状態空間レベルでの詳細な神経メカニズムが未解明であった。",
+    "solution_and_method": "振動刺激周波数識別タスク（vibrotactile frequency discrimination task）を実行中のサルの前頭前皮質（PFC）から多チャンネル神経記録を行い、神経細胞集団の活動状態を多次元状態空間軌跡（state-space trajectories）として解析し、ベイズ推定量モデルとの対応関係を検証した。",
+    "formula_block": "$$\\hat{f}_{Bayes} = \\mathbb{E}[f \\mid f_{sensory}]$$",
+    "diagram_caption": "④ AI・数理神経制御 — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 39636858</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1073/pnas.2312831121</text>\n</svg>",
+    "key_results": "PFCにおける集団神経活動の状態空間軌跡が、最初に提示された刺激周波数の歪んだ（warped）内部表現をエンコードしていることを発見した。さらに、この歪んだ表現はベイズ推定量モデルから導かれる予測値と一致していた。",
+    "discussion_and_implications": "知覚バイアスが前頭前皮質の神経ダイナミクス内に直接反映されている実証的証拠が得られ、PFCが感覚情報と事前に形成された統計的モデルを統合して高次知覚を構築していることが確認された。",
+    "relevance_to_my_research": "高次元の脳活動データを状態空間軌跡として捉え、Koopman作用素やリザバーコンピューティング（RC）などの数理基盤を用いて認知プロセスや内部モデルのダイナミクスを追跡・制御する研究に直結する。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 39636858</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">④ AI・数理神経制御</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1073/pnas.2312831121</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "Perception is influenced by sensory stimulation, prior knowledge, and contextual cues, which collectively contribute to the emergence of perceptual biases. However, the precise neural mechanisms underlying these biases remain poorly understood. This study aims to address this gap by analyzing neural recordings from the prefrontal cortex (PFC) of monkeys performing a vibrotactile frequency discrimination task. Our findings provide empirical evidence supporting the hypothesis that perceptual biases can be reflected in the neural activity of the PFC. We found that the state-space trajectories of PFC neuronal activity encoded a warped representation of the first frequency presented during the task. Remarkably, this distorted representation of the frequency aligned with the predictions of its Bayesian estimator. The identification of these neural correlates expands our understanding of the neural basis of perceptual biases and highlights the involvement of the PFC in shaping perceptual experiences. Similar analyses could be employed in other delayed comparison tasks and in various brain regions to explore where and how neural activity reflects perceptual biases during different stages of the trial.",
+            "ja": "知覚は感覚刺激、事前知識、および文脈的キューの影響を受け、これらが全体として知覚バイアスの表出に寄与する。しかし、これらのバイアスの根底にある正確な神経メカニズムは未だ十分に解明されていない。本研究は、振動刺激の周波数識別タスクを実行するサルの前頭前皮質（PFC）からの神経記録を解析することで、このギャップに対処することを目的とする。我々の知見は、知覚バイアスがPFCの神経活動に反映され得るという仮説を支持する実証的証拠を提供する。我々は、PFC神経活動の状態空間軌跡が、タスク中に最初に提示された周波数の歪んだ表現を符号化していることを見出した。注目すべきことに、この周波数の歪んだ表現はベイズ推定量の予測と一致していた。これらの神経相関の特定は、知覚バイアスの神経基盤に関する理解を広げ、知覚体験の形成におけるPFCの関与を浮き彫りにする。同様の解析は、他の遅延比較タスクや様々な脳領域において、試行の異なる段階で神経活動がどのように知覚バイアスを反映しているかを探索するために使用できる可能性がある。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "perceptual bias": {
+      "ipa": "pərˈsɛptʃuəl ˈbaɪəs",
+      "pos": "noun",
+      "ja": "知覚バイアス",
+      "nuance": "客観的な感覚入力に対し、事前知識や周辺文脈の影響を受けて生じる認識の系統的な偏り。"
+    },
+    "state-space trajectory": {
+      "ipa": "steɪt speɪs trəˈdʒɛktəri",
+      "pos": "noun",
+      "ja": "状態空間軌跡",
+      "nuance": "多数の神経元活動を多次元空間上の1点として表し、その時間変化を軌跡として表現した動的軌道。"
+    },
+    "bayesian estimator": {
+      "ipa": "ˈbeɪziən ˈɛstəmætər",
+      "pos": "noun",
+      "ja": "ベイズ推定量",
+      "nuance": "事前確率分布と観測データ（尤度）を組み合わせ、事後分布の期待値などに基づき最適推定を行う数理モデル。"
+    },
+    "vibrotactile": {
+      "ipa": "ˌvaɪbroʊˈtæktəl",
+      "pos": "adj",
+      "ja": "振動覚の・皮膚振動刺激の",
+      "nuance": "皮膚に対する機械的な振動を通じて得られる触覚刺激に関連する属性。"
+    },
+    "prefrontal cortex": {
+      "ipa": "priːˈfrʌntl ˈkɔːrtɛks",
+      "pos": "noun",
+      "ja": "前頭前皮質（PFC）",
+      "nuance": "作業記憶、意思決定、文脈理解などの高次脳機能を統括する大脳皮質の前方領域。"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-21-37999672",
+  "entry_type": "daily_paper",
+  "date": "2026-11-21",
+  "pmid": "37999672",
+  "pmcid": "PMC10932945",
+  "doi_url": "https://doi.org/10.1016/j.jacep.2023.10.015",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37999672/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10932945/",
+  "category": "clinical",
+  "category_label": "⑤ 臨床応用・バイオマーカー",
+  "journal": "JACC. Clinical electrophysiology (2024)",
+  "impact_factor": 6.2,
+  "doi": "10.1016/j.jacep.2023.10.015",
+  "title_en": "Noninvasive Vagus Nerve Stimulation in Postural Tachycardia Syndrome: A Randomized Clinical Trial.",
+  "title_ja": "体位性頻脈症候群における非侵襲的迷走神経刺激：ランダム化臨床試験",
+  "tags": [
+    "体位性頻脈症候群",
+    "経皮迷走神経刺激",
+    "心拍変動",
+    "自律神経自身抗体"
+  ],
+  "summary": {
+    "problem": "体位性頻脈症候群（POTS）患者に対する非侵襲的な経皮迷走神経刺激（tVNS）の長期的な臨床効果、および自律神経トーンや免疫応答への詳細な作用メカニズムがヒトにおいて十分に実証されていなかった。",
+    "solution_and_method": "POTS患者を対象に2ヶ月間の二重盲検偽刺激対照ランダム化臨床試験を実施。耳珠へのtVNS（20 Hz、不快閾値直下1 mA、1日1時間、n=12）と耳垂への sham 刺激（n=14）を比較し、起立時心拍数増加量、5分間ECG解析による心拍変動（HRV）、血清炎症性サイトカイン、抗自律神経自身抗体を2ヶ月前後に測定・評価した。",
+    "formula_block": "$$\\Delta HR_{postural} = HR_{standing} - HR_{supine}$$",
+    "diagram_caption": "⑤ 臨床応用・バイオマーカー — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37999672</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.jacep.2023.10.015</text>\n</svg>",
+    "key_results": "2ヶ月の治療後、立位時の心拍数増加量は介入群で17.6 ± 9.9 beats/minであり、偽刺激群（31.7 ± 14.4 beats/min）と比較して有意に小さかった（P = 0.01）。抗アドレナリン自身抗体および炎症性サイトカインも介入群で有意に低下し（P < 0.05）、HRVの改善が確認された。デバイス関連の有害事象は報告されなかった。",
+    "discussion_and_implications": "tVNSはPOTSに対する非侵襲的神経変調療法として有効であり、その治療機序には自律神経バランス（交感/副交感）の改善だけでなく、自己抗体や炎症カスケードの抑制という神経免疫相乗作用が強く関与していることが明らかとなった。",
+    "relevance_to_my_research": "迷走神経刺激（tVNS）という外乱・制御入力に対する心拍変動・自律神経系の応答動態を点過程解析や閉ループ制御システム（RC/Koopman制御）を用いて最適化・個別化するための臨床基盤データとなる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37999672</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">⑤ 臨床応用・バイオマーカー</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1016/j.jacep.2023.10.015</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "[BACKGROUND] Low-level transcutaneous stimulation of the auricular branch of the vagus nerve at the tragus is antiarrhythmic and anti-inflammatory in animals and humans. Preliminary studies show that transcutaneous vagus nerve stimulation (tVNS) is beneficial in animal models of postural tachycardia syndrome (POTS).\n\n[OBJECTIVES] In this study the authors conducted a sham-controlled, double-blind, randomized clinical trial to examine the effect of tVNS on POTS over a 2-month period relative to sham stimulation.\n\n[METHODS] tVNS (20 Hz, 1 mA below discomfort threshold) was delivered using an ear clip attached to either the tragus (active; n = 12) or the ear lobe (sham; n = 14) for 1 hour daily over a 2-month period. Postural tachycardia was assessed during the baseline and 2-month visit. Heart rate variability based on 5-minute electrocardiogram, serum cytokines, and antiautonomic autoantibodies were measured at the respective time points.\n\n[RESULTS] Mean age was 34 ± 11 years (100% female; 81% Caucasian). Adherence to daily stimulation was 83% in the active arm and 86% in the sham arm (P > 0.05). Postural tachycardia was significantly less in the active arm compared with the sham arm at 2 months (mean postural increase in heart rate 17.6 ± 9.9 beats/min vs 31.7 ± 14.4 beats/min; P = 0.01). Antiadrenergic autoantibodies and inflammatory cytokines were lower in the active arm compared with the sham arm at 2 months (P < 0.05). Heart rate variability was better in the active arm. No device-related side effects were observed.\n\n[CONCLUSIONS] Our results support the emerging paradigm of noninvasive neuromodulation to treat POTS. Mechanistically, this effect appears to be related to reduction of antiautonomic autoantibodies and inflammatory cytokines, and improvement in autonomic tone. Further studies are warranted. (Autoimmune Basis for Postural Tachycardia Syndrome; NCT05043051).",
+            "ja": "[背景] 耳珠における迷走神経耳介枝の低レベル経皮刺激は、動物およびヒトにおいて抗不整脈作用および抗炎症作用を有する。予備研究では、経皮迷走神経刺激（tVNS）が体位性頻脈症候群（POTS）の動物モデルで有益であることが示されている。[目的] 本研究において、著者らは偽刺激と比較して2ヶ月間にわたるtVNSのPOTSに対する効果を調べるため、偽刺激対照二重盲検ランダム化臨床試験を実施した。[方法] tVNS（20 Hz、不快閾値より1 mA低い強度）は、2ヶ月間にわたり毎日1時間、耳珠（介入群; n = 12）または耳垂（偽刺激群; n = 14）に取り付けたイヤークリップを用いて送達された。体位性頻脈はベースライン時および2ヶ月目の受診時に評価された。5分間の心電図に基づく心拍変動、血清サイトカイン、および抗自律神経自身抗体がそれぞれの時点で測定された。[結果] 平均年齢は34 ± 11歳（100%女性、81%白人）であった。毎日の刺激に対する順守率は介入群で83%、偽刺激群で86%であった（P > 0.05）。2ヶ月目において、立位時の心拍数増加は介入群で偽刺激群と比較して有意に少なかった（平均体位性心拍増加：17.6 ± 9.9 回/分 vs 31.7 ± 14.4 回/分; P = 0.01）。抗アドレナリン受容体自身抗体および炎症性サイトカインは、2ヶ月目で偽刺激群と比較して介入群で低かった（P < 0.05）。心拍変動は介入群で優れていた。デバイス関連の副作用は観察されなかった。[結論] 我々の結果は、POTSを治療するための非侵襲的神経変調の新たなパラダイムを支持する。メカニズム的には、この効果は抗自律神経自身抗体および炎症性サイトカインの減少、ならびに自律神経トーンの改善に関連していると思われる。さらなる研究が必要である。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "postural tachycardia syndrome": {
+      "ipa": "ˈpɑːstʃərəl ˌtækɪˈkɑːrdiə ˈsɪndroʊm",
+      "pos": "noun",
+      "ja": "体位性頻脈症候群（POTS）",
+      "nuance": "起立時に血圧低下を伴わずに著しい心拍数増加が生じ、めまいや倦怠感を呈する自律神経調節不全疾患。"
+    },
+    "transcutaneous vagus nerve stimulation": {
+      "ipa": "trænzkjuːˈteɪniəs ˈveɪɡəs nɜːrv ˌstɪmjuˈleɪʃən",
+      "pos": "noun",
+      "ja": "経皮迷走神経刺激（tVNS）",
+      "nuance": "皮膚表面（耳部など）に電極を設置し、非侵襲的に迷走神経枝を刺激して自律神経機能を調節する技術。"
+    },
+    "antiautonomic autoantibodies": {
+      "ipa": "ˌæntiˌɔːtəˈnɑːmɪk ˌɔːtoʊˈæntibɑːdiz",
+      "pos": "noun",
+      "ja": "抗自律神経自身抗体",
+      "nuance": "自律神経系の受容体（アドレナリン受容体等）に対して結合し、その機能を阻害・増幅させる病因性自己抗体。"
+    },
+    "tragus": {
+      "ipa": "ˈtreɪɡəs",
+      "pos": "noun",
+      "ja": "耳珠（じじゅ）",
+      "nuance": "外耳道の入口前方に位置する突起部位であり、迷走神経耳介枝（ABVN）が解剖学的に豊富に分布する刺激ポイント。"
+    },
+    "neuromodulation": {
+      "ipa": "ˌnʊroʊˌmɑːdʒuˈleɪʃən",
+      "pos": "noun",
+      "ja": "神経変調（ニューロモデュレーション）",
+      "nuance": "電気刺激や薬物等を用いて特定 神経回路のターゲット活性を非破壊的に変化・調節する技術体系。"
+    }
+  }
+}

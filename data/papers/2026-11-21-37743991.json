@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-21-37743991",
+  "entry_type": "daily_paper",
+  "date": "2026-11-21",
+  "pmid": "37743991",
+  "pmcid": "PMC10513449",
+  "doi_url": "https://doi.org/10.3389/fpsyt.2023.1250925",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/37743991/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10513449/",
+  "category": "heart",
+  "category_label": "② 心臓・非線形HRV",
+  "journal": "Frontiers in psychiatry (2023)",
+  "impact_factor": 3.2,
+  "doi": "10.3389/fpsyt.2023.1250925",
+  "title_en": "Reduced heart rate variability during mania in a repeated naturalistic observational study.",
+  "title_ja": "反復自然主義的観察研究における躁病期での心拍変動の低下",
+  "tags": [
+    "双極性障害",
+    "心拍変動",
+    "自律神経機能不全",
+    "光電容積脈波"
+  ],
+  "summary": {
+    "problem": "双極性障害患者における気分状態（躁状態と寛解状態）の移り変わりに伴う自律神経機能（HRV）の縦断的変化に関する知見が乏しかった。",
+    "solution_and_method": "入院中の双極性障害患者15名を対象に、夜間PPGリストバンド型センサーを用いて躁状態および寛解状態の5分間夜間安静時心拍データを取得し、RMSSD、HF、LF、VLF、Total power、サンプルエントロピー等の時間域・周波数域・非線形HRV指標を算出。対応のあるt検定および年齢・性別を共変量とした線形回帰により個体内比較を実施した。",
+    "formula_block": "$$RMSSD = \\sqrt{\\frac{1}{N-1}\\sum_{i=1}^{N-1}(RR_{i+1} - RR_i)^2}$$",
+    "diagram_caption": "② 心臓・非線形HRV — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37743991</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fpsyt.2023.1250925</text>\n</svg>",
+    "key_results": "寛解状態と比較して躁状態では全てのHRV指標が有意に低下した（p ≤ 0.02）。効果量はHedges' g = 0.65〜1.24（中〜大）であった。これらのHRV変化に対して年齢や性別の有意な影響は見られなかった。",
+    "discussion_and_implications": "同一個体内の縦断的追跡から、躁状態における自律神経調節不全（副交感神経活性の低下等）が実証され、HRVが双極性障害の病態生理および状態変化を示す客観的バイオマーカーとなり得ることが示された。",
+    "relevance_to_my_research": "脳心臓相互作用モデルや非線形HRV（Sample Entropy等）解析を精神疾患の動的状態遷移（躁・寛解）に適用し、自律神経機能の変動パターンを定量化・評価する上での直接的な根拠となる。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 37743991</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">② 心臓・非線形HRV</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.3389/fpsyt.2023.1250925</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "[BACKGROUND] Bipolar disorder (BD) is a chronic recurrent mood disorder associated with autonomic nervous system (ANS) dysfunction, indexed by heart rate variability (HRV). Changes in HRV between mood states are sparsely studied longitudinally. We aimed to compare HRV of hospitalized manic individuals with their own euthymic selves in a naturalistic observational study.\n\n[METHODS] 34 individuals were included, of which 16 were lost to follow-up. Ultimately 15 patients provided reliable heart rate data in both a manic and euthymic state, using photoplethysmography (PPG) sensor wristbands overnight. We calculated HRV measures Root Mean Square of Successive Differences (RMSSD), High-frequency (HF: 0.15-0.40 Hz), Low-frequency (LF: 0.40-0.15 Hz), Very low-frequency (VLF: 0.0033-0.04 Hz), Total power and Sample Entropy in 5-min night-time resting samples. We compared HRV measures by mood state within individuals using paired t-tests and linear regression to control for age and sex.\n\n[RESULTS] HRV was lower in the manic state when compared to the euthymic state for all HRV metrics (p ≤ 0.02), with large to medium effect sizes (g = 1.24 to 0.65). HRV changes were not significantly affected by age or sex.\n\n[CONCLUSION] This longitudinal study provides evidence of lower HRV in manic states compared to euthymia, indicating an association between ANS dysregulation and changes in bipolar mood state. This corroborates previous cross-sectional studies, although the association may be less clear or reversed in hypomanic states. Further investigation in larger longitudinal samples is warranted.",
+            "ja": "[背景] 双極性障害（BD）は、心拍変動（HRV）により指標化される自律神経系（ANS）機能不全に関連する慢性再発性の気分障害である。気分状態間のHRVの変化について縦断的に調べた研究は乏しい。本研究では、自然主義的観察研究において、入院中の躁病患者のHRVを同患者の寛解（気分の安定）状態と比較することを目的とした。[方法] 34名が参加し、そのうち16名が追跡不能となった。最終的に15名の患者が、夜間に光電容積脈波（PPG）センサーリストバンドを使用して、躁状態と寛解状態の両方で信頼性の高い心拍データを提供した。5分間の夜間安静時サンプルにおいて、HRV指標である逐次差二乗平均平方根（RMSSD）、高周波（HF: 0.15-0.40 Hz）、低周波（LF: 0.40-0.15 Hz）、超低周波（VLF: 0.0033-0.04 Hz）、総パワー（Total power）、およびサンプルエントロピーを算出した。年齢と性別を調整するため、対応のあるt検定および線形回帰を用いて個体内の気分状態別HRV指標を比較した。[結果] 全てのHRV指標において、寛解状態と比較して躁状態のときにHRVが低く（p ≤ 0.02）、効果量は中程度から大であった（g = 1.24〜0.65）。HRVの変化は年齢や性別の有意な影響を受けなかった。[結論] この縦断的研究は、寛解状態と比較して躁状態でHRVが低くなる証拠を提供し、ANSの調節不全と双極性気分状態の変化との関連を示している。これは過去の横断研究を裏付けるものであるが、軽躁状態ではこの関連が明確でないか逆転する可能性がある。より大規模な縦断的サンプルでの更なる調査が望まれる。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "euthymic": {
+      "ipa": "juːˈθaɪmɪk",
+      "pos": "adj",
+      "ja": "気分寛解の・精神安定状態の",
+      "nuance": "気分障害患者において躁や抑うつの病状が消失し、気分が正常に保たれている状態を指す用語。"
+    },
+    "photoplethysmography": {
+      "ipa": "ˌfoʊtoʊpləˈθɪzməɡrəfi",
+      "pos": "noun",
+      "ja": "光電容積脈波（PPG）",
+      "nuance": "皮膚組織への光照射と吸収の変化から血流量の脈動を観察し、心拍間隔を非侵襲に計測する技術。"
+    },
+    "sample entropy": {
+      "ipa": "ˈsæmpəl ˈɛntrəpi",
+      "pos": "noun",
+      "ja": "サンプルエントロピー",
+      "nuance": "時系列データにおけるパターンの自己類似性や複雑性を非線形力学系に基づいて評価する指標。"
+    },
+    "naturalistic observational study": {
+      "ipa": "ˌnætʃərəˈlɪstɪk ˌɑːbzərˈveɪʃənl ˈstʌdi",
+      "pos": "noun",
+      "ja": "自然主義的観察研究",
+      "nuance": "日常的な臨床環境の中で被験者への過剰な介入を行わず、ありのままの状態を追跡する研究手法。"
+    },
+    "effect size": {
+      "ipa": "ɪˈfɛkt saɪz",
+      "pos": "noun",
+      "ja": "効果量",
+      "nuance": "サンプルサイズに依存せずに、現象のインパクトや群間・条件間の差の大きさを数値化した指標。"
+    }
+  }
+}

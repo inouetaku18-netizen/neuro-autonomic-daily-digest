@@ -1,0 +1,81 @@
+{
+  "id": "paper-2026-11-21-38826650",
+  "entry_type": "daily_paper",
+  "date": "2026-11-21",
+  "pmid": "38826650",
+  "pmcid": "PMC11143122",
+  "doi_url": "https://doi.org/10.1007/s11571-023-09984-6",
+  "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/38826650/",
+  "pmc_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11143122/",
+  "category": "brain",
+  "category_label": "① 脳・神経ダイナミクス",
+  "journal": "Cognitive neurodynamics (2024)",
+  "impact_factor": 3.5,
+  "doi": "10.1007/s11571-023-09984-6",
+  "title_en": "Linear mixed-effect models for correlated response to process electroencephalogram recordings.",
+  "title_ja": "脳波記録の相関応答に対処するための線形混合効果モデル",
+  "tags": [
+    "脳波解析",
+    "線形混合効果モデル",
+    "置換エントロピー",
+    "レンペル・ジヴ複雑性"
+  ],
+  "summary": {
+    "problem": "脳波（EEG）信号は高い変動性を持ち、複数の定量指標間に相関が存在するが、従来の神経科学分析において複数の応答変数とそれらの相関関係を同時にモデル化する統計手法は一般的に適用されていなかった。",
+    "solution_and_method": "閉眼安静時、開眼安静時、過換気、光刺激の4状態における臨床EEGデータセットに対して置換シャノンエントロピーおよび置換レンペル・ジヴ複雑性を算出し、複数の指標とその相関構造を同時に扱う確認的仮説検定として線形混合効果モデル（LMEM）を構築・適用した。",
+    "formula_block": "$$Y_{ij} = X_{ij}\\beta + Z_{ij}b_i + \\epsilon_{ij}$$",
+    "diagram_caption": "① 脳・神経ダイナミクス — Verified Open Access Source",
+    "diagram_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38826650</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1007/s11571-023-09984-6</text>\n</svg>",
+    "key_results": "置換シャノンエントロピーと置換レンペル・ジヴ複雑性の間には正の相関が認められた。両指標の平均値を同時に使用した場合、4つの状態全てを互いに識別可能であったが、各指標を単独で使用した場合は一部の状態間で統計的有意差が得られなかった。",
+    "discussion_and_implications": "複数の情報理論的指標とその相関関係を同時にモデル化するLMEMの導入は、単一指標による個別解析よりも高精度な状態識別を可能にし、神経科学におけるEEGデータ解析の新たな多変量統計フレームワークを提供する。",
+    "relevance_to_my_research": "脳心臓点過程モデルや非線形HRV、Koopman制御等において、複数の非線形指標や状態変数を同時観察する際、試行間・被験者間の変動や変数間相関を適切に統計処理するためのモデリング手法として応用可能である。"
+  },
+  "full_text": {
+    "sections": [
+      {
+        "id": "intro",
+        "title_en": "Abstract (Verified Original Text — Drop PDF to Decode Full Text)",
+        "title_ja": "アブストラクト原文（全文はリンク先からPDFを取得し画面右下の「PDF全文解読」へドロップしてください）",
+        "section_svg": "<svg viewBox=\"0 0 600 180\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect width=\"600\" height=\"180\" rx=\"10\" fill=\"#f8fafc\" stroke=\"#cbd5e1\" stroke-width=\"1.5\"/>\n  <rect x=\"24\" y=\"24\" width=\"165\" height=\"56\" rx=\"8\" fill=\"#eff6ff\" stroke=\"#2563eb\" stroke-width=\"1.5\"/>\n  <text x=\"106\" y=\"48\" text-anchor=\"middle\" fill=\"#1e3a8a\" font-size=\"12\" font-weight=\"bold\">PubMed / PMC OA</text>\n  <text x=\"106\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"11\">PMID: 38826650</text>\n  <path d=\"M 195 52 L 225 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"232\" y=\"24\" width=\"175\" height=\"56\" rx=\"8\" fill=\"#f0fdfa\" stroke=\"#0d9488\" stroke-width=\"1.5\"/>\n  <text x=\"319\" y=\"48\" text-anchor=\"middle\" fill=\"#115e59\" font-size=\"12\" font-weight=\"bold\">① 脳・神経ダイナミクス</text>\n  <text x=\"319\" y=\"66\" text-anchor=\"middle\" fill=\"#334155\" font-size=\"10\">Verified Abstract Digest</text>\n  <path d=\"M 413 52 L 443 52\" stroke=\"#0d9488\" stroke-width=\"2\"/>\n  <rect x=\"450\" y=\"24\" width=\"126\" height=\"56\" rx=\"8\" fill=\"#1e3a8a\"/>\n  <text x=\"513\" y=\"48\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"11\" font-weight=\"bold\">PDF Full-Text</text>\n  <text x=\"513\" y=\"65\" text-anchor=\"middle\" fill=\"#bfdbfe\" font-size=\"10\">Drop PDF to Decode</text>\n  <rect x=\"24\" y=\"102\" width=\"552\" height=\"54\" rx=\"6\" fill=\"#ffffff\" stroke=\"#e2e8f0\"/>\n  <text x=\"38\" y=\"124\" fill=\"#475569\" font-size=\"11\" font-weight=\"bold\">Verified DOI Source:</text>\n  <text x=\"38\" y=\"143\" fill=\"#2563eb\" font-size=\"11\">https://doi.org/10.1007/s11571-023-09984-6</text>\n</svg>",
+        "paragraphs": [
+          {
+            "en": "A data set of clinical studies of electroencephalogram recordings (EEG) following data acquisition protocols in control individuals (Eyes Closed Wakefulness - Eyes Open Wakefulness, Hyperventilation, and Optostimulation) are quantified with information theory metrics, namely permutation Shanon entropy and permutation Lempel Ziv complexity, to identify functional changes. This work implement Linear mixed-effects models (LMEMs) for confirmatory hypothesis testing. The results show that EEGs have high variability for both metrics and there is a positive correlation between them. The mean of permutation Lempel-Ziv complexity and permutation Shanon entropy used simultaneously for each of the four states are distinguishable from each other. However, used separately, the differences between permutation Lempel-Ziv complexity or permutation Shanon entropy of some states were not statistically significant. This shows that the joint use of both metrics provides more information than the separate use of each of them. Despite their wide use in medicine, LMEMs have not been commonly applied to simultaneously model metrics that quantify EEG signals. Modeling EEGs using a model that characterizes more than one response variable and their possible correlations represents a new way of analyzing EEG data in neuroscience.",
+            "ja": "対照被験者におけるデータ収集プロトコル（閉眼安静時-開眼安静時、過換気、および光刺激）に従った脳波（EEG）記録の臨床研究データセットが、機能的変化を特定するために情報理論指標である置換シャノンエントロピーおよび置換レンペル・ジヴ複雑性を用いて定量化される。本研究は、確認的仮説検定のために線形混合効果モデル（LMEM）を実装している。結果は、EEGが両方の指標において高い変動性を示し、両者の間に正の相関があることを示している。4つの状態それぞれにおいて同時に使用された置換レンペル・ジヴ複雑性と置換シャノンエントロピーの平均値は、互いに区別可能であった。しかし、個別に使用した場合、一部の状態における置換レンペル・ジヴ複雑性または置換シャノンエントロピーの違いは統計的に有意ではなかった。これは、両方の指標を結合して使用することが、それぞれを個別に試用するよりも多くの情報を提供することを示している。医学における広範な使用にもかかわらず、LMEMはEEG信号を定量化する指標を同時にモデル化するために一般的には適用されてこなかった。複数の応答変数とその潜在的な相関を特徴付けるモデルを使用してEEGをモデル化することは、神経科学におけるEEGデータ分析の新たな方法を表している。"
+          }
+        ]
+      }
+    ]
+  },
+  "vocabulary": {
+    "permutation shannon entropy": {
+      "ipa": "pərˈmjuːteɪʃən ˈʃænən ˈɛntrəpi",
+      "pos": "noun",
+      "ja": "置換シャノンエントロピー",
+      "nuance": "時系列データの順序パターンの出現確率に基づいて不確実性や複雑性を評価する情報理論的指標。"
+    },
+    "lempel-ziv complexity": {
+      "ipa": "ˈlɛmpəl zɪv kəmˈplɛksəti",
+      "pos": "noun",
+      "ja": "レンペル・ジヴ複雑性",
+      "nuance": "系列内に新しいパターンが生成される速度に基づき、信号の不規則性・複雑性を測定する指標。"
+    },
+    "linear mixed-effects models": {
+      "ipa": "ˈlɪniər mɪkst ɪˈfɛkts ˈmɑːdəlz",
+      "pos": "noun",
+      "ja": "線形混合効果モデル",
+      "nuance": "個体差などの固定効果と不規則な変量効果を同時に組み込み、相関を持つ反復測定データを解析するモデル。"
+    },
+    "confirmatory hypothesis testing": {
+      "ipa": "kənˈfɜːrmətɔːri haɪˈpɑːθəsɪs ˈtɛstɪŋ",
+      "pos": "noun",
+      "ja": "確認的仮説検定",
+      "nuance": "事前定義された特定の統計的仮説の妥当性を厳密に検証・判定する分析プロセス。"
+    },
+    "response variable": {
+      "ipa": "rɪˈspɑːns ˈvɛriəbl",
+      "pos": "noun",
+      "ja": "応答変数（目的変数）",
+      "nuance": "モデルにおいて他の説明変数の影響を受けて変化する結果側の変数。"
+    }
+  }
+}
